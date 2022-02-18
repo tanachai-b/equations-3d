@@ -2,7 +2,7 @@
 'use strict';
 
 
-class Complex {
+class Vector2 {
     /**
      * @param {number} x
      * @param {number} y
@@ -12,115 +12,72 @@ class Complex {
         this.y = y;
     }
 
-    magnitude() { return Math.hypot(this.x, this.y) }
+    magnitude2() { return this.x ** 2 + this.y ** 2 }
 
-    unit() { return new Complex(this.x / this.magnitude(), this.y / this.magnitude()); }
+    magnitude() { return Math.sqrt(this.magnitude2()); }
 
-    conjugate() { return new Complex(this.x, -this.y); }
+    unit() { return new Vector2(this.x / this.magnitude(), this.y / this.magnitude()); }
 
-    /**
-     * @param {Complex} complex
-     */
-    plus(complex) { return new Complex(this.x + complex.x, this.y + complex.y); }
+    conjugate() { return new Vector2(this.x, -this.y); }
 
     /**
-     * @param {Complex} complex
+     * @param {Vector2} vector2
      */
-    minus(complex) { return new Complex(this.x - complex.x, this.y - complex.y); }
+    plus(vector2) { return new Vector2(this.x + vector2.x, this.y + vector2.y); }
 
     /**
-     * @param {Complex} complex
+     * @param {Vector2} vector2
      */
-    times(complex) { return new Complex(this.x * complex.x - this.y * complex.y, this.x * complex.y + this.y * complex.x); }
+    minus(vector2) { return new Vector2(this.x - vector2.x, this.y - vector2.y); }
 
     /**
-     * @param {Complex} complex
+     * @param {Vector2} vector2
      */
-    over(complex) { return this.times(complex.conjugate()).times(new Complex(1 / complex.magnitude() ** 2, 0)); }
+    times(vector2) { return new Vector2(this.x * vector2.x - this.y * vector2.y, this.x * vector2.y + this.y * vector2.x); }
 
     /**
-     * @param {Vector} point
-     * @param {Camera} camera
+     * @param {Vector2} vector2
      */
-    static projectFrom3d(point, camera) {
+    over(vector2) { return this.times(vector2.conjugate()).times(new Vector2(1 / vector2.magnitude() ** 2, 0)); }
 
-        // let x0 = point.x - camera.position.x;
-        // let y0 = point.y - camera.position.y;
-        // let z0 = point.z - camera.position.z;
+    /**
+     * @param {number} zoom
+     */
+    draw(zoom) {
 
-        // let x1 = x0 * Math.cos(camera.yaw) - y0 * Math.sin(camera.yaw);
-        // let y1 = y0 * Math.cos(camera.yaw) + x0 * Math.sin(camera.yaw);
-        // let z1 = z0;
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.lineWidth = 1;
 
-        // let x2 = x1;
-        // let y2 = y1 * Math.cos(camera.pitch) + z1 * Math.sin(camera.pitch);
-        // let z2 = z1 * Math.cos(camera.pitch) - y1 * Math.sin(camera.pitch);
+        let x1 = this.x * zoom + canvas.width / 2;
+        let y1 = -this.y * zoom + canvas.height / 2;
 
-        // let calcX = (x2 / Math.max(y2 + 1000 * 10 ** (camera.zoom / 10), 0)) * 1000 + camera.drawWidth / 2 + camera.drawX;
-        // let calcY = -(z2 / Math.max(y2 + 1000 * 10 ** (camera.zoom / 10), 0)) * 1000 + camera.drawHeight / 2 + camera.drawY;
-
-
-        let point1 = point.minus(camera.position).overVector(camera.yawPitch, camera.rollx);
-
-        let calcX = (point1.x / Math.max(point1.y + 1000 * 10 ** (camera.zoom / 10), 0)) * 1000 + camera.drawWidth / 2 + camera.drawX;
-        let calcY = -(point1.z / Math.max(point1.y + 1000 * 10 ** (camera.zoom / 10), 0)) * 1000 + camera.drawHeight / 2 + camera.drawY;
-
-        return new Complex(calcX, calcY);
+        ctx.beginPath();
+        ctx.arc(x1, y1, 4, 0, Math.PI * 2);
+        ctx.stroke();
     }
 
     /**
-     * @param {number} radius
-     * @param {Vector} point
-     * @param {Camera} camera
+     * @param {Vector3} vector3
      */
-    static projectSphere(radius, point, camera) {
+    static projectFrom3d(vector3) {
 
-        // let x0 = point.x - camera.position.x;
-        // let y0 = point.y - camera.position.y;
-        // let z0 = point.z - camera.position.z;
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
 
-        // let x1 = x0 * Math.cos(camera.yaw) - y0 * Math.sin(camera.yaw);
-        // let y1 = y0 * Math.cos(camera.yaw) + x0 * Math.sin(camera.yaw);
-        // let z1 = z0;
+        let x1 = (vector3.x / Math.max(vector3.y + 1000) * 1000) + canvas.width / 2;
+        let y1 = -(vector3.z / Math.max(vector3.y + 1000) * 1000) + canvas.height / 2;
 
-        // let x2 = x1;
-        // let y2 = y1 * Math.cos(camera.pitch) + z1 * Math.sin(camera.pitch);
-        // let z2 = z1 * Math.cos(camera.pitch) - y1 * Math.sin(camera.pitch);
-
-
-        // let depth = y2 + 1000 * 10 ** (camera.zoom / 10);
-        // let center = new Vector(depth, -x2, z2);
-        // let centerDistance = center.magnitude();
-
-
-        let point1 = point.minus(camera.position).overVector(camera.yawPitch, camera.rollx);
-
-        let depth = point1.y + 1000 * 10 ** (camera.zoom / 10);
-        let center = new Vector(depth, -point1.x, point1.z);
-        let centerDistance = center.magnitude();
-
-        let offsetX = radius * Math.sqrt(centerDistance ** 2 - radius ** 2) / centerDistance
-        let offsetY = (centerDistance ** 2 - radius ** 2) / centerDistance
-        let offset = new Vector(offsetY, -offsetX, 0);
-
-
-        let circle = [];
-
-        for (let i = 0; i <= Math.PI * 2; i += Math.PI / 180 * 5) {
-            let circle1 = offset.timesVector(new Vector(1, 0, 0), new Vector(0, Math.cos(i), Math.sin(i)));
-
-            let circle2 = circle1.timesVector(center.unit(), center);
-
-            let calcX = -circle2.y / Math.max(circle2.x, 0) * 1000 + camera.drawWidth / 2 + camera.drawX;
-            let calcY = -circle2.z / Math.max(circle2.x, 0) * 1000 + camera.drawHeight / 2 + camera.drawY;
-            circle.push(new Complex(calcX, calcY));
-        }
-
-        return circle;
+        return new Vector2(x1, y1);
     }
 }
 
-class Vector {
+class Vector3 {
     /**
      * @param {number} x
      * @param {number} y
@@ -136,31 +93,31 @@ class Vector {
 
     unit() { return this.over(this.magnitude()); }
 
-    conjugate() { return new Vector(this.x, -this.y, -this.x); }
+    conjugate() { return new Vector3(this.x, -this.y, -this.x); }
 
     /**
-     * @param {Vector} vector
+     * @param {Vector3} vector
      */
-    plus(vector) { return new Vector(this.x + vector.x, this.y + vector.y, this.z + vector.z); }
+    plus(vector) { return new Vector3(this.x + vector.x, this.y + vector.y, this.z + vector.z); }
 
     /**
-     * @param {Vector} vector
+     * @param {Vector3} vector
      */
-    minus(vector) { return new Vector(this.x - vector.x, this.y - vector.y, this.z - vector.z); }
+    minus(vector) { return new Vector3(this.x - vector.x, this.y - vector.y, this.z - vector.z); }
 
     /**
      * @param {number} number
      */
-    times(number) { return new Vector(this.x * number, this.y * number, this.z * number); }
+    times(number) { return new Vector3(this.x * number, this.y * number, this.z * number); }
 
     /**
      * @param {number} number
      */
-    over(number) { return new Vector(this.x / number, this.y / number, this.z / number); }
+    over(number) { return new Vector3(this.x / number, this.y / number, this.z / number); }
 
     /**
-     * @param {Vector} pointA
-     * @param {Vector} pointB
+     * @param {Vector3} pointA
+     * @param {Vector3} pointB
      */
     timesVector(pointA, pointB) {
 
@@ -177,7 +134,6 @@ class Vector {
         let z4 = z3 * Math.cos(-pitch) + x3 * Math.sin(-pitch);
 
         let roll = Math.atan2(z4, y4);
-        // let roll = Math.atan2(pointB.z * (pointA.x ** 2 + pointA.y ** 2) - (pointB.x * pointA.x + pointB.y * pointA.y) * pointA.z, (pointB.y * pointA.x - pointB.x * pointA.y) * pointA.magnitude());
 
 
         let xx1 = this.x;
@@ -192,12 +148,12 @@ class Vector {
         let yy3 = yy2 * Math.cos(yaw) + xx2 * Math.sin(yaw);
         let zz3 = zz2;
 
-        return new Vector(xx3, yy3, zz3).times(pointA.magnitude());
+        return new Vector3(xx3, yy3, zz3).times(pointA.magnitude());
     }
 
     /**
-     * @param {Vector} pointA
-     * @param {Vector} pointB
+     * @param {Vector3} pointA
+     * @param {Vector3} pointB
      */
     overVector(pointA, pointB) {
 
@@ -228,6 +184,6 @@ class Vector {
         let yy3 = yy2 * Math.cos(-roll) - zz2 * Math.sin(-roll);
         let zz3 = zz2 * Math.cos(-roll) + yy2 * Math.sin(-roll);
 
-        return new Vector(xx3, yy3, zz3).over(pointA.magnitude());
+        return new Vector3(xx3, yy3, zz3).over(pointA.magnitude());
     }
 }
