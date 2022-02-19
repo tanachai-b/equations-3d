@@ -69,7 +69,7 @@ window.onload = function () {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         objects.forEach((object) => {
-            object.draw(camZoom, camRot);
+            object.draw(camRot, camZoom);
         });
 
     }, 1000 / 60);

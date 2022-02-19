@@ -194,10 +194,10 @@ class Vector3 {
     }
 
     /**
-     * @param {number} camZoom
      * @param {Plane} camRot
+     * @param {number} camZoom
      */
-    draw(camZoom, camRot) {
+    draw(camRot, camZoom) {
 
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
@@ -207,7 +207,7 @@ class Vector3 {
         ctx.fillStyle = '#FFFFFF';
         ctx.lineWidth = 1;
 
-        let v2 = this.project(camZoom, camRot);
+        let v2 = this.project(camRot, camZoom);
 
         let v1v = this.timesPlane(camRot);
         let rad = 4 / Math.max(v1v.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
@@ -218,10 +218,10 @@ class Vector3 {
     }
 
     /**
-     * @param {number} camZoom
      * @param {Plane} camRot
+     * @param {number} camZoom
      */
-    project(camZoom, camRot) {
+    project(camRot, camZoom) {
 
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
