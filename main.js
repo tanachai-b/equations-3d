@@ -73,11 +73,14 @@ window.onload = function () {
         let layerPoints = getLayerPoints(x, step, memory, calcCount);
         objects = objects.concat(layerPoints);
 
-        console.log(layerPoints.length);
+        // console.log(layerPoints.length);
+
+        let lines = connect(layerPoints);
+        objects = objects.concat(lines);
     }
 
-    console.log(calcCount[0]);
-    console.log(objects.length);
+    // console.log(calcCount[0]);
+    // console.log(objects.length);
 
 
     let ctx = canvas.getContext('2d');
@@ -170,4 +173,49 @@ function drawFunction(x, y, z, memory) {
 
         return value;
     }
+}
+
+/** @param {Vector3[]} layerPoints */
+function connect(layerPoints) {
+    let lines = [];
+
+
+    let lineCalc = 0;
+
+    for (let i = 0; i < layerPoints.length - 1; i++) {
+
+        let minDist = Number.MAX_SAFE_INTEGER;
+        let minLine = null;
+        let lastMinLine = null;
+
+        let runned = new Set([i]);
+
+        for (let j = 0; j < layerPoints.length; j++) {
+            if (runned.has(j)) continue;
+            runned.add(j);
+
+            lineCalc++
+
+            let v = layerPoints[i];
+            let w = layerPoints[j];
+
+            let dist = w.minus(v).magnitude2();
+
+            if (dist <= minDist) {
+                minDist = dist;
+                lastMinLine = minLine;
+                minLine = new Line(v, w);
+            }
+
+
+        }
+
+        if (lastMinLine != null) { lines.push(lastMinLine); }
+        if (minLine != null) { lines.push(minLine); }
+    }
+
+
+    console.log(lineCalc);
+
+    return lines;
 }
