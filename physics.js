@@ -36,8 +36,11 @@ class Vector2 {
      */
     static polar(magnitude, angle) { return new Vector2(magnitude * Math.cos(angle), magnitude * Math.sin(angle)); }
 
-    /** @param {number} camZoom */
-    draw(camZoom) {
+    /**
+     * @param {Plane} camRot
+     * @param {number} camZoom
+     */
+    draw(camRot, camZoom) {
 
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
