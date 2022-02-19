@@ -70,13 +70,7 @@ window.onload = function () {
 
     let step = 20;
     for (let x = -300; x <= 300; x += step) {
-        let layerPoints = getLayerPoints(x, step, memory, calcCount);
-        objects = objects.concat(layerPoints);
-
-        // console.log(layerPoints.length);
-
-        let lines = connect(layerPoints);
-        objects = objects.concat(lines);
+        objects = objects.concat(getLayer(x, step, memory, calcCount));
     }
 
     // console.log(calcCount[0]);
@@ -98,62 +92,86 @@ window.onload = function () {
  * @param {Map<any, any>} memory
  * @param {number[]} calcCount
  */
-function getLayerPoints(x, step, memory, calcCount) {
+function getLayer(x, step, memory, calcCount) {
 
-    let layerPoints = [];
+    let layer = [];
+
+    let blocks = new Map();
+
 
     for (let y = -300; y <= 300; y += step) {
         for (let z = -300; z <= 300; z += step) {
 
+            let blockPoints = [];
+
             let isDraw = false;
 
             calcCount[0]++;
-            let value = drawFunction(x - step / 2, y - step / 2, z - step / 2, memory);
+            let value = drawFunction(x, y - step / 2, z - step / 2, memory);
 
             checkDrawLoop:
-            for (let x1 = -step / 2; x1 <= step / 2; x1 += step) {
-                for (let y1 = -step / 2; y1 <= step / 2; y1 += step) {
-                    for (let z1 = -step / 2; z1 <= step / 2; z1 += step) {
-                        calcCount[0]++;
-                        if (drawFunction(x + x1, y + y1, z + z1, memory) != value) {
-                            isDraw = true;
-                            break checkDrawLoop;
-                        }
+            for (let y1 = -step / 2; y1 <= step / 2; y1 += step) {
+                for (let z1 = -step / 2; z1 <= step / 2; z1 += step) {
+                    calcCount[0]++;
+                    if (drawFunction(x, y + y1, z + z1, memory) != value) {
+                        isDraw = true;
+                        break checkDrawLoop;
                     }
                 }
             }
 
-            if (!isDraw) { continue; }
-            // objects.push(new Vector3(x, y, z));
+            if (isDraw) {
+                // objects.push(new Vector3(x, y, z));
 
+                let linStep = 2;
 
-            let linStep = 2;
-
-            calcCount[0]++;
-            let yval1 = drawFunction(x, y - step / 2, z, memory);
-
-            for (let y1 = -step / 2; y1 <= step / 2; y1 += linStep) {
                 calcCount[0]++;
-                if (drawFunction(x, y + y1, z, memory) != yval1) {
-                    layerPoints.push(new Vector3(x, y + y1 - linStep / 2, z));
-                    break;
+                let yval1 = drawFunction(x, y - step / 2, z, memory);
+
+                for (let y1 = -step / 2; y1 <= step / 2; y1 += linStep) {
+                    calcCount[0]++;
+                    if (drawFunction(x, y + y1, z, memory) != yval1) {
+                        blockPoints.push(new Vector3(x, y + y1 - linStep / 2, z));
+                        break;
+                    }
+                }
+
+                calcCount[0]++;
+                let zval1 = drawFunction(x, y, z - step / 2, memory);
+
+                for (let z1 = -step / 2; z1 <= step / 2; z1 += linStep) {
+                    calcCount[0]++;
+                    if (drawFunction(x, y, z + z1, memory) != zval1) {
+                        blockPoints.push(new Vector3(x, y, z + z1 - linStep / 2));
+                        break;
+                    }
                 }
             }
 
-            calcCount[0]++;
-            let zval1 = drawFunction(x, y, z - step / 2, memory);
-
-            for (let z1 = -step / 2; z1 <= step / 2; z1 += linStep) {
-                calcCount[0]++;
-                if (drawFunction(x, y, z + z1, memory) != zval1) {
-                    layerPoints.push(new Vector3(x, y, z + z1 - linStep / 2));
-                    break;
-                }
-            }
+            layer = layer.concat(blockPoints);
+            blocks.set(`${y}|${z}`, blockPoints);
         }
     }
 
-    return layerPoints;
+    for (let y = -300; y <= 300; y += step) {
+        for (let z = -300; z <= 300; z += step) {
+
+            let thisBlock = blocks.get(`${y}|${z}`);
+            if (thisBlock.length > 1) { layer.push(new Line(thisBlock[0], thisBlock[1])); }
+
+            let rightBlock = blocks.get(`${y + step}|${z}`);
+            let downBlock = blocks.get(`${y}|${z + step}`);
+            let lastBlock = blocks.get(`${y + step}|${z + step}`);
+            let diagBlock = blocks.get(`${y + step}|${z - step}`);
+
+            if (rightBlock != null) { layer = layer.concat(connect(thisBlock, rightBlock)); }
+            if (downBlock != null) { layer = layer.concat(connect(thisBlock, downBlock)); }
+            if (lastBlock != null) { layer = layer.concat(connect(thisBlock, lastBlock)); }
+            if (diagBlock != null) { layer = layer.concat(connect(thisBlock, diagBlock)); }
+        }
+    }
+
+    return layer;
 }
 
 /**
@@ -175,47 +193,35 @@ function drawFunction(x, y, z, memory) {
     }
 }
 
-/** @param {Vector3[]} layerPoints */
-function connect(layerPoints) {
-    let lines = [];
 
-
+function connect(block1, block2) {
     let lineCalc = 0;
 
-    for (let i = 0; i < layerPoints.length - 1; i++) {
+    let lines = [];
+
+    for (let i = 0; i < block1.length; i++) {
 
         let minDist = Number.MAX_SAFE_INTEGER;
         let minLine = null;
-        let lastMinLine = null;
 
-        let runned = new Set([i]);
-
-        for (let j = 0; j < layerPoints.length; j++) {
-            if (runned.has(j)) continue;
-            runned.add(j);
-
+        for (let j = 0; j < block2.length; j++) {
             lineCalc++
 
-            let v = layerPoints[i];
-            let w = layerPoints[j];
+            let v = block1[i];
+            let w = block2[j];
 
             let dist = w.minus(v).magnitude2();
 
             if (dist <= minDist) {
                 minDist = dist;
-                lastMinLine = minLine;
                 minLine = new Line(v, w);
             }
-
-
         }
 
-        if (lastMinLine != null) { lines.push(lastMinLine); }
         if (minLine != null) { lines.push(minLine); }
     }
 
-
-    console.log(lineCalc);
+    // console.log(lineCalc);
 
     return lines;
 }
