@@ -210,13 +210,13 @@ class Vector3 {
         ctx.fillStyle = '#FFFFFF';
         ctx.lineWidth = 1;
 
-        let v2 = this.project(camRot, camZoom);
+        let v1 = this.project(camRot, camZoom);
 
-        let v1v = this.timesPlane(camRot);
-        let rad = 1 / Math.max(v1v.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
+        let v1r = this.timesPlane(camRot);
+        let rad = 1 / Math.max(v1r.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
 
         ctx.beginPath();
-        ctx.arc(v2.x, v2.y, rad, 0, Math.PI * 2);
+        ctx.arc(v1.x, v1.y, rad, 0, Math.PI * 2);
         ctx.fill();
     }
 
@@ -269,4 +269,41 @@ class Plane {
 
     /** @param {Plane} plane */
     overPlane(plane) { return new Plane(this.v.overPlane(plane), this.w.overPlane(plane)); }
+
+    /**
+     * @param {Plane} camRot
+     * @param {number} camZoom
+     */
+    draw(camRot, camZoom) {
+
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.lineWidth = 1;
+
+        let v1 = this.v.project(camRot, camZoom);
+        let w1 = this.w.project(camRot, camZoom);
+
+        let v1r = this.v.timesPlane(camRot);
+        let vrad = 1 / Math.max(v1r.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
+
+        let w1r = this.w.timesPlane(camRot);
+        let wrad = 1 / Math.max(w1r.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
+
+        // ctx.beginPath();
+        // ctx.arc(v1.x, v1.y, vrad, 0, Math.PI * 2);
+        // ctx.fill();
+
+        // ctx.beginPath();
+        // ctx.arc(w1.x, w1.y, wrad, 0, Math.PI * 2);
+        // ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(v1.x,v1.y);
+        ctx.lineTo(w1.x,w1.y);
+        ctx.stroke();
+    }
 }

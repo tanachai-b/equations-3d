@@ -31,16 +31,19 @@ window.onload = function () {
     });
 
 
-    /** @type {(Vector2|Vector3)[]} */
-    let objects = [
-        new Vector2(0, 0),
-    ];
+    /** @type {(Vector2|Vector3|Plane)[]} */
+    let objects = [new Vector2(0, 0)];
 
+    let frame = [];
     for (let i = -1; i <= 1; i += 2) {
         for (let j = -1; j <= 1; j += 2) {
             for (let k = -1; k <= 1; k += 2) {
                 let v1 = new Vector3(i * 300, j * 300, k * 300);
                 objects.push(v1);
+
+                // if (i < 1) { objects.push(new Plane(v1, v1.plus(new Vector3(2 * 300, 0, 0)))); }
+                // if (j < 1) { objects.push(new Plane(v1, v1.plus(new Vector3(0, 2 * 300, 0)))); }
+                // if (k < 1) { objects.push(new Plane(v1, v1.plus(new Vector3(0, 0, 2 * 300)))); }
             }
         }
     }
@@ -69,6 +72,8 @@ window.onload = function () {
     for (let x = -300; x <= 300; x += step) {
         let layerPoints = getLayerPoints(x, step, memory, calcCount);
         objects = objects.concat(layerPoints);
+
+        console.log(layerPoints.length);
     }
 
     console.log(calcCount[0]);
