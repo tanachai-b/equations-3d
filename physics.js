@@ -54,8 +54,8 @@ class Vector2 {
         let y1 = -this.y * 10 ** (camZoom / 10) + canvas.height / 2;
 
         ctx.beginPath();
-        ctx.arc(x1, y1, 4 * 10 ** (camZoom / 10), 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.arc(x1, y1, 1 * 10 ** (camZoom / 10), 0, Math.PI * 2);
+        ctx.fill();
     }
 }
 
@@ -213,11 +213,11 @@ class Vector3 {
         let v2 = this.project(camRot, camZoom);
 
         let v1v = this.timesPlane(camRot);
-        let rad = 4 / Math.max(v1v.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
+        let rad = 1 / Math.max(v1v.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
 
         ctx.beginPath();
         ctx.arc(v2.x, v2.y, rad, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.fill();
     }
 
     /**
