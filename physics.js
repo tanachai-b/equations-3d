@@ -37,7 +37,7 @@ class Vector2 {
     static polar(magnitude, angle) { return new Vector2(magnitude * Math.cos(angle), magnitude * Math.sin(angle)); }
 
     /**
-     * @param {Plane} camRot
+     * @param {Line} camRot
      * @param {number} camZoom
      */
     draw(camRot, camZoom) {
@@ -149,14 +149,14 @@ class Vector3 {
     }
 
     /**
-     * @param {Plane} plane
+     * @param {Line} line
      */
-    timesPlane(plane) {
+    timesLine(line) {
 
-        let yaw = plane.v.xy().unit();
-        let pitch = plane.v.timesXY(yaw.conjugate()).xz();
+        let yaw = line.v.xy().unit();
+        let pitch = line.v.timesXY(yaw.conjugate()).xz();
 
-        let w1 = plane.w.timesXY(yaw.conjugate());
+        let w1 = line.w.timesXY(yaw.conjugate());
         let w2 = w1.timesXZ(pitch.conjugate());
         let roll = w2.yz().unit();
 
@@ -168,14 +168,14 @@ class Vector3 {
     }
 
     /**
-     * @param {Plane} plane
+     * @param {Line} line
      */
-    overPlane(plane) {
+    overLine(line) {
 
-        let yaw = plane.v.xy().unit();
-        let pitch = plane.v.timesXY(yaw.conjugate()).xz();
+        let yaw = line.v.xy().unit();
+        let pitch = line.v.timesXY(yaw.conjugate()).xz();
 
-        let w1 = plane.w.timesXY(yaw.conjugate());
+        let w1 = line.w.timesXY(yaw.conjugate());
         let w2 = w1.timesXZ(pitch.conjugate());
         let roll = w2.yz().unit();
 
@@ -183,7 +183,7 @@ class Vector3 {
         let v2 = v1.timesXZ(pitch.conjugate());
         let v3 = v2.timesYZ(roll.conjugate());
 
-        return v3.overScalar(plane.v.magnitude2());
+        return v3.overScalar(line.v.magnitude2());
     }
 
     /**
@@ -197,7 +197,7 @@ class Vector3 {
     }
 
     /**
-     * @param {Plane} camRot
+     * @param {Line} camRot
      * @param {number} camZoom
      */
     draw(camRot, camZoom) {
@@ -212,7 +212,7 @@ class Vector3 {
 
         let v1 = this.project(camRot, camZoom);
 
-        let v1r = this.timesPlane(camRot);
+        let v1r = this.timesLine(camRot);
         let rad = 1 / Math.max(v1r.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
 
         ctx.beginPath();
@@ -221,7 +221,7 @@ class Vector3 {
     }
 
     /**
-     * @param {Plane} camRot
+     * @param {Line} camRot
      * @param {number} camZoom
      */
     project(camRot, camZoom) {
@@ -230,7 +230,7 @@ class Vector3 {
         // @ts-ignore
         let canvas = document.getElementById('canvas');
 
-        let v1 = this.timesPlane(camRot);
+        let v1 = this.timesLine(camRot);
 
         let x1 = (v1.x / Math.max(v1.y + 1000 / 10 ** (camZoom / 10), 0) * 1000) + canvas.width / 2;
         let y1 = -(v1.z / Math.max(v1.y + 1000 / 10 ** (camZoom / 10), 0) * 1000) + canvas.height / 2;
@@ -239,7 +239,7 @@ class Vector3 {
     }
 }
 
-class Plane {
+class Line {
     /**
      * @param {Vector3} v
      * @param {Vector3} w
@@ -249,29 +249,29 @@ class Plane {
         this.w = w;
     }
 
-    static standard() { return new Plane(new Vector3(1, 0, 0), new Vector3(0, 1, 0)); }
+    static standard() { return new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0)); }
 
     magnitude2() { return this.v.magnitude2(); }
     magnitude() { return this.v.magnitude(); }
-    unit() { return new Plane(this.v.unit(), this.w.unit()); }
+    unit() { return new Line(this.v.unit(), this.w.unit()); }
 
     /** @param {Vector2} vector2 */
-    timesXY(vector2) { return new Plane(this.v.timesXY(vector2), this.w.timesXY(vector2)); }
+    timesXY(vector2) { return new Line(this.v.timesXY(vector2), this.w.timesXY(vector2)); }
 
     /** @param {Vector2} vector2 */
-    timesXZ(vector2) { return new Plane(this.v.timesXZ(vector2), this.w.timesXZ(vector2)); }
+    timesXZ(vector2) { return new Line(this.v.timesXZ(vector2), this.w.timesXZ(vector2)); }
 
     /** @param {Vector2} vector2 */
-    timesYZ(vector2) { return new Plane(this.v.timesYZ(vector2), this.w.timesYZ(vector2)); }
+    timesYZ(vector2) { return new Line(this.v.timesYZ(vector2), this.w.timesYZ(vector2)); }
 
-    /** @param {Plane} plane */
-    timesPlane(plane) { return new Plane(this.v.timesPlane(plane), this.w.timesPlane(plane)); }
+    /** @param {Line} line */
+    timesLine(line) { return new Line(this.v.timesLine(line), this.w.timesLine(line)); }
 
-    /** @param {Plane} plane */
-    overPlane(plane) { return new Plane(this.v.overPlane(plane), this.w.overPlane(plane)); }
+    /** @param {Line} line */
+    overLine(line) { return new Line(this.v.overLine(line), this.w.overLine(line)); }
 
     /**
-     * @param {Plane} camRot
+     * @param {Line} camRot
      * @param {number} camZoom
      */
     draw(camRot, camZoom) {
@@ -287,10 +287,10 @@ class Plane {
         let v1 = this.v.project(camRot, camZoom);
         let w1 = this.w.project(camRot, camZoom);
 
-        let v1r = this.v.timesPlane(camRot);
+        let v1r = this.v.timesLine(camRot);
         let vrad = 1 / Math.max(v1r.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
 
-        let w1r = this.w.timesPlane(camRot);
+        let w1r = this.w.timesLine(camRot);
         let wrad = 1 / Math.max(w1r.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
 
         // ctx.beginPath();
@@ -302,8 +302,8 @@ class Plane {
         // ctx.fill();
 
         ctx.beginPath();
-        ctx.moveTo(v1.x,v1.y);
-        ctx.lineTo(w1.x,w1.y);
+        ctx.moveTo(v1.x, v1.y);
+        ctx.lineTo(w1.x, w1.y);
         ctx.stroke();
     }
 }

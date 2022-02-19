@@ -12,7 +12,7 @@ window.onload = function () {
     let mButtons = 0;
 
     let camPos = new Vector3(0, 0, 0);
-    let camRot = new Plane(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
+    let camRot = new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
     let camZoom = 0;
 
     canvas.oncontextmenu = function (event) { event.preventDefault(); event.stopPropagation(); }
@@ -31,7 +31,7 @@ window.onload = function () {
     });
 
 
-    /** @type {(Vector2|Vector3|Plane)[]} */
+    /** @type {(Vector2|Vector3|Line)[]} */
     let objects = [new Vector2(0, 0)];
 
     let frame = [];
@@ -41,9 +41,9 @@ window.onload = function () {
                 let v1 = new Vector3(i * 300, j * 300, k * 300);
                 objects.push(v1);
 
-                // if (i < 1) { objects.push(new Plane(v1, v1.plus(new Vector3(2 * 300, 0, 0)))); }
-                // if (j < 1) { objects.push(new Plane(v1, v1.plus(new Vector3(0, 2 * 300, 0)))); }
-                // if (k < 1) { objects.push(new Plane(v1, v1.plus(new Vector3(0, 0, 2 * 300)))); }
+                // if (i < 1) { objects.push(new Line(v1, v1.plus(new Vector3(2 * 300, 0, 0)))); }
+                // if (j < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 2 * 300, 0)))); }
+                // if (k < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 0, 2 * 300)))); }
             }
         }
     }
@@ -54,10 +54,10 @@ window.onload = function () {
 
     //             let v1 = new Vector3(i * 20 + 50, j * 20 + 30, k * 20 + 20);
 
-    //             let p1 = new Plane(new Vector3(1, 0.5, 0.5).unit(), new Vector3(-0.5, 1, 0.5));
+    //             let p1 = new Line(new Vector3(1, 0.5, 0.5).unit(), new Vector3(-0.5, 1, 0.5));
 
-    //             let v2 = v1.timesPlane(p1);
-    //             let v3 = v2.overPlane(p1);
+    //             let v2 = v1.timesLine(p1);
+    //             let v3 = v2.overLine(p1);
 
     //             objects.push(v3);
     //         }
