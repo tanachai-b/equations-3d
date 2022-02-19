@@ -68,13 +68,13 @@ window.onload = function () {
     let calcCount = [0];
     let memory = new Map();
 
-    let step = 20;
-    for (let x = -300; x <= 300; x += step) {
-        objects = objects.concat(getLayer(x, step, memory, calcCount));
+    let layerStep = 50;
+    for (let layer = -300; layer <= 300; layer += layerStep) {
+        objects = objects.concat(getLayer(layer, memory, calcCount));
     }
 
-    // console.log(calcCount[0]);
-    // console.log(objects.length);
+    console.log(calcCount[0]);
+    console.log(objects.length);
 
 
     let ctx = canvas.getContext('2d');
@@ -87,33 +87,31 @@ window.onload = function () {
 }
 
 /**
- * @param {number} x
- * @param {number} step
+ * @param {number} layer
  * @param {Map<any, any>} memory
  * @param {number[]} calcCount
  */
-function getLayer(x, step, memory, calcCount) {
+function getLayer(layer, memory, calcCount) {
 
-    let layer = [];
-
+    let layerObjs = [];
     let blocks = new Map();
 
-
-    for (let y = -300; y <= 300; y += step) {
-        for (let z = -300; z <= 300; z += step) {
+    let blockStep = 20;
+    for (let x = -300; x <= 300; x += blockStep) {
+        for (let y = -300; y <= 300; y += blockStep) {
 
             let blockPoints = [];
 
             let isDraw = false;
 
             calcCount[0]++;
-            let value = drawFunction(x, y - step / 2, z - step / 2, memory);
+            let val1 = drawFunction(layer, x - blockStep / 2, y - blockStep / 2, memory);
 
             checkDrawLoop:
-            for (let y1 = -step / 2; y1 <= step / 2; y1 += step) {
-                for (let z1 = -step / 2; z1 <= step / 2; z1 += step) {
+            for (let x1 = -blockStep / 2; x1 <= blockStep / 2; x1 += blockStep) {
+                for (let y1 = -blockStep / 2; y1 <= blockStep / 2; y1 += blockStep) {
                     calcCount[0]++;
-                    if (drawFunction(x, y + y1, z + z1, memory) != value) {
+                    if (drawFunction(layer, x + x1, y + y1, memory) != val1) {
                         isDraw = true;
                         break checkDrawLoop;
                     }
@@ -123,55 +121,55 @@ function getLayer(x, step, memory, calcCount) {
             if (isDraw) {
                 // objects.push(new Vector3(x, y, z));
 
-                let linStep = 2;
+                let linStep = 1;
 
                 calcCount[0]++;
-                let yval1 = drawFunction(x, y - step / 2, z, memory);
+                let valx1 = drawFunction(layer, x - blockStep / 2, y, memory);
 
-                for (let y1 = -step / 2; y1 <= step / 2; y1 += linStep) {
+                for (let x1 = -blockStep / 2; x1 <= blockStep / 2; x1 += linStep) {
                     calcCount[0]++;
-                    if (drawFunction(x, y + y1, z, memory) != yval1) {
-                        blockPoints.push(new Vector3(x, y + y1 - linStep / 2, z));
+                    if (drawFunction(layer, x + x1, y, memory) != valx1) {
+                        blockPoints.push(new Vector3(layer, x + x1 - linStep / 2, y));
                         break;
                     }
                 }
 
                 calcCount[0]++;
-                let zval1 = drawFunction(x, y, z - step / 2, memory);
+                let valy1 = drawFunction(layer, x, y - blockStep / 2, memory);
 
-                for (let z1 = -step / 2; z1 <= step / 2; z1 += linStep) {
+                for (let y1 = -blockStep / 2; y1 <= blockStep / 2; y1 += linStep) {
                     calcCount[0]++;
-                    if (drawFunction(x, y, z + z1, memory) != zval1) {
-                        blockPoints.push(new Vector3(x, y, z + z1 - linStep / 2));
+                    if (drawFunction(layer, x, y + y1, memory) != valy1) {
+                        blockPoints.push(new Vector3(layer, x, y + y1 - linStep / 2));
                         break;
                     }
                 }
             }
 
-            layer = layer.concat(blockPoints);
-            blocks.set(`${y}|${z}`, blockPoints);
+            // layerObjs = layerObjs.concat(blockPoints);
+            blocks.set(`${x}|${y}`, blockPoints);
         }
     }
 
-    for (let y = -300; y <= 300; y += step) {
-        for (let z = -300; z <= 300; z += step) {
+    for (let x = -300; x <= 300; x += blockStep) {
+        for (let y = -300; y <= 300; y += blockStep) {
 
-            let thisBlock = blocks.get(`${y}|${z}`);
-            if (thisBlock.length > 1) { layer.push(new Line(thisBlock[0], thisBlock[1])); }
+            let thisBlock = blocks.get(`${x}|${y}`);
+            if (thisBlock.length > 1) { layerObjs.push(new Line(thisBlock[0], thisBlock[1])); }
 
-            let rightBlock = blocks.get(`${y + step}|${z}`);
-            let downBlock = blocks.get(`${y}|${z + step}`);
-            let lastBlock = blocks.get(`${y + step}|${z + step}`);
-            let diagBlock = blocks.get(`${y + step}|${z - step}`);
+            let rightBlock = blocks.get(`${x + blockStep}|${y}`);
+            let downBlock = blocks.get(`${x}|${y + blockStep}`);
+            let lastBlock = blocks.get(`${x + blockStep}|${y + blockStep}`);
+            let diagBlock = blocks.get(`${x + blockStep}|${y - blockStep}`);
 
-            if (rightBlock != null) { layer = layer.concat(connect(thisBlock, rightBlock)); }
-            if (downBlock != null) { layer = layer.concat(connect(thisBlock, downBlock)); }
-            if (lastBlock != null) { layer = layer.concat(connect(thisBlock, lastBlock)); }
-            if (diagBlock != null) { layer = layer.concat(connect(thisBlock, diagBlock)); }
+            if (rightBlock != null) { layerObjs = layerObjs.concat(connect(thisBlock, rightBlock)); }
+            if (downBlock != null) { layerObjs = layerObjs.concat(connect(thisBlock, downBlock)); }
+            if (lastBlock != null) { layerObjs = layerObjs.concat(connect(thisBlock, lastBlock)); }
+            if (diagBlock != null) { layerObjs = layerObjs.concat(connect(thisBlock, diagBlock)); }
         }
     }
 
-    return layer;
+    return layerObjs;
 }
 
 /**
@@ -194,6 +192,10 @@ function drawFunction(x, y, z, memory) {
 }
 
 
+/**
+ * @param {Vector3[]} block1
+ * @param {Vector3[]} block2
+ */
 function connect(block1, block2) {
     let lineCalc = 0;
 
