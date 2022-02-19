@@ -9,7 +9,6 @@ window.onload = function () {
     let canvas = document.getElementById('canvas');
 
 
-
     let mButtons = 0;
 
     let camPos = new Vector3(0, 0, 0);
@@ -30,7 +29,6 @@ window.onload = function () {
     canvas.addEventListener('wheel', (event) => {
         camZoom -= Math.sign(event.deltaY);
     });
-
 
 
     /** @type {(Vector2|Vector3)[]} */
@@ -63,107 +61,108 @@ window.onload = function () {
     //     }
     // }
 
-    let calcCount = 0;
 
+    let calcCount = [0];
     let memory = new Map();
 
     let step = 20;
     for (let x = -300; x <= 300; x += step) {
-
-        let layerPoints = [];
-
-        for (let y = -300; y <= 300; y += step) {
-            for (let z = -300; z <= 300; z += step) {
-
-                let isDraw = false;
-
-                calcCount++;
-                let value = drawFunction(x - step / 2, y - step / 2, z - step / 2);
-
-                checkDrawLoop:
-                for (let x1 = -step / 2; x1 <= step / 2; x1 += step) {
-                    for (let y1 = -step / 2; y1 <= step / 2; y1 += step) {
-                        for (let z1 = -step / 2; z1 <= step / 2; z1 += step) {
-                            calcCount++;
-                            if (drawFunction(x + x1, y + y1, z + z1) != value) {
-                                isDraw = true;
-                                break checkDrawLoop;
-                            }
-                        }
-                    }
-                }
-
-                if (!isDraw) { continue; }
-                // objects.push(new Vector3(x, y, z));
-
-
-                let linStep = 2;
-
-                calcCount++;
-                let yval1 = drawFunction(x, y - step / 2, z);
-
-                for (let y1 = -step / 2; y1 <= step / 2; y1 += linStep) {
-                    calcCount++;
-                    if (drawFunction(x, y + y1, z) != yval1) {
-                        layerPoints.push(new Vector3(x, y + y1 - linStep / 2, z));
-                        break;
-                    }
-                }
-
-                calcCount++;
-                let zval1 = drawFunction(x, y, z - step / 2);
-
-                for (let z1 = -step / 2; z1 <= step / 2; z1 += linStep) {
-                    calcCount++;
-                    if (drawFunction(x, y, z + z1) != zval1) {
-                        layerPoints.push(new Vector3(x, y, z + z1 - linStep / 2));
-                        break;
-                    }
-                }
-            }
-        }
-
+        let layerPoints = getLayerPoints(x, step, memory, calcCount);
         objects = objects.concat(layerPoints);
     }
 
-    console.log(calcCount);
+    console.log(calcCount[0]);
     console.log(objects.length);
 
 
-
-    /**
-     * @param {number} x
-     * @param {number} y
-     * @param {number} z
-     */
-    function drawFunction(x, y, z) {
-
-        if (memory.has(`${x}|${y}|${z}`)) {
-            return memory.get(`${x}|${y}|${z}`);
-        } else {
-
-            let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2) - 200) ** 2 + z ** 2;
-
-
-
-
-            memory.set(`${x}|${y}|${z}`, value);
-            return value;
-        }
-    }
-
-
+    let ctx = canvas.getContext('2d');
     setInterval(() => {
-
-
-        let ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         objects.forEach((object) => {
             object.draw(camRot, camZoom);
         });
-
-
-
     }, 1000 / 60);
+}
+
+/**
+ * @param {number} x
+ * @param {number} step
+ * @param {Map<any, any>} memory
+ * @param {number[]} calcCount
+ */
+function getLayerPoints(x, step, memory, calcCount) {
+
+    let layerPoints = [];
+
+    for (let y = -300; y <= 300; y += step) {
+        for (let z = -300; z <= 300; z += step) {
+
+            let isDraw = false;
+
+            calcCount[0]++;
+            let value = drawFunction(x - step / 2, y - step / 2, z - step / 2, memory);
+
+            checkDrawLoop:
+            for (let x1 = -step / 2; x1 <= step / 2; x1 += step) {
+                for (let y1 = -step / 2; y1 <= step / 2; y1 += step) {
+                    for (let z1 = -step / 2; z1 <= step / 2; z1 += step) {
+                        calcCount[0]++;
+                        if (drawFunction(x + x1, y + y1, z + z1, memory) != value) {
+                            isDraw = true;
+                            break checkDrawLoop;
+                        }
+                    }
+                }
+            }
+
+            if (!isDraw) { continue; }
+            // objects.push(new Vector3(x, y, z));
+
+
+            let linStep = 2;
+
+            calcCount[0]++;
+            let yval1 = drawFunction(x, y - step / 2, z, memory);
+
+            for (let y1 = -step / 2; y1 <= step / 2; y1 += linStep) {
+                calcCount[0]++;
+                if (drawFunction(x, y + y1, z, memory) != yval1) {
+                    layerPoints.push(new Vector3(x, y + y1 - linStep / 2, z));
+                    break;
+                }
+            }
+
+            calcCount[0]++;
+            let zval1 = drawFunction(x, y, z - step / 2, memory);
+
+            for (let z1 = -step / 2; z1 <= step / 2; z1 += linStep) {
+                calcCount[0]++;
+                if (drawFunction(x, y, z + z1, memory) != zval1) {
+                    layerPoints.push(new Vector3(x, y, z + z1 - linStep / 2));
+                    break;
+                }
+            }
+        }
+    }
+
+    return layerPoints;
+}
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @param {Map} memory
+ */
+function drawFunction(x, y, z, memory) {
+
+    if (memory.has(`${x}|${y}|${z}`)) {
+        return memory.get(`${x}|${y}|${z}`);
+
+    } else {
+        let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2) - 200) ** 2 + z ** 2;
+        memory.set(`${x}|${y}|${z}`, value);
+
+        return value;
+    }
 }
