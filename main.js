@@ -7,37 +7,33 @@ window.onload = function () {
     /** @type {HTMLCanvasElement} */
     // @ts-ignore
     let canvas = document.getElementById('canvas');
-    let ctx = canvas.getContext('2d');
 
 
-    canvas.oncontextmenu = function (event) { event.preventDefault(); event.stopPropagation(); }
 
 
 
 
     let mButtons = 0;
-    // let mVector2 = new Vector2(0, 0);
 
-    let zoom = 0;
-    let yaw = 0;
-    let pitch = 0;
-
+    let camPos = new Vector3(0, 0, 0);
+    let camRot = new Plane(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
+    let camZoom = 0;
 
 
+    canvas.oncontextmenu = function (event) { event.preventDefault(); event.stopPropagation(); }
     canvas.addEventListener('mousedown', (event) => { mButtons = event.buttons; });
     canvas.addEventListener('mouseup', (event) => { mButtons = event.buttons; });
     canvas.addEventListener('mouseleave', (event) => { mButtons = event.buttons; });
     canvas.addEventListener('mouseenter', (event) => { mButtons = event.buttons; });
     canvas.addEventListener('mousemove', (event) => {
         if (mButtons == 1) {
-            // mVector2 = new Vector2(event.offsetX - canvas.width / 2, -event.offsetY + canvas.height / 2);
 
-            yaw += event.movementX / 200;
-            pitch -= event.movementY / 200;
+            camRot = camRot.timesYZ(Vector2.polar(1, event.movementY / 2 * Math.PI / 180));
+            camRot = camRot.timesXY(Vector2.polar(1, event.movementX / 2 * Math.PI / 180));
         }
     });
     canvas.addEventListener('wheel', (event) => {
-        zoom -= Math.sign(event.deltaY);
+        camZoom -= Math.sign(event.deltaY);
     });
 
 
@@ -56,7 +52,6 @@ window.onload = function () {
         /** @type {[Vector2 | Vector3]} */
         let objects = [
             new Vector2(0, 0),
-            // mVector2,
         ];
 
 
@@ -78,12 +73,10 @@ window.onload = function () {
 
                     let v1 = new Vector3(i * 20 + 50, j * 20 + 30, k * 20 + 20);
 
+                    let p1 = new Plane(new Vector3(1, 0.5, 0.5).unit(), new Vector3(-0.5, 1, 0.5));
 
-                    let plane = new Vector3(1, 0.5, 0.5).unit();
-
-                    let v2 = v1.timesPlane(plane, new Vector3(0, 1, 0).timesXY(plane.xy().unit()));
-
-                    let v3 = v2.overPlane(plane, new Vector3(0, 1, 0).timesXY(plane.xy().unit()));
+                    let v2 = v1.timesPlane(p1);
+                    let v3 = v2.overPlane(p1);
 
                     objects.push(v3);
                 }
@@ -93,11 +86,11 @@ window.onload = function () {
 
 
 
-
+        let ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         objects.forEach((object) => {
-            object.draw(zoom, yaw, pitch);
+            object.draw(camZoom, camRot);
         });
 
 

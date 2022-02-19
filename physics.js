@@ -1,7 +1,6 @@
 //@ts-check
 'use strict';
 
-
 class Vector2 {
     /**
      * @param {number} x
@@ -17,6 +16,8 @@ class Vector2 {
     unit() { return new Vector2(this.x / this.magnitude(), this.y / this.magnitude()); }
     conjugate() { return new Vector2(this.x, -this.y); }
 
+    angle() { return Math.atan2(this.y, this.x); }
+
     /** @param {Vector2} vector2 */
     plus(vector2) { return new Vector2(this.x + vector2.x, this.y + vector2.y); }
 
@@ -29,8 +30,14 @@ class Vector2 {
     /** @param {Vector2} vector2 */
     over(vector2) { return this.times(vector2.conjugate()).times(new Vector2(1 / vector2.magnitude2(), 0)); }
 
-    /** @param {number} zoom */
-    draw(zoom) {
+    /**
+     * @param {number} magnitude
+     * @param {number} angle
+     */
+    static polar(magnitude, angle) { return new Vector2(magnitude * Math.cos(angle), magnitude * Math.sin(angle)); }
+
+    /** @param {number} camZoom */
+    draw(camZoom) {
 
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
@@ -40,38 +47,12 @@ class Vector2 {
         ctx.fillStyle = '#FFFFFF';
         ctx.lineWidth = 1;
 
-        let x1 = this.x * 10 ** (zoom / 10) + canvas.width / 2;
-        let y1 = -this.y * 10 ** (zoom / 10) + canvas.height / 2;
+        let x1 = this.x * 10 ** (camZoom / 10) + canvas.width / 2;
+        let y1 = -this.y * 10 ** (camZoom / 10) + canvas.height / 2;
 
         ctx.beginPath();
-        ctx.arc(x1, y1, 4, 0, Math.PI * 2);
+        ctx.arc(x1, y1, 4 * 10 ** (camZoom / 10), 0, Math.PI * 2);
         ctx.stroke();
-    }
-
-    /**
-     * @param {Vector3} vector3
-     * @param {number} zoom
-     * @param {number} yaw
-     * @param {number} pitch
-     */
-    static projectFrom3d(vector3, zoom, yaw, pitch) {
-
-        /** @type {HTMLCanvasElement} */
-        // @ts-ignore
-        let canvas = document.getElementById('canvas');
-
-        let x1 = vector3.x * Math.cos(yaw) - vector3.y * Math.sin(yaw);
-        let y1 = vector3.y * Math.cos(yaw) + vector3.x * Math.sin(yaw);
-        let z1 = vector3.z;
-
-        let x2 = x1;
-        let y2 = y1 * Math.cos(pitch) + z1 * Math.sin(pitch);
-        let z2 = z1 * Math.cos(pitch) - y1 * Math.sin(pitch);
-
-        let x3 = (x2 / Math.max(y2 + 1000 / 10 ** (zoom / 10), 0) * 1000) + canvas.width / 2;
-        let y3 = -(z2 / Math.max(y2 + 1000 / 10 ** (zoom / 10), 0) * 1000) + canvas.height / 2;
-
-        return new Vector2(x3, y3);
     }
 }
 
@@ -103,10 +84,10 @@ class Vector3 {
     minus(vector3) { return new Vector3(this.x - vector3.x, this.y - vector3.y, this.z - vector3.z); }
 
     /** @param {number} number */
-    times(number) { return new Vector3(this.x * number, this.y * number, this.z * number); }
+    timesScalar(number) { return new Vector3(this.x * number, this.y * number, this.z * number); }
 
     /** @param {number} number */
-    over(number) { return new Vector3(this.x / number, this.y / number, this.z / number); }
+    overScalar(number) { return new Vector3(this.x / number, this.y / number, this.z / number); }
 
     /** @param {Vector2} xy */
     timesXY(xy) {
@@ -136,51 +117,87 @@ class Vector3 {
     }
 
     /**
-     * @param {Vector3} a
-     * @param {Vector3} b
+     * @param {Vector3} vector3
      */
-    timesPlane(a, b) {
+    times(vector3) {
 
-        let yaw = a.xy().unit();
-        let pitch = a.timesXY(yaw.conjugate()).xz().unit();
+        let yaw = vector3.xy().unit();
+        let pitch = vector3.timesXY(yaw.conjugate()).xz();
 
-        let b1 = b.timesXY(yaw.conjugate());
-        let b2 = b1.timesXZ(pitch.conjugate());
-        let roll = b2.yz().unit();
+        /** @type {Vector3} */
+        let v1 = this.timesXZ(pitch);
+        let v2 = v1.timesXY(yaw);
 
-        let p1 = this.timesYZ(roll);
-        let p2 = p1.timesXZ(pitch);
-        let p3 = p2.timesXY(yaw);
-
-        return p3.times(a.magnitude());
+        return v2;
     }
 
     /**
-     * @param {Vector3} a
-     * @param {Vector3} b
+     * @param {Vector3} vector3
      */
-    overPlane(a, b) {
+    over(vector3) {
 
-        let yaw = a.xy().unit();
-        let pitch = a.timesXY(yaw.conjugate()).xz().unit();
+        let yaw = vector3.xy().unit();
+        let pitch = vector3.timesXY(yaw.conjugate()).xz();
 
-        let b1 = b.timesXY(yaw.conjugate());
-        let b2 = b1.timesXZ(pitch.conjugate());
-        let roll = b2.yz().unit();
+        let v1 = this.timesXY(yaw.conjugate());
+        let v2 = v1.timesXZ(pitch.conjugate());
 
-        let p1 = this.timesXY(yaw.conjugate());
-        let p2 = p1.timesXZ(pitch.conjugate());
-        let p3 = p2.timesYZ(roll.conjugate());
-
-        return p3.over(a.magnitude());
+        return v2.overScalar(vector3.magnitude2());
     }
 
     /**
-     * @param {number} zoom
+     * @param {Plane} plane
+     */
+    timesPlane(plane) {
+
+        let yaw = plane.v.xy().unit();
+        let pitch = plane.v.timesXY(yaw.conjugate()).xz();
+
+        let w1 = plane.w.timesXY(yaw.conjugate());
+        let w2 = w1.timesXZ(pitch.conjugate());
+        let roll = w2.yz().unit();
+
+        let v1 = this.timesYZ(roll);
+        let v2 = v1.timesXZ(pitch);
+        let v3 = v2.timesXY(yaw);
+
+        return v3;
+    }
+
+    /**
+     * @param {Plane} plane
+     */
+    overPlane(plane) {
+
+        let yaw = plane.v.xy().unit();
+        let pitch = plane.v.timesXY(yaw.conjugate()).xz();
+
+        let w1 = plane.w.timesXY(yaw.conjugate());
+        let w2 = w1.timesXZ(pitch.conjugate());
+        let roll = w2.yz().unit();
+
+        let v1 = this.timesXY(yaw.conjugate());
+        let v2 = v1.timesXZ(pitch.conjugate());
+        let v3 = v2.timesYZ(roll.conjugate());
+
+        return v3.overScalar(plane.v.magnitude2());
+    }
+
+    /**
+     * @param {number} magnitude
      * @param {number} yaw
      * @param {number} pitch
      */
-    draw(zoom, yaw, pitch) {
+    static polar(magnitude, yaw, pitch) {
+        let v1 = new Vector3(magnitude, 0, 0).timesXZ(Vector2.polar(1, pitch));
+        return v1.timesXY(Vector2.polar(1, yaw));
+    }
+
+    /**
+     * @param {number} camZoom
+     * @param {Plane} camRot
+     */
+    draw(camZoom, camRot) {
 
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
@@ -190,10 +207,63 @@ class Vector3 {
         ctx.fillStyle = '#FFFFFF';
         ctx.lineWidth = 1;
 
-        let v2 = Vector2.projectFrom3d(this, zoom, yaw, pitch);
+        let v2 = this.project(camZoom, camRot);
+
+        let v1v = this.timesPlane(camRot);
+        let rad = 4 / Math.max(v1v.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
 
         ctx.beginPath();
-        ctx.arc(v2.x, v2.y, 4, 0, Math.PI * 2);
+        ctx.arc(v2.x, v2.y, rad, 0, Math.PI * 2);
         ctx.stroke();
     }
+
+    /**
+     * @param {number} camZoom
+     * @param {Plane} camRot
+     */
+    project(camZoom, camRot) {
+
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+
+        let v1 = this.timesPlane(camRot);
+
+        let x1 = (v1.x / Math.max(v1.y + 1000 / 10 ** (camZoom / 10), 0) * 1000) + canvas.width / 2;
+        let y1 = -(v1.z / Math.max(v1.y + 1000 / 10 ** (camZoom / 10), 0) * 1000) + canvas.height / 2;
+
+        return new Vector2(x1, y1);
+    }
+}
+
+class Plane {
+    /**
+     * @param {Vector3} v
+     * @param {Vector3} w
+     */
+    constructor(v, w) {
+        this.v = v;
+        this.w = w;
+    }
+
+    static standard() { return new Plane(new Vector3(1, 0, 0), new Vector3(0, 1, 0)); }
+
+    magnitude2() { return this.v.magnitude2(); }
+    magnitude() { return this.v.magnitude(); }
+    unit() { return new Plane(this.v.unit(), this.w.unit()); }
+
+    /** @param {Vector2} xy */
+    timesXY(xy) { return new Plane(this.v.timesXY(xy), this.w.timesXY(xy)); }
+
+    /** @param {Vector2} xz */
+    timesXZ(xz) { return new Plane(this.v.timesXZ(xz), this.w.timesXZ(xz)); }
+
+    /** @param {Vector2} yz */
+    timesYZ(yz) { return new Plane(this.v.timesYZ(yz), this.w.timesYZ(yz)); }
+
+    /** @param {Plane} plane */
+    timesPlane(plane) { return new Plane(this.v.timesPlane(plane), this.w.timesPlane(plane)); }
+
+    /** @param {Plane} plane */
+    overPlane(plane) { return new Plane(this.v.overPlane(plane), this.w.overPlane(plane)); }
 }
