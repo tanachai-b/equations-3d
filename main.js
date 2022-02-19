@@ -33,7 +33,7 @@ window.onload = function () {
 
 
 
-    /** @type {[Vector2 | Vector3]} */
+    /** @type {(Vector2|Vector3)[]} */
     let objects = [
         new Vector2(0, 0),
     ];
@@ -63,21 +63,28 @@ window.onload = function () {
     //     }
     // }
 
+    let calcCount = 0;
+
     let memory = new Map();
 
-    let step = 10;
+    let step = 20;
     for (let x = -300; x <= 300; x += step) {
+
+        let layerPoints = [];
+
         for (let y = -300; y <= 300; y += step) {
             for (let z = -300; z <= 300; z += step) {
 
-                let value = drawFunction(x - step / 2, y - step / 2, z - step / 2);
-
                 let isDraw = false;
+
+                calcCount++;
+                let value = drawFunction(x - step / 2, y - step / 2, z - step / 2);
 
                 checkDrawLoop:
                 for (let x1 = -step / 2; x1 <= step / 2; x1 += step) {
                     for (let y1 = -step / 2; y1 <= step / 2; y1 += step) {
                         for (let z1 = -step / 2; z1 <= step / 2; z1 += step) {
+                            calcCount++;
                             if (drawFunction(x + x1, y + y1, z + z1) != value) {
                                 isDraw = true;
                                 break checkDrawLoop;
@@ -86,13 +93,40 @@ window.onload = function () {
                     }
                 }
 
-                if (isDraw) {
-                    objects.push(new Vector3(x, y, z));
+                if (!isDraw) { continue; }
+                // objects.push(new Vector3(x, y, z));
+
+
+                let linStep = 2;
+
+                calcCount++;
+                let yval1 = drawFunction(x, y - step / 2, z);
+
+                for (let y1 = -step / 2; y1 <= step / 2; y1 += linStep) {
+                    calcCount++;
+                    if (drawFunction(x, y + y1, z) != yval1) {
+                        layerPoints.push(new Vector3(x, y + y1 - linStep / 2, z));
+                        break;
+                    }
+                }
+
+                calcCount++;
+                let zval1 = drawFunction(x, y, z - step / 2);
+
+                for (let z1 = -step / 2; z1 <= step / 2; z1 += linStep) {
+                    calcCount++;
+                    if (drawFunction(x, y, z + z1) != zval1) {
+                        layerPoints.push(new Vector3(x, y, z + z1 - linStep / 2));
+                        break;
+                    }
                 }
             }
         }
+
+        objects = objects.concat(layerPoints);
     }
 
+    console.log(calcCount);
     console.log(objects.length);
 
 
