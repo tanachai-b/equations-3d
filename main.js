@@ -10,15 +10,11 @@ window.onload = function () {
 
 
 
-
-
-
     let mButtons = 0;
 
     let camPos = new Vector3(0, 0, 0);
     let camRot = new Plane(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
     let camZoom = 0;
-
 
     canvas.oncontextmenu = function (event) { event.preventDefault(); event.stopPropagation(); }
     canvas.addEventListener('mousedown', (event) => { mButtons = event.buttons; });
@@ -27,7 +23,6 @@ window.onload = function () {
     canvas.addEventListener('mouseenter', (event) => { mButtons = event.buttons; });
     canvas.addEventListener('mousemove', (event) => {
         if (mButtons == 1) {
-
             camRot = camRot.timesYZ(Vector2.polar(1, event.movementY / 2 * Math.PI / 180));
             camRot = camRot.timesXY(Vector2.polar(1, event.movementX / 2 * Math.PI / 180));
         }
@@ -38,23 +33,12 @@ window.onload = function () {
 
 
 
-
-
-
-
-
     setInterval(() => {
-
-
-
-
 
         /** @type {[Vector2 | Vector3]} */
         let objects = [
             new Vector2(0, 0),
         ];
-
-
 
         for (let i = -1; i <= 1; i += 2) {
             for (let j = -1; j <= 1; j += 2) {
@@ -64,8 +48,6 @@ window.onload = function () {
                 }
             }
         }
-
-
 
         for (let i = 0; i < 10; i++) {
             for (let j = 0; j < 10; j++) {
@@ -83,9 +65,6 @@ window.onload = function () {
             }
         }
 
-
-
-
         let ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -93,15 +72,5 @@ window.onload = function () {
             object.draw(camZoom, camRot);
         });
 
-
     }, 1000 / 60);
-
-
-
-
-
-
-
-
-
 }

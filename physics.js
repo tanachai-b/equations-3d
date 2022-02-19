@@ -89,29 +89,29 @@ class Vector3 {
     /** @param {number} number */
     overScalar(number) { return new Vector3(this.x / number, this.y / number, this.z / number); }
 
-    /** @param {Vector2} xy */
-    timesXY(xy) {
-        let x1 = this.x * xy.x - this.y * xy.y;
-        let y1 = this.x * xy.y + this.y * xy.x;
+    /** @param {Vector2} vector2 */
+    timesXY(vector2) {
+        let x1 = this.x * vector2.x - this.y * vector2.y;
+        let y1 = this.x * vector2.y + this.y * vector2.x;
         let z1 = this.z;
 
         return new Vector3(x1, y1, z1);
     }
 
-    /** @param {Vector2} xz */
-    timesXZ(xz) {
-        let x1 = this.x * xz.x - this.z * xz.y;
+    /** @param {Vector2} vector2 */
+    timesXZ(vector2) {
+        let x1 = this.x * vector2.x - this.z * vector2.y;
         let y1 = this.y;
-        let z1 = this.x * xz.y + this.z * xz.x;
+        let z1 = this.x * vector2.y + this.z * vector2.x;
 
         return new Vector3(x1, y1, z1);
     }
 
-    /** @param {Vector2} yz */
-    timesYZ(yz) {
+    /** @param {Vector2} vector2 */
+    timesYZ(vector2) {
         let x1 = this.x;
-        let y1 = this.y * yz.x - this.z * yz.y;
-        let z1 = this.y * yz.y + this.z * yz.x;
+        let y1 = this.y * vector2.x - this.z * vector2.y;
+        let z1 = this.y * vector2.y + this.z * vector2.x;
 
         return new Vector3(x1, y1, z1);
     }
@@ -252,14 +252,14 @@ class Plane {
     magnitude() { return this.v.magnitude(); }
     unit() { return new Plane(this.v.unit(), this.w.unit()); }
 
-    /** @param {Vector2} xy */
-    timesXY(xy) { return new Plane(this.v.timesXY(xy), this.w.timesXY(xy)); }
+    /** @param {Vector2} vector2 */
+    timesXY(vector2) { return new Plane(this.v.timesXY(vector2), this.w.timesXY(vector2)); }
 
-    /** @param {Vector2} xz */
-    timesXZ(xz) { return new Plane(this.v.timesXZ(xz), this.w.timesXZ(xz)); }
+    /** @param {Vector2} vector2 */
+    timesXZ(vector2) { return new Plane(this.v.timesXZ(vector2), this.w.timesXZ(vector2)); }
 
-    /** @param {Vector2} yz */
-    timesYZ(yz) { return new Plane(this.v.timesYZ(yz), this.w.timesYZ(yz)); }
+    /** @param {Vector2} vector2 */
+    timesYZ(vector2) { return new Plane(this.v.timesYZ(vector2), this.w.timesYZ(vector2)); }
 
     /** @param {Plane} plane */
     timesPlane(plane) { return new Plane(this.v.timesPlane(plane), this.w.timesPlane(plane)); }
