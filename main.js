@@ -181,7 +181,7 @@ function getLayer(layer, layerStep, memory, blocks, calcCount) {
                 }
             }
 
-            layerObjs = layerObjs.concat(blockPoints);
+            // layerObjs = layerObjs.concat(blockPoints);
             blocks.set(`${layer}|${x}|${y}`, blockPoints);
         }
     }
@@ -294,6 +294,8 @@ function drawFunction(x, y, z, memory) {
         // let value = 300 ** 2 > x ** 2 + y ** 2 + z ** 2;
 
         // let value = z ** 2 > x ** 2 + y ** 2 - 100 ** 2;
+
+        // let value = 300 ** 2 > x ** 2 + y ** 2+ z ** 2;
 
         memory.set(`${x}|${y}|${z}`, value);
 
