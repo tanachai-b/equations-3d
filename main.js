@@ -192,7 +192,7 @@ function getLayer(layer, layerStep, memory, blocks, calcCount) {
         for (let y = -300; y <= 300; y += blockStep) {
 
             let thisBlock = blocks.get(`${layer}|${x}|${y}`);
-            layerObjs = layerObjs.concat(connectWithin(thisBlock));
+            // layerObjs = layerObjs.concat(connectWithin(thisBlock));
 
             for (let x1 = -blockStep; x1 <= blockStep; x1 += blockStep) {
                 for (let y1 = -blockStep; y1 <= blockStep; y1 += blockStep) {
@@ -215,32 +215,32 @@ function getLayer(layer, layerStep, memory, blocks, calcCount) {
     return layerObjs;
 }
 
-/**
- * @param {Vector3[]} block
- */
-function connectWithin(block) {
+// /**
+//  * @param {Vector3[]} block
+//  */
+// function connectWithin(block) {
 
 
-    let lines = [];
+//     let lines = [];
 
 
-    for (let i = 0; i < block.length - 1; i++) {
-        for (let j = i + 1; j < block.length; j++) {
+//     for (let i = 0; i < block.length - 1; i++) {
+//         for (let j = i + 1; j < block.length; j++) {
 
 
-            let v = block[i];
-            let w = block[j];
+//             let v = block[i];
+//             let w = block[j];
 
-            let dist = w.minus(v).magnitude2();
-
-
-            lines.push(new Line(v, w));
-        }
-    }
+//             let dist = w.minus(v).magnitude2();
 
 
-    return lines;
-}
+//             lines.push(new Line(v, w));
+//         }
+//     }
+
+
+//     return lines;
+// }
 
 /**
  * @param {Vector3[]} block1
@@ -289,11 +289,11 @@ function drawFunction(x, y, z, memory) {
         return memory.get(`${x}|${y}|${z}`);
 
     } else {
-        // let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
+        let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
 
         // let value = 300 ** 2 > x ** 2 + y ** 2 + z ** 2;
 
-        let value = z ** 2 / 1.2 > x ** 2 + y ** 2 - 100 ** 2;
+        // let value = z ** 2 > x ** 2 + y ** 2 - 100 ** 2;
 
         memory.set(`${x}|${y}|${z}`, value);
 
