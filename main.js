@@ -38,18 +38,23 @@ window.onload = function () {
         new Vector2(0, 0)
     ];
 
-    for (let i = -1; i <= 1; i += 2) {
-        for (let j = -1; j <= 1; j += 2) {
-            for (let k = -1; k <= 1; k += 2) {
-                let v1 = new Vector3(i * 300, j * 300, k * 300);
-                objects.push(v1);
+    // objects.push(new Line(new Vector3(-300, 0, 0), new Vector3(300, 0, 0)));
+    // objects.push(new Line(new Vector3(0, -300, 0), new Vector3(0, 300, 0)));
+    // objects.push(new Line(new Vector3(0, 0, -300), new Vector3(0, 0, 300)));
 
-                // if (i < 1) { objects.push(new Line(v1, v1.plus(new Vector3(2 * 300, 0, 0)))); }
-                // if (j < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 2 * 300, 0)))); }
-                // if (k < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 0, 2 * 300)))); }
-            }
-        }
-    }
+    // for (let i = -1; i <= 1; i += 2) {
+    //     for (let j = -1; j <= 1; j += 2) {
+    //         for (let k = -1; k <= 1; k += 2) {
+    //             let v1 = new Vector3(i * 300, j * 300, k * 300);
+    //             // objects.push(v1);
+
+    //             if (i < 1) { objects.push(new Line(v1, v1.plus(new Vector3(2 * 300, 0, 0)))); }
+    //             if (j < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 2 * 300, 0)))); }
+    //             if (k < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 0, 2 * 300)))); }
+    //         }
+    //     }
+    // }
+
 
     // for (let i = 0; i < 10; i++) {
     //     for (let j = 0; j < 10; j++) {
@@ -71,7 +76,7 @@ window.onload = function () {
     let calcCount = [0];
     let memory = new Map();
 
-    let layerStep = 20;
+    let layerStep = 50;
     for (let layer = -300; layer <= 300; layer += layerStep) {
         objects = objects.concat(getLayer(layer, memory, calcCount));
         objects = objects.concat(getLayer1(layer, memory, calcCount));
@@ -84,7 +89,11 @@ window.onload = function () {
 
     let ctx = canvas.getContext('2d');
     setInterval(() => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = '#FFFFFF    ';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
         objects.forEach((object) => {
             object.draw(camRot, camZoom);
         });
@@ -113,8 +122,8 @@ function getLayer(layer, memory, calcCount) {
             let val1 = drawFunction(layer, x - blockStep / 2, y - blockStep / 2, memory);
 
             checkDrawLoop:
-            for (let x1 = -blockStep / 2; x1 <= blockStep / 2; x1 += blockStep) {
-                for (let y1 = -blockStep / 2; y1 <= blockStep / 2; y1 += blockStep) {
+            for (let x1 = -blockStep / 2; x1 <= blockStep / 2; x1 += blockStep / 2) {
+                for (let y1 = -blockStep / 2; y1 <= blockStep / 2; y1 += blockStep / 2) {
                     calcCount[0]++;
                     if (drawFunction(layer, x + x1, y + y1, memory) != val1) {
                         isDraw = true;
@@ -199,8 +208,8 @@ function getLayer1(layer, memory, calcCount) {
             let val1 = drawFunction(x - blockStep / 2, layer, y - blockStep / 2, memory);
 
             checkDrawLoop:
-            for (let x1 = -blockStep / 2; x1 <= blockStep / 2; x1 += blockStep) {
-                for (let y1 = -blockStep / 2; y1 <= blockStep / 2; y1 += blockStep) {
+            for (let x1 = -blockStep / 2; x1 <= blockStep / 2; x1 += blockStep / 2) {
+                for (let y1 = -blockStep / 2; y1 <= blockStep / 2; y1 += blockStep / 2) {
                     calcCount[0]++;
                     if (drawFunction(x + x1, layer, y + y1, memory) != val1) {
                         isDraw = true;
@@ -285,8 +294,8 @@ function getLayer2(layer, memory, calcCount) {
             let val1 = drawFunction(x - blockStep / 2, y - blockStep / 2, layer, memory);
 
             checkDrawLoop:
-            for (let x1 = -blockStep / 2; x1 <= blockStep / 2; x1 += blockStep) {
-                for (let y1 = -blockStep / 2; y1 <= blockStep / 2; y1 += blockStep) {
+            for (let x1 = -blockStep / 2; x1 <= blockStep / 2; x1 += blockStep / 2) {
+                for (let y1 = -blockStep / 2; y1 <= blockStep / 2; y1 += blockStep / 2) {
                     calcCount[0]++;
                     if (drawFunction(x + x1, y + y1, layer, memory) != val1) {
                         isDraw = true;
@@ -350,25 +359,6 @@ function getLayer2(layer, memory, calcCount) {
 }
 
 /**
- * @param {number} x
- * @param {number} y
- * @param {number} z
- * @param {Map} memory
- */
-function drawFunction(x, y, z, memory) {
-
-    if (memory.has(`${x}|${y}|${z}`)) {
-        return memory.get(`${x}|${y}|${z}`);
-
-    } else {
-        let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2) - 200) ** 2 + z ** 2;
-        memory.set(`${x}|${y}|${z}`, value);
-
-        return value;
-    }
-}
-
-/**
  * @param {Vector3[]} block1
  * @param {Vector3[]} block2
  */
@@ -402,4 +392,28 @@ function connect(block1, block2) {
     // console.log(lineCalc);
 
     return lines;
+}
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @param {Map} memory
+ */
+function drawFunction(x, y, z, memory) {
+
+    if (memory.has(`${x}|${y}|${z}`)) {
+        return memory.get(`${x}|${y}|${z}`);
+
+    } else {
+        let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
+
+        // let value = 300 ** 2 > x ** 2 + y ** 2 + z ** 2;
+
+        // let value = z ** 2 / 1.2 > x ** 2 + y ** 2 - 100 ** 2;
+
+        memory.set(`${x}|${y}|${z}`, value);
+
+        return value;
+    }
 }

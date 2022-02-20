@@ -46,8 +46,8 @@ class Vector2 {
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.fillStyle = '#FFFFFF';
+        ctx.strokeStyle = '#888888';
+        ctx.fillStyle = '#888888';
         ctx.lineWidth = 1;
 
         let x1 = this.x * 10 ** (camZoom / 10) + canvas.width / 2;
@@ -206,8 +206,8 @@ class Vector3 {
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.fillStyle = '#FFFFFF';
+        ctx.strokeStyle = '#888888';
+        ctx.fillStyle = '#888888';
         ctx.lineWidth = 1;
 
         let v1 = this.project(camRot, camZoom);
@@ -280,8 +280,8 @@ class Line {
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.fillStyle = '#FFFFFF';
+        ctx.strokeStyle = '#888888';
+        ctx.fillStyle = '#888888';
         ctx.lineWidth = 1;
 
         let v1 = this.v.project(camRot, camZoom);
