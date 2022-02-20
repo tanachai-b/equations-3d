@@ -367,11 +367,10 @@ function connect(block1, block2) {
 
     let lines = [];
 
+    let minDist = Number.MAX_SAFE_INTEGER;
+    let minLine = null;
+
     for (let i = 0; i < block1.length; i++) {
-
-        let minDist = Number.MAX_SAFE_INTEGER;
-        let minLine = null;
-
         for (let j = 0; j < block2.length; j++) {
             lineCalc++
 
@@ -385,9 +384,9 @@ function connect(block1, block2) {
                 minLine = new Line(v, w);
             }
         }
-
-        if (minLine != null) { lines.push(minLine); }
     }
+
+    if (minLine != null) { lines.push(minLine); }
 
     // console.log(lineCalc);
 
@@ -406,11 +405,11 @@ function drawFunction(x, y, z, memory) {
         return memory.get(`${x}|${y}|${z}`);
 
     } else {
-        let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
+        // let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
 
         // let value = 300 ** 2 > x ** 2 + y ** 2 + z ** 2;
 
-        // let value = z ** 2 / 1.2 > x ** 2 + y ** 2 - 100 ** 2;
+        let value = z ** 2 / 1.2 > x ** 2 + y ** 2 - 100 ** 2;
 
         memory.set(`${x}|${y}|${z}`, value);
 
