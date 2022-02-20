@@ -76,10 +76,11 @@ window.onload = function () {
     let calcCount = [0];
     let memory = new Map();
     let blocks = new Map();
+    let done = new Set();
 
     let layerStep = 50;
     for (let layer = -300; layer <= 300; layer += layerStep) {
-        objects = objects.concat(getLayer(layer, layerStep, memory, blocks, calcCount));
+        objects = objects.concat(getLayer(layer, layerStep, memory, blocks, done, calcCount));
     }
 
     console.log(calcCount[0]);
@@ -106,7 +107,7 @@ window.onload = function () {
  * @param {Map<any, any>} blocks
  * @param {number[]} calcCount
  */
-function getLayer(layer, layerStep, memory, blocks, calcCount) {
+function getLayer(layer, layerStep, memory, blocks, done, calcCount) {
 
     let layerObjs = [];
 
@@ -114,7 +115,7 @@ function getLayer(layer, layerStep, memory, blocks, calcCount) {
     let blockStep = layerStep;
     for (let x = -300; x <= 300; x += blockStep) {
         for (let y = -300; y <= 300; y += blockStep) {
-            if (blocks.has(`${layer}|${x}|${y}`)) continue;
+            // if (blocks.has(`${layer}|${x}|${y}`)) continue;
 
             let blockPoints = [];
 
@@ -179,20 +180,18 @@ function getLayer(layer, layerStep, memory, blocks, calcCount) {
                         }
                     }
                 }
-            }
 
-            // layerObjs = layerObjs.concat(blockPoints);
-            blocks.set(`${layer}|${x}|${y}`, blockPoints);
+                // layerObjs = layerObjs.concat(blockPoints);
+                blocks.set(`${layer}|${x}|${y}`, blockPoints);
+            }
         }
     }
-
-    let done = new Set();
 
     for (let x = -300; x <= 300; x += blockStep) {
         for (let y = -300; y <= 300; y += blockStep) {
 
             let thisBlock = blocks.get(`${layer}|${x}|${y}`);
-            // layerObjs = layerObjs.concat(connectWithin(thisBlock));
+            if (thisBlock == null) continue;
 
             for (let x1 = -blockStep; x1 <= blockStep; x1 += blockStep) {
                 for (let y1 = -blockStep; y1 <= blockStep; y1 += blockStep) {
@@ -201,11 +200,14 @@ function getLayer(layer, layerStep, memory, blocks, calcCount) {
                         if (done.has(`${layer}|${x}|${y}||${layer + l1}|${x + x1}|${y + y1}`)) continue;
                         if (done.has(`${layer + l1}|${x + x1}|${y + y1}||${layer}|${x}|${y}`)) continue;
 
-                        done.add(`${layer}|${x}|${y}||${layer + l1}|${x + x1}|${y + y1}`);
-                        done.add(`${layer + l1}|${x + x1}|${y + y1}||${layer}|${x}|${y}`);
-
                         let nextBlock = blocks.get(`${layer + l1}|${x + x1}|${y + y1}`);
-                        if (nextBlock != null) { layerObjs = layerObjs.concat(connect(thisBlock, nextBlock)); }
+                        if (nextBlock != null) {
+
+                            done.add(`${layer}|${x}|${y}||${layer + l1}|${x + x1}|${y + y1}`);
+                            done.add(`${layer + l1}|${x + x1}|${y + y1}||${layer}|${x}|${y}`);
+
+                            layerObjs = layerObjs.concat(connect(thisBlock, nextBlock));
+                        }
                     }
                 }
             }
@@ -215,39 +217,11 @@ function getLayer(layer, layerStep, memory, blocks, calcCount) {
     return layerObjs;
 }
 
-// /**
-//  * @param {Vector3[]} block
-//  */
-// function connectWithin(block) {
-
-
-//     let lines = [];
-
-
-//     for (let i = 0; i < block.length - 1; i++) {
-//         for (let j = i + 1; j < block.length; j++) {
-
-
-//             let v = block[i];
-//             let w = block[j];
-
-//             let dist = w.minus(v).magnitude2();
-
-
-//             lines.push(new Line(v, w));
-//         }
-//     }
-
-
-//     return lines;
-// }
-
 /**
  * @param {Vector3[]} block1
  * @param {Vector3[]} block2
  */
 function connect(block1, block2) {
-    let lineCalc = 0;
 
     let lines = [];
 
@@ -256,7 +230,6 @@ function connect(block1, block2) {
 
     for (let i = 0; i < block1.length; i++) {
         for (let j = 0; j < block2.length; j++) {
-            lineCalc++
 
             let v = block1[i];
             let w = block2[j];
@@ -271,8 +244,6 @@ function connect(block1, block2) {
     }
 
     if (minLine != null) { lines.push(minLine); }
-
-    // console.log(lineCalc);
 
     return lines;
 }
