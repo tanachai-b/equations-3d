@@ -33,7 +33,7 @@ window.onload = function () {
     });
 
 
-    /** @type {(Vector2|Vector3|Line)[]} */
+    /** @type {(Vector2|Vector3|Line|Plane)[]} */
     let objects = [
         // new Vector2(0, 0)
     ];
@@ -73,7 +73,8 @@ window.onload = function () {
     // }
 
 
-    objects.push(new Line(new Vector3(100, 100, 0), new Vector3(200, 200, 200)));
+    objects.push(new Plane(new Vector3(-300, -300, -300), new Vector3(300, -300, -300), new Vector3(300, -300, 300)));
+    objects.push(new Plane(new Vector3(-300, 300, 300), new Vector3(300, 300, -300), new Vector3(300, 300, 300)));
 
 
 

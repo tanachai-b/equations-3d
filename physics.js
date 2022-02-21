@@ -307,3 +307,44 @@ class Line {
         ctx.stroke();
     }
 }
+
+
+class Plane {
+    /**
+     * @param {Vector3} u
+     * @param {Vector3} v
+     * @param {Vector3} w
+     */
+    constructor(u, v, w) {
+        this.u = u;
+        this.v = v;
+        this.w = w;
+    }
+
+    /**
+     * @param {Line} camRot
+     * @param {number} camZoom
+     */
+    draw(camRot, camZoom) {
+
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        ctx.strokeStyle = '#888888';
+        ctx.fillStyle = '#CC4444';
+        ctx.lineWidth = 1;
+
+        let u1 = this.u.project(camRot, camZoom);
+        let v1 = this.v.project(camRot, camZoom);
+        let w1 = this.w.project(camRot, camZoom);
+
+        ctx.beginPath();
+        ctx.moveTo(u1.x, u1.y);
+        ctx.lineTo(v1.x, v1.y);
+        ctx.lineTo(w1.x, w1.y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+}
