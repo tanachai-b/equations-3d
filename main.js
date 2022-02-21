@@ -181,8 +181,10 @@ function getLayer(layer, layerStep, memory, blocks, done, calcCount) {
                     }
                 }
 
-                // layerObjs = layerObjs.concat(blockPoints);
-                blocks.set(`${layer}|${x}|${y}`, blockPoints);
+                if (blockPoints.length > 0) {
+                    // layerObjs = layerObjs.concat(blockPoints);
+                    blocks.set(`${layer}|${x}|${y}`, blockPoints);
+                }
             }
         }
     }
@@ -190,25 +192,119 @@ function getLayer(layer, layerStep, memory, blocks, done, calcCount) {
     for (let x = -300; x <= 300; x += blockStep) {
         for (let y = -300; y <= 300; y += blockStep) {
 
-            let thisBlock = blocks.get(`${layer}|${x}|${y}`);
-            if (thisBlock == null) continue;
+            // let thisBlock = blocks.get(`${layer}|${x}|${y}`);
+            // if (thisBlock == null) continue;
 
-            for (let x1 = -blockStep; x1 <= blockStep; x1 += blockStep) {
-                for (let y1 = -blockStep; y1 <= blockStep; y1 += blockStep) {
-                    for (let l1 = -blockStep; l1 <= blockStep; l1 += blockStep) {
+            // for (let x1 = -blockStep; x1 <= blockStep; x1 += blockStep) {
+            //     for (let y1 = -blockStep; y1 <= blockStep; y1 += blockStep) {
+            //         for (let l1 = -blockStep; l1 <= blockStep; l1 += blockStep) {
 
-                        if (done.has(`${layer}|${x}|${y}||${layer + l1}|${x + x1}|${y + y1}`)) continue;
-                        if (done.has(`${layer + l1}|${x + x1}|${y + y1}||${layer}|${x}|${y}`)) continue;
+            //             if (done.has(`${layer}|${x}|${y}||${layer + l1}|${x + x1}|${y + y1}`)) continue;
+            //             if (done.has(`${layer + l1}|${x + x1}|${y + y1}||${layer}|${x}|${y}`)) continue;
 
-                        let nextBlock = blocks.get(`${layer + l1}|${x + x1}|${y + y1}`);
-                        if (nextBlock != null) {
+            //             let nextBlock = blocks.get(`${layer + l1}|${x + x1}|${y + y1}`);
+            //             if (nextBlock != null) {
 
-                            done.add(`${layer}|${x}|${y}||${layer + l1}|${x + x1}|${y + y1}`);
-                            done.add(`${layer + l1}|${x + x1}|${y + y1}||${layer}|${x}|${y}`);
+            //                 done.add(`${layer}|${x}|${y}||${layer + l1}|${x + x1}|${y + y1}`);
+            //                 done.add(`${layer + l1}|${x + x1}|${y + y1}||${layer}|${x}|${y}`);
 
-                            layerObjs = layerObjs.concat(connect(thisBlock, nextBlock));
+            //                 layerObjs = layerObjs.concat(connect(thisBlock, nextBlock));
+            //             }
+            //         }
+            //     }
+            // }
+
+            let adjBlock0 = blocks.get(`${layer}|${x}|${y}`);
+            let adjBlock1 = blocks.get(`${layer}|${x + blockStep}|${y}`);
+            let adjBlock2 = blocks.get(`${layer}|${x}|${y + blockStep}`);
+            let adjBlock3 = blocks.get(`${layer}|${x + blockStep}|${y + blockStep}`);
+            let adjBlock4 = blocks.get(`${layer - blockStep}|${x}|${y}`);
+            let adjBlock5 = blocks.get(`${layer - blockStep}|${x + blockStep}|${y}`);
+            let adjBlock6 = blocks.get(`${layer - blockStep}|${x}|${y + blockStep}`);
+            let adjBlock7 = blocks.get(`${layer - blockStep}|${x + blockStep}|${y + blockStep}`);
+
+            // let ls = [adjBlock0, adjBlock1, adjBlock2, adjBlock3, adjBlock4, adjBlock5, adjBlock6, adjBlock7];
+
+            // for (let i = 0; i < ls.length - 1; i++) {
+            //     for (let j = i + 1; j < ls.length; j++) {
+            //         if (ls[i] != null && ls[j] != null) {
+            //             layerObjs = layerObjs.concat(connect(ls[i], ls[j]));
+            //         }
+            //     }
+            // }
+
+            let sides = [
+                [adjBlock0, adjBlock1, adjBlock2, adjBlock3],
+                [adjBlock0, adjBlock2, adjBlock4, adjBlock6],
+
+                [adjBlock0, adjBlock2, adjBlock5, adjBlock7],
+                [adjBlock1, adjBlock3, adjBlock4, adjBlock6],
+
+                [adjBlock0, adjBlock1, adjBlock4, adjBlock5],
+
+                [adjBlock0, adjBlock1, adjBlock6, adjBlock7],
+                [adjBlock4, adjBlock5, adjBlock2, adjBlock3],
+
+                [adjBlock0, adjBlock4, adjBlock3, adjBlock7],
+                [adjBlock1, adjBlock5, adjBlock2, adjBlock6],
+            ]
+
+            for (let side = 0; side < sides.length; side++) {
+                if (
+                    sides[side][0] != null &&
+                    sides[side][1] != null &&
+                    sides[side][2] != null &&
+                    sides[side][3] != null
+                ) {
+                    // layerObjs = layerObjs.concat(connect(sides[side][0], sides[side][1]));
+                    // layerObjs = layerObjs.concat(connect(sides[side][1], sides[side][2]));
+                    // layerObjs = layerObjs.concat(connect(sides[side][2], sides[side][0]));
+
+                    // layerObjs = layerObjs.concat(connect(sides[side][1], sides[side][2]));
+                    // layerObjs = layerObjs.concat(connect(sides[side][2], sides[side][3]));
+                    // layerObjs = layerObjs.concat(connect(sides[side][3], sides[side][1]));
+
+                    
+                    layerObjs = layerObjs.concat(connect(sides[side][0], sides[side][1]));
+                    layerObjs = layerObjs.concat(connect(sides[side][1], sides[side][3]));
+                    layerObjs = layerObjs.concat(connect(sides[side][3], sides[side][2]));
+                    layerObjs = layerObjs.concat(connect(sides[side][2], sides[side][0]));
+                } else {
+                    let ls = [sides[side][0], sides[side][1], sides[side][2], sides[side][3]];
+
+                    let countNull = 0;
+                    for (let i = 0; i < ls.length; i++) { if (ls[i] == null) countNull++; }
+
+                    if (countNull == 1) {
+                        for (let i = 0; i < ls.length - 1; i++) {
+                            for (let j = i + 1; j < ls.length; j++) {
+                                if (ls[i] != null && ls[j] != null) {
+                                    layerObjs = layerObjs.concat(connect(ls[i], ls[j]));
+                                }
+                            }
                         }
                     }
+                }
+            }
+
+            
+            let sidesx = [
+                [adjBlock0, adjBlock5, adjBlock3],
+                [adjBlock4, adjBlock2, adjBlock7],
+            
+                [adjBlock2, adjBlock7, adjBlock1],
+                [adjBlock6, adjBlock3, adjBlock5],
+            ]
+            
+            for (let side = 0; side < sidesx.length; side++) {
+                if (
+                    sidesx[side][0] != null &&
+                    sidesx[side][1] != null &&
+                    sidesx[side][2] != null 
+                ) {
+                    layerObjs = layerObjs.concat(connect(sidesx[side][0], sidesx[side][1]));
+                    layerObjs = layerObjs.concat(connect(sidesx[side][1], sidesx[side][2]));
+                    layerObjs = layerObjs.concat(connect(sidesx[side][2], sidesx[side][0]));
                 }
             }
         }
@@ -260,13 +356,13 @@ function drawFunction(x, y, z, memory) {
         return memory.get(`${x}|${y}|${z}`);
 
     } else {
-        let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
+        // let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
 
         // let value = 300 ** 2 > x ** 2 + y ** 2 + z ** 2;
 
         // let value = z ** 2 > x ** 2 + y ** 2 - 100 ** 2;
 
-        // let value = 300 ** 2 > x ** 2 + y ** 2+ z ** 2;
+        let value = z ** 2 > x ** 2 + y ** 2 + 100 ** 2;
 
         memory.set(`${x}|${y}|${z}`, value);
 
