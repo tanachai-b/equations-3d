@@ -287,14 +287,14 @@ class Line {
         return new Line(v1, w1);
     }
 
-    depth() { return Math.min(this.v.depth(), this.w.depth()); }
+    depth() { return (this.v.depth() + this.w.depth()) / 2; }
 
     draw() {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#000000';
+        ctx.strokeStyle = '#00000044';
         ctx.fillStyle = '#888888';
         ctx.lineWidth = 1;
 
@@ -331,7 +331,7 @@ class Plane {
         return new Plane(u1, v1, w1);
     }
 
-    depth() { return Math.min(this.u.depth(), this.v.depth(), this.w.depth()); }
+    depth() { return (this.u.depth() + this.v.depth() + this.w.depth()) / 3; }
 
     draw() {
         /** @type {HTMLCanvasElement} */
@@ -396,9 +396,9 @@ class Polygon2 {
     }
 
     depth() {
-        let min = Number.MAX_SAFE_INTEGER;
-        this.points.forEach((point) => { if (point.depth() < min) { min = point.depth(); } });
-        return min;
+        let sum = 0;
+        this.points.forEach((point) => { sum += point.depth() });
+        return sum / this.points.length;
     }
 
     draw() {
@@ -406,8 +406,8 @@ class Polygon2 {
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#4488CC';
-        ctx.fillStyle = '#88CCFFCC';
+        ctx.strokeStyle = '#88AAEE';
+        ctx.fillStyle = '#CCDDFFCC';
         ctx.lineWidth = 1;
 
         ctx.beginPath();

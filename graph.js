@@ -180,10 +180,11 @@ function calcPoint(x, y, z, memory) {
     if (memory.has(`${x}|${y}|${z}`)) { return memory.get(`${x}|${y}|${z}`); }
 
 
-    let value = 270 ** 2 > x ** 2 + y ** 2 + z ** 2;
+    // let value = 200 ** 2 > (x/1.2) ** 2 + y ** 2 + (z/0.8) ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 - 100 ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 + 100 ** 2;
-    // let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
+    let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 150) ** 2 + z ** 2;
+    // let value = z * 300 > x ** 2 + y ** 2;
 
     memory.set(`${x}|${y}|${z}`, value);
     return value;
