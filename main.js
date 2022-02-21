@@ -75,251 +75,174 @@ window.onload = function () {
 
     let calcCount = [0];
     let memory = new Map();
-    let xyBlocks = new Map();
-    let ylBlocks = new Map();
-    let xlBlocks = new Map();
 
-    let layerStep = 50;
-
-    objects = objects.concat(getGraph(layerStep, memory, xyBlocks, ylBlocks, xlBlocks, calcCount));
+    let blockSize = 100;
+    objects = objects.concat(getGraph(blockSize, memory, calcCount));
 
 
     console.log(calcCount[0]);
     console.log(objects.length);
+    // console.log(memory);
 
 
     let ctx = canvas.getContext('2d');
     setInterval(() => {
-        // ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = '#FFFFFF    ';
+        ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        objects.forEach((object) => {
-            object.draw(camRot, camZoom);
-        });
+        objects.forEach((object) => { object.draw(camRot, camZoom); });
     }, 1000 / 60);
 }
 
 /**
- * @param {number} layerStep
+ * @param {number} blockSize
  * @param {Map<any, any>} memory
- * @param {Map<any, any>} xyBlocks
- * @param {Map<any, any>} ylBlocks
- * @param {Map<any, any>} xlBlocks
  * @param {number[]} calcCount
  */
-function getGraph(layerStep, memory, xyBlocks, ylBlocks, xlBlocks, calcCount) {
+function getGraph(blockSize, memory, calcCount) {
 
     let graphObjs = [];
-    let blockStep = layerStep;
 
-    for (let layer = -300; layer <= 300; layer += layerStep) {
+    let blocks = [];
 
-        for (let x = -300; x <= 300; x += blockStep) {
-            for (let y = -300; y <= 300; y += blockStep) {
+    for (let x = -0; x < 300; x += blockSize) {
+        for (let y = -300; y < 300; y += blockSize) {
+            for (let z = -300; z < 300; z += blockSize) {
+
+                let adjPoint = [];
+                for (let x1 = 0; x1 <= blockSize; x1 += blockSize) {
+                    for (let y1 = 0; y1 <= blockSize; y1 += blockSize) {
+                        for (let z1 = 0; z1 <= blockSize; z1 += blockSize) {
+                            adjPoint.push(new Vector3(x + x1, y + y1, z + z1));
+                        }
+                    }
+                }
 
                 let isDraw = false;
 
-                calcCount[0]++;
-                let val1 = drawFunction(layer - blockStep / 2, x - blockStep / 2, y - blockStep / 2, memory);
-
                 checkDrawLoop:
-                for (let l1 = -blockStep / 2; l1 <= blockStep / 2; l1 += blockStep) {
-                    for (let x1 = -blockStep / 2; x1 <= blockStep / 2; x1 += blockStep) {
-                        for (let y1 = -blockStep / 2; y1 <= blockStep / 2; y1 += blockStep) {
-                            calcCount[0]++;
-                            if (drawFunction(layer + l1, x + x1, y + y1, memory) != val1) {
-                                isDraw = true;
-                                break checkDrawLoop;
-                            }
+                for (let i = 0; i < adjPoint.length; i++) {
+                    for (let j = i + 1; j < adjPoint.length; j++) {
+                        let p1 = adjPoint[i];
+                        let p2 = adjPoint[j];
+
+                        if (calcPoint(p1.x, p1.y, p1.z, memory) != calcPoint(p2.x, p2.y, p2.z, memory)) {
+                            isDraw = true;
+                            break checkDrawLoop;
                         }
                     }
                 }
 
                 if (isDraw) {
-                    let xyBlock = [];
-                    let ylBlock = [];
-                    let xlBlock = [];
-
-                    let linStep = 1;
-
-                    calcCount[0]++;
-                    let valx1 = drawFunction(layer, x - blockStep / 2, y, memory);
-
-                    for (let x1 = -blockStep / 2; x1 <= blockStep / 2; x1 += linStep) {
-                        calcCount[0]++;
-                        if (drawFunction(layer, x + x1, y, memory) != valx1) {
-                            xyBlock.push(new Vector3(layer, x + x1 - linStep / 2, y));
-                            xlBlock.push(new Vector3(layer, x + x1 - linStep / 2, y));
-                            break;
-                        }
-                    }
-
-                    calcCount[0]++;
-                    let valy1 = drawFunction(layer, x, y - blockStep / 2, memory);
-
-                    for (let y1 = -blockStep / 2; y1 <= blockStep / 2; y1 += linStep) {
-                        calcCount[0]++;
-                        if (drawFunction(layer, x, y + y1, memory) != valy1) {
-                            xyBlock.push(new Vector3(layer, x, y + y1 - linStep / 2));
-                            ylBlock.push(new Vector3(layer, x, y + y1 - linStep / 2));
-                            break;
-                        }
-                    }
-
-                    calcCount[0]++;
-                    let vall1 = drawFunction(layer - blockStep / 2, x, y, memory);
-
-                    for (let l1 = -blockStep / 2; l1 <= blockStep / 2; l1 += linStep) {
-                        calcCount[0]++;
-                        if (drawFunction(layer + l1, x, y, memory) != vall1) {
-                            ylBlock.push(new Vector3(layer + l1 - linStep / 2, x, y));
-                            xlBlock.push(new Vector3(layer + l1 - linStep / 2, x, y));
-                            break;
-                        }
-                    }
-
-                    if (xyBlock.length > 0) {
-                        // layerObjs = layerObjs.concat(xyBlock);
-                        xyBlocks.set(`${layer}|${x}|${y}`, xyBlock);
-                    }
-
-                    if (ylBlock.length > 0) {
-                        // layerObjs = layerObjs.concat(ylBlock);
-                        ylBlocks.set(`${layer}|${x}|${y}`, ylBlock);
-                    }
-
-                    if (xlBlock.length > 0) {
-                        // layerObjs = layerObjs.concat(xlBlock);
-                        xlBlocks.set(`${layer}|${x}|${y}`, xlBlock);
-                    }
+                    blocks.push(new Vector3(x, y, z));
                 }
             }
         }
-
-        for (let x = -300; x <= 300; x += blockStep) {
-            for (let y = -300; y <= 300; y += blockStep) {
-
-                let thisXyBlock = xyBlocks.get(`${layer}|${x}|${y}`)
-                if (thisXyBlock != null && thisXyBlock.length > 1) {
-                    graphObjs = graphObjs.concat(connectWithin(thisXyBlock));
-                }
-
-                let adjXyBlocks = [];
-
-                for (let x1 = 0; x1 <= blockStep; x1 += blockStep) {
-                    for (let y1 = 0; y1 <= blockStep; y1 += blockStep) {
-                        if (xyBlocks.has(`${layer}|${x + x1}|${y + y1}`)) {
-                            adjXyBlocks.push(xyBlocks.get(`${layer}|${x + x1}|${y + y1}`));
-                        }
-                    }
-                }
-
-                for (let i = 0; i < adjXyBlocks.length - 1; i++) {
-                    for (let j = i + 1; j < adjXyBlocks.length; j++) {
-                        if (adjXyBlocks[i] != null && adjXyBlocks[j] != null) {
-                            graphObjs = graphObjs.concat(connect(adjXyBlocks[i], adjXyBlocks[j]));
-                        }
-                    }
-                }
-
-
-                let thisYlBlock = ylBlocks.get(`${layer}|${x}|${y}`)
-                if (thisYlBlock != null && thisYlBlock.length > 1) {
-                    graphObjs = graphObjs.concat(connectWithin(thisYlBlock));
-                }
-
-                let adjYlBlocks = [];
-
-                for (let l1 = 0; l1 >= -blockStep; l1 -= blockStep) {
-                    for (let y1 = 0; y1 <= blockStep; y1 += blockStep) {
-                        if (ylBlocks.has(`${layer + l1}|${x}|${y + y1}`)) {
-                            adjYlBlocks.push(ylBlocks.get(`${layer + l1}|${x}|${y + y1}`));
-                        }
-                    }
-                }
-
-                for (let i = 0; i < adjYlBlocks.length - 1; i++) {
-                    for (let j = i + 1; j < adjYlBlocks.length; j++) {
-                        if (adjYlBlocks[i] != null && adjYlBlocks[j] != null) {
-                            graphObjs = graphObjs.concat(connect(adjYlBlocks[i], adjYlBlocks[j]));
-                        }
-                    }
-                }
-
-
-                let thisXlBlock = xlBlocks.get(`${layer}|${x}|${y}`)
-                if (thisXlBlock != null && thisXlBlock.length > 1) {
-                    graphObjs = graphObjs.concat(connectWithin(thisXlBlock));
-                }
-
-                let adjXlBlocks = [];
-
-                for (let l1 = 0; l1 >= -blockStep; l1 -= blockStep) {
-                    for (let x1 = 0; x1 <= blockStep; x1 += blockStep) {
-                        if (xlBlocks.has(`${layer + l1}|${x + x1}|${y}`)) {
-                            adjXlBlocks.push(xlBlocks.get(`${layer + l1}|${x + x1}|${y}`));
-                        }
-                    }
-                }
-
-                for (let i = 0; i < adjXlBlocks.length - 1; i++) {
-                    for (let j = i + 1; j < adjXlBlocks.length; j++) {
-                        if (adjXlBlocks[i] != null && adjXlBlocks[j] != null) {
-                            graphObjs = graphObjs.concat(connect(adjXlBlocks[i], adjXlBlocks[j]));
-                        }
-                    }
-                }
-            }
-        }
-
     }
+
+    blocks.forEach((block) => {
+
+        let sides = [
+            calcPlane(new Vector3(block.x, block.y, block.z), new Vector3(0, blockSize, 0), new Vector3(0, 0, blockSize), memory),
+            calcPlane(new Vector3(block.x + blockSize, block.y, block.z), new Vector3(0, blockSize, 0), new Vector3(0, 0, blockSize), memory),
+
+            calcPlane(new Vector3(block.x, block.y, block.z), new Vector3(blockSize, 0, 0), new Vector3(0, 0, blockSize), memory),
+            calcPlane(new Vector3(block.x, block.y + blockSize, block.z), new Vector3(blockSize, 0, 0), new Vector3(0, 0, blockSize), memory),
+
+            calcPlane(new Vector3(block.x, block.y, block.z), new Vector3(0, blockSize, 0), new Vector3(blockSize, 0, 0), memory),
+            calcPlane(new Vector3(block.x, block.y, block.z + blockSize), new Vector3(0, blockSize, 0), new Vector3(blockSize, 0, 0), memory),
+        ];
+
+        sides.forEach((side) => {
+            if (side != null && side.length == 2) {
+                // side.forEach((point) => { graphObjs.push(point); });
+                graphObjs.push(new Line(side[0], side[1]));
+            }
+        });
+
+
+        // graphObjs.push(new Line(new Vector3(block.x, block.y, block.z), new Vector3(block.x, block.y + blockSize, block.z)));
+        // graphObjs.push(new Line(new Vector3(block.x, block.y, block.z + blockSize), new Vector3(block.x, block.y + blockSize, block.z + blockSize)));
+        // graphObjs.push(new Line(new Vector3(block.x, block.y, block.z), new Vector3(block.x, block.y, block.z + blockSize)));
+        // graphObjs.push(new Line(new Vector3(block.x, block.y + blockSize, block.z), new Vector3(block.x, block.y + blockSize, block.z + blockSize)));
+
+        // graphObjs.push(new Line(new Vector3(block.x + blockSize, block.y, block.z), new Vector3(block.x + blockSize, block.y + blockSize, block.z)));
+        // graphObjs.push(new Line(new Vector3(block.x + blockSize, block.y, block.z + blockSize), new Vector3(block.x + blockSize, block.y + blockSize, block.z + blockSize)));
+        // graphObjs.push(new Line(new Vector3(block.x + blockSize, block.y, block.z), new Vector3(block.x + blockSize, block.y, block.z + blockSize)));
+        // graphObjs.push(new Line(new Vector3(block.x + blockSize, block.y + blockSize, block.z), new Vector3(block.x + blockSize, block.y + blockSize, block.z + blockSize)));
+
+        // graphObjs.push(new Line(new Vector3(block.x, block.y, block.z), new Vector3(block.x + blockSize, block.y, block.z)));
+        // graphObjs.push(new Line(new Vector3(block.x, block.y + blockSize, block.z), new Vector3(block.x + blockSize, block.y + blockSize, block.z)));
+        // graphObjs.push(new Line(new Vector3(block.x, block.y, block.z + blockSize), new Vector3(block.x + blockSize, block.y, block.z + blockSize)));
+        // graphObjs.push(new Line(new Vector3(block.x, block.y + blockSize, block.z + blockSize), new Vector3(block.x + blockSize, block.y + blockSize, block.z + blockSize)));
+    });
 
     return graphObjs;
 }
 
-
 /**
- * @param {Vector3[]} block
+ * @param {Vector3} v1
+ * @param {Vector3} v2
+ * @param {Vector3} v3
+ * @param {Map<any, any>} memory
  */
-function connectWithin(block) {
-    if (block.length > 1) {
-        return [new Line(block[0], block[1])];
-    } else {
-        return null;
+function calcPlane(v1, v2, v3, memory) {
+
+    if (memory.has(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}||${v3.x}|${v3.y}|${v3.z}`)) {
+        return memory.get(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}||${v3.x}|${v3.y}|${v3.z}`);
     }
+
+
+    let points = []
+
+    if (points.length < 2) {
+        let point = calcLine(v1, v1.plus(v2), memory)
+        if (point != null) { points.push(point); }
+    }
+
+    if (points.length < 2) {
+        let point = calcLine(v1.plus(v3), v1.plus(v2).plus(v3), memory)
+        if (point != null) { points.push(point); }
+    }
+
+    if (points.length < 2) {
+        let point = calcLine(v1, v1.plus(v3), memory)
+        if (point != null) { points.push(point); }
+    }
+
+    if (points.length < 2) {
+        let point = calcLine(v1.plus(v2), v1.plus(v3).plus(v2), memory)
+        if (point != null) { points.push(point); }
+    }
+
+    memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}||${v3.x}|${v3.y}|${v3.z}`, points);
+    return points;
 }
 
 /**
- * @param {Vector3[]} block1
- * @param {Vector3[]} block2
+ * @param {Vector3} v1
+ * @param {Vector3} v2
+ * @param {Map<any, any>} memory
  */
-function connect(block1, block2) {
+function calcLine(v1, v2, memory) {
 
-    let lines = [];
+    if (memory.has(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`)) { return memory.get(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`); }
 
-    let minDist = Number.MAX_SAFE_INTEGER;
-    let minLine = null;
 
-    for (let i = 0; i < block1.length; i++) {
-        for (let j = 0; j < block2.length; j++) {
+    let direction = v2.minus(v1).unit();
+    let blockSize = v2.minus(v1).magnitude();
 
-            let v = block1[i];
-            let w = block2[j];
+    let initVal = calcPoint(v1.x, v1.y, v1.z, memory);
 
-            let dist = w.minus(v).magnitude2();
+    for (let i = 0; i <= blockSize; i += 1) {
+        let point = v1.plus(direction.timesScalar(i));
+        let calc = calcPoint(point.x, point.y, point.z, memory);
 
-            if (dist > 0 && dist <= minDist) {
-                minDist = dist;
-                minLine = new Line(v, w);
-            }
-        }
+        if (calc == initVal) { continue; }
+
+        memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, point);
+        return point;
     }
-
-    if (minLine != null) { lines.push(minLine); }
-
-    return lines;
 }
 
 /**
@@ -328,19 +251,16 @@ function connect(block1, block2) {
  * @param {number} z
  * @param {Map} memory
  */
-function drawFunction(x, y, z, memory) {
+function calcPoint(x, y, z, memory) {
 
-    if (memory.has(`${x}|${y}|${z}`)) {
-        return memory.get(`${x}|${y}|${z}`);
+    if (memory.has(`${x}|${y}|${z}`)) { return memory.get(`${x}|${y}|${z}`); }
 
-    } else {
-        let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
-        // let value = 275 ** 2 > x ** 2 + y ** 2 + z ** 2;
-        // let value = z ** 2 > x ** 2 + y ** 2 - 100 ** 2;
-        // let value = z ** 2 > x ** 2 + y ** 2 + 100 ** 2;
 
-        memory.set(`${x}|${y}|${z}`, value);
+    // let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
+    // let value = 250 ** 2 > x ** 2 + y ** 2 + z ** 2;
+    let value = z ** 2 > x ** 2 + y ** 2 - 250 ** 2;
+    // let value = z ** 2 > x ** 2 + y ** 2 + 100 ** 2;
 
-        return value;
-    }
+    memory.set(`${x}|${y}|${z}`, value);
+    return value;
 }
