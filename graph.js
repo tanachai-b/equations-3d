@@ -168,8 +168,8 @@ function calcPoint(x, y, z, memory) {
 
 
     // let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
-    // let value = 250 ** 2 > x ** 2 + y ** 2 + z ** 2;
-    let value = z ** 2 > x ** 2 + y ** 2 - 250 ** 2;
+    let value = 250 ** 2 > x ** 2 + y ** 2 + z ** 2;
+    // let value = z ** 2 > x ** 2 + y ** 2 - 250 ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 + 100 ** 2;
 
     memory.set(`${x}|${y}|${z}`, value);

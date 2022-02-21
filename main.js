@@ -54,15 +54,22 @@ window.onload = function () {
     }
 
 
-    let blockSize = 100;
+    let blockSize = 50;
     let memory = new Map();
     objects = objects.concat(getGraph(blockSize, memory));
+
+
+
+
+
+    // objects.push(new Plane(new Vector3(-300, -300, -300), new Vector3(300, -300, -300), new Vector3(300, -300, 300)));
+    // objects.push(new Plane(new Vector3(-300, -300, -300), new Vector3(-300, -300, 300), new Vector3(300, -300, 300)));
+
+    // objects.push(new Plane(new Vector3(-300, 300, -300), new Vector3(300, 300, -300), new Vector3(300, 300, 300)));
+    // objects.push(new Plane(new Vector3(-300, 300, -300), new Vector3(-300, 300, 300), new Vector3(300, 300, 300)));
+
+
     console.log(objects.length);
-
-
-    objects.push(new Plane(new Vector3(-300, -300, -300), new Vector3(300, -300, -300), new Vector3(300, -300, 300)));
-    objects.push(new Plane(new Vector3(-300, 300, 300), new Vector3(300, 300, -300), new Vector3(300, 300, 300)));
-
 
 
     let ctx = canvas.getContext('2d');
@@ -70,14 +77,16 @@ window.onload = function () {
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        let projected = [];
+        let projObjs = [];
 
         objects.forEach((object) => {
-            // object.draw(camRot, camZoom);
-            projected.push(object.projectx(camRot, camZoom));
+            let projected = object.project(camRot, camZoom);
+            let depth = projected.depth();
+            projObjs.push([projected, depth]);
         });
 
-        projected.forEach((object) => { object.drawx(); });
+        projObjs.sort((a, b) => { return b[1] - a[1]; });
+        projObjs.forEach((object) => { object[0].draw(); });
 
     }, 1000 / 60);
 }
