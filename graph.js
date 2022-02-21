@@ -5,13 +5,11 @@
  * @param {number} blockSize
  * @param {Map<any, any>} memory
  */
- function getGraph(blockSize, memory) {
-
-    let graphObjs = [];
+function getGraph(blockSize, memory) {
 
     let blocks = [];
 
-    for (let x = -0; x < 300; x += blockSize) {
+    for (let x = -300; x < 300; x += blockSize) {
         for (let y = -300; y < 300; y += blockSize) {
             for (let z = -300; z < 300; z += blockSize) {
 
@@ -39,14 +37,18 @@
                     }
                 }
 
-                if (isDraw) {
-                    blocks.push(new Vector3(x, y, z));
-                }
+                if (isDraw) { blocks.push(new Vector3(x, y, z)); }
             }
         }
     }
 
+
+    let graphObjs = [];
+
+    let lineMem = new Set();
+
     blocks.forEach((block) => {
+
 
         let sides = [
             calcPlane(new Vector3(block.x, block.y, block.z), new Vector3(0, blockSize, 0), new Vector3(0, 0, blockSize), memory),
@@ -64,12 +66,15 @@
         sides.forEach((side) => {
             if (side != null && side.length == 2) {
                 // side.forEach((point) => { graphObjs.push(point); });
-                graphObjs.push(new Line(side[0], side[1]));
+
+                if (!lineMem.has(`${side[0].x}|${side[0].y}|${side[0].z}||${side[1].x}|${side[1].y}|${side[1].z}`)) {
+                    lineMem.add(`${side[0].x}|${side[0].y}|${side[0].z}||${side[1].x}|${side[1].y}|${side[1].z}`);
+                    graphObjs.push(new Line(side[0], side[1]));
+                }
+
                 side.forEach((point) => { points.push(point); });
             }
         });
-
-
 
 
         // graphObjs.push(new Line(new Vector3(block.x, block.y, block.z), new Vector3(block.x, block.y + blockSize, block.z)));
@@ -168,9 +173,10 @@ function calcPoint(x, y, z, memory) {
 
 
     // let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
-    let value = 250 ** 2 > x ** 2 + y ** 2 + z ** 2;
+    // let value = 250 ** 2 > x ** 2 + y ** 2 + z ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 - 250 ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 + 100 ** 2;
+    let value = 270 ** 2 > x ** 2 + y ** 2 + z ** 2;
 
     memory.set(`${x}|${y}|${z}`, value);
     return value;
