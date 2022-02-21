@@ -38,22 +38,22 @@ window.onload = function () {
         // new Vector2(0, 0)
     ];
 
-    // objects.push(new Line(new Vector3(-300, 0, 0), new Vector3(300, 0, 0)));
-    // objects.push(new Line(new Vector3(0, -300, 0), new Vector3(0, 300, 0)));
-    // objects.push(new Line(new Vector3(0, 0, -300), new Vector3(0, 0, 300)));
+    objects.push(new Line(new Vector3(-300, 0, 0), new Vector3(300, 0, 0)));
+    objects.push(new Line(new Vector3(0, -300, 0), new Vector3(0, 300, 0)));
+    objects.push(new Line(new Vector3(0, 0, -300), new Vector3(0, 0, 300)));
 
-    // for (let i = -1; i <= 1; i += 2) {
-    //     for (let j = -1; j <= 1; j += 2) {
-    //         for (let k = -1; k <= 1; k += 2) {
-    //             let v1 = new Vector3(i * 300, j * 300, k * 300);
-    //             // objects.push(v1);
+    for (let i = -1; i <= 1; i += 2) {
+        for (let j = -1; j <= 1; j += 2) {
+            for (let k = -1; k <= 1; k += 2) {
+                let v1 = new Vector3(i * 300, j * 300, k * 300);
+                // objects.push(v1);
 
-    //             if (i < 1) { objects.push(new Line(v1, v1.plus(new Vector3(2 * 300, 0, 0)))); }
-    //             if (j < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 2 * 300, 0)))); }
-    //             if (k < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 0, 2 * 300)))); }
-    //         }
-    //     }
-    // }
+                if (i < 1) { objects.push(new Line(v1, v1.plus(new Vector3(2 * 300, 0, 0)))); }
+                if (j < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 2 * 300, 0)))); }
+                if (k < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 0, 2 * 300)))); }
+            }
+        }
+    }
 
 
     // for (let i = 0; i < 10; i++) {
@@ -73,16 +73,21 @@ window.onload = function () {
     // }
 
 
-    let calcCount = [0];
-    let memory = new Map();
+    objects.push(new Line(new Vector3(100, 100, 0), new Vector3(200, 200, 200)));
+
+
+
 
     let blockSize = 100;
-    objects = objects.concat(getGraph(blockSize, memory, calcCount));
+    let memory = new Map();
 
+    // objects = objects.concat(getGraph(blockSize, memory));
 
-    console.log(calcCount[0]);
     console.log(objects.length);
-    // console.log(memory);
+
+
+
+
 
 
     let ctx = canvas.getContext('2d');
@@ -97,9 +102,8 @@ window.onload = function () {
 /**
  * @param {number} blockSize
  * @param {Map<any, any>} memory
- * @param {number[]} calcCount
  */
-function getGraph(blockSize, memory, calcCount) {
+function getGraph(blockSize, memory) {
 
     let graphObjs = [];
 
@@ -153,12 +157,17 @@ function getGraph(blockSize, memory, calcCount) {
             calcPlane(new Vector3(block.x, block.y, block.z + blockSize), new Vector3(0, blockSize, 0), new Vector3(blockSize, 0, 0), memory),
         ];
 
+        let points = [];
+
         sides.forEach((side) => {
             if (side != null && side.length == 2) {
                 // side.forEach((point) => { graphObjs.push(point); });
                 graphObjs.push(new Line(side[0], side[1]));
+                side.forEach((point) => { points.push(point); });
             }
         });
+
+
 
 
         // graphObjs.push(new Line(new Vector3(block.x, block.y, block.z), new Vector3(block.x, block.y + blockSize, block.z)));
