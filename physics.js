@@ -338,8 +338,8 @@ class Plane {
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#4488CC';
-        ctx.fillStyle = '#88CCFFCC';
+        ctx.strokeStyle = '#88AAEE';
+        ctx.fillStyle = '#CCDDFFCC';
         ctx.lineWidth = 1;
 
         ctx.beginPath();
@@ -364,12 +364,14 @@ class Polygon2 {
         if (points.length == 3) { this.points = points; return; }
         if (!sort) { this.points = points; return; }
 
+        let axisLine = new Line(points[1].minus(points[0]).unit(), points[2].minus(points[0]));
+
         let sortable = [];
         points.forEach((point, index) => {
             if (index == 0) {
                 sortable.push([-Number.MAX_SAFE_INTEGER, point]);
             } else {
-                let flatten = point.minus(points[0]).overLine(new Line(points[1].minus(points[0]), points[2].minus(points[0])));
+                let flatten = point.minus(points[0]).overLine(axisLine);
                 sortable.push([flatten.xy().angle(), point]);
             }
         });

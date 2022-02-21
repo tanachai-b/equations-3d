@@ -37,63 +37,34 @@ window.onload = function () {
     /** @type {(Vector2|Vector3|Line|Plane|Polygon2)[]} */
     let objects = [];
 
-    let step = 30;
-    for (let diff = -300; diff < 300; diff += step) {
-        objects.push(new Line(new Vector3(diff, 0, 0), new Vector3(diff + step, 0, 0)));
-        objects.push(new Line(new Vector3(0, diff, 0), new Vector3(0, diff + step, 0)));
-        objects.push(new Line(new Vector3(0, 0, diff), new Vector3(0, 0, diff + step)));
+    let step = 10;
+    for (let i = -300; i < 300; i += step) {
+        objects.push(new Line(new Vector3(i, 0, 0), new Vector3(i + step, 0, 0)));
+        objects.push(new Line(new Vector3(0, i, 0), new Vector3(0, i + step, 0)));
+        objects.push(new Line(new Vector3(0, 0, i), new Vector3(0, 0, i + step)));
 
-        objects.push(new Line(new Vector3(diff, -300, -300), new Vector3(diff + step, -300, -300)));
-        objects.push(new Line(new Vector3(diff, 300, -300), new Vector3(diff + step, 300, -300)));
-        objects.push(new Line(new Vector3(diff, -300, 300), new Vector3(diff + step, -300, 300)));
+        objects.push(new Line(new Vector3(i, -300, -300), new Vector3(i + step, -300, -300)));
+        objects.push(new Line(new Vector3(i, 300, -300), new Vector3(i + step, 300, -300)));
+        objects.push(new Line(new Vector3(i, -300, 300), new Vector3(i + step, -300, 300)));
         // objects.push(new Line(new Vector3(diff, 300, 300), new Vector3(diff + step, 300, 300)));
 
-        objects.push(new Line(new Vector3(-300, diff, -300), new Vector3(-300, diff + step, -300)));
-        objects.push(new Line(new Vector3(300, diff, -300), new Vector3(300, diff + step, -300)));
-        objects.push(new Line(new Vector3(-300, diff, 300), new Vector3(-300, diff + step, 300)));
+        objects.push(new Line(new Vector3(-300, i, -300), new Vector3(-300, i + step, -300)));
+        objects.push(new Line(new Vector3(300, i, -300), new Vector3(300, i + step, -300)));
+        objects.push(new Line(new Vector3(-300, i, 300), new Vector3(-300, i + step, 300)));
         // objects.push(new Line(new Vector3(300, diff, 300), new Vector3(300, diff + step, 300)));
 
-        objects.push(new Line(new Vector3(-300, -300, diff), new Vector3(-300, -300, diff + step)));
-        objects.push(new Line(new Vector3(300, -300, diff), new Vector3(300, -300, diff + step)));
-        objects.push(new Line(new Vector3(-300, 300, diff), new Vector3(-300, 300, diff + step)));
+        objects.push(new Line(new Vector3(-300, -300, i), new Vector3(-300, -300, i + step)));
+        objects.push(new Line(new Vector3(300, -300, i), new Vector3(300, -300, i + step)));
+        objects.push(new Line(new Vector3(-300, 300, i), new Vector3(-300, 300, i + step)));
         // objects.push(new Line(new Vector3(300, 300, diff), new Vector3(300, 300, diff + step)));
     }
 
-    // for (let i = -1; i <= 1; i += 2) {
-    //     for (let j = -1; j <= 1; j += 2) {
-    //         for (let k = -1; k <= 1; k += 2) {
-    //             let v1 = new Vector3(i * 300, j * 300, k * 300);
-
-    //             if (i < 1) { objects.push(new Line(v1, v1.plus(new Vector3(2 * 300, 0, 0)))); }
-    //             if (j < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 2 * 300, 0)))); }
-    //             if (k < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 0, 2 * 300)))); }
-    //         }
-    //     }
-    // }
-
-
-    // let blockSize = 50;
-    // let memory = new Map();
-    // objects = objects.concat(getGraph(blockSize, memory));
-
-
-
-    objects.push(new Polygon2([
-        new Vector3(-300,-300, -100),
-        new Vector3(300,-300, 100),
-        new Vector3(-300,300, -50),
-        new Vector3(300,300, 50),
-    ]));
-
-
-    // objects.push(new Plane(new Vector3(-300, -300, -300), new Vector3(300, -300, -300), new Vector3(300, -300, 300)));
-    // objects.push(new Plane(new Vector3(-300, -300, -300), new Vector3(-300, -300, 300), new Vector3(300, -300, 300)));
-
-    // objects.push(new Plane(new Vector3(-300, 300, -300), new Vector3(300, 300, -300), new Vector3(300, 300, 300)));
-    // objects.push(new Plane(new Vector3(-300, 300, -300), new Vector3(-300, 300, 300), new Vector3(300, 300, 300)));
-
+    let blockSize = 20;
+    let memory = new Map();
+    objects = objects.concat(getGraph(blockSize, memory));
 
     console.log(objects.length);
+
 
 
     let ctx = canvas.getContext('2d');
