@@ -59,19 +59,19 @@ window.onload = function () {
         // objects.push(new Line(new Vector3(300, 300, diff), new Vector3(300, 300, diff + step)));
     }
 
-    // let blockSize = 50;
-    // let memory = new Map();
-    // objects = objects.concat(getGraph(blockSize, memory));
+    let blockSize = 20;
+    let memory = new Map();
+    objects = objects.concat(getGraph(blockSize, memory));
 
 
-    objects.push(new Polygon2(
-        [
-            new Vector3(-300,-300,0),
-            new Vector3(300,-300,0),
-            new Vector3(-300,300,0),
-            new Vector3(300,300,0),
-        ]
-    ))
+    // objects.push(new Polygon2(
+    //     [
+    //         new Vector3(-300, -300, 0),
+    //         new Vector3(300, -300, 0),
+    //         new Vector3(-300, 300, 0),
+    //         new Vector3(300, 300, 0),
+    //     ]
+    // ))
 
 
     console.log(objects.length);
@@ -83,16 +83,15 @@ window.onload = function () {
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        let projObjs = [];
+        let sorting = [];
 
         objects.forEach((object) => {
-            let projected = object.project(camRot, camZoom);
-            let depth = projected.depth();
-            projObjs.push([projected, depth]);
+            let depth = object.depth(camRot, camZoom);
+            sorting.push([object, depth]);
         });
 
-        projObjs.sort((a, b) => { return b[1] - a[1]; });
-        projObjs.forEach((object) => { object[0].draw(); });
+        sorting.sort((a, b) => { return b[1] - a[1]; });
+        sorting.forEach((object) => { object[0].draw(camRot, camZoom); });
 
     }, 1000 / 60);
 }

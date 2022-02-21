@@ -208,9 +208,9 @@ class Vector3 {
     }
 
     /**
-    * @param {Line} camRot
-    * @param {number} camZoom
-    */
+     * @param {Line} camRot
+     * @param {number} camZoom
+     */
     project(camRot, camZoom) {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
@@ -222,12 +222,24 @@ class Vector3 {
         let x1 = v1.x / z1 * 1000 + canvas.width / 2;
         let y1 = -v1.z / z1 * 1000 + canvas.height / 2;
 
-        return new Vector3(x1, y1, v1.y);
+        return new Vector2(x1, y1);
     }
 
-    depth() { return this.z; }
+    /**
+     * @param {Line} [camRot]
+     * @param {number} [camZoom]
+     */
+    depth(camRot, camZoom) {
+        let v1 = this.timesLine(camRot);
+        let z1 = Math.max(v1.y + 1000 / 10 ** (camZoom / 10), 0);
+        return z1;
+    }
 
-    draw() {
+    /**
+     * @param {Line} camRot
+     * @param {number} camZoom
+     */
+    draw(camRot, camZoom) {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
@@ -236,10 +248,19 @@ class Vector3 {
         ctx.fillStyle = '#888888';
         ctx.lineWidth = 1;
 
+
+        let v1 = this.timesLine(camRot);
+
+        let z1 = Math.max(v1.y + 1000 / 10 ** (camZoom / 10), 0);
+        let x1 = v1.x / z1 * 1000 + canvas.width / 2;
+        let y1 = -v1.z / z1 * 1000 + canvas.height / 2;
+
+
         let rad = 1 / this.z * 1000;
 
+
         ctx.beginPath();
-        ctx.arc(this.x, this.y, rad, 0, Math.PI * 2);
+        ctx.arc(x1, y1, rad, 0, Math.PI * 2);
         ctx.fill();
     }
 }
@@ -276,20 +297,16 @@ class Line {
     overLine(line) { return new Line(this.v.overLine(line), this.w.overLine(line)); }
 
     /**
-    * @param {Line} camRot
-    * @param {number} camZoom
-    */
-    project(camRot, camZoom) {
+     * @param {Line} camRot
+     * @param {number} camZoom
+     */
+    depth(camRot, camZoom) { return (this.v.depth(camRot, camZoom) + this.w.depth(camRot, camZoom)) / 2; }
 
-        let v1 = this.v.project(camRot, camZoom);
-        let w1 = this.w.project(camRot, camZoom);
-
-        return new Line(v1, w1);
-    }
-
-    depth() { return (this.v.depth() + this.w.depth()) / 2; }
-
-    draw() {
+    /**
+     * @param {Line} camRot
+     * @param {any} camZoom
+     */
+    draw(camRot, camZoom) {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
@@ -298,9 +315,12 @@ class Line {
         ctx.fillStyle = '#888888';
         ctx.lineWidth = 1;
 
+        let v1 = this.v.project(camRot, camZoom);
+        let w1 = this.w.project(camRot, camZoom);
+
         ctx.beginPath();
-        ctx.moveTo(this.v.x, this.v.y);
-        ctx.lineTo(this.w.x, this.w.y);
+        ctx.moveTo(v1.x, v1.y);
+        ctx.lineTo(w1.x, w1.y);
         ctx.stroke();
     }
 }
@@ -319,21 +339,22 @@ class Plane {
     }
 
     /**
-    * @param {Line} camRot
-    * @param {number} camZoom
-    */
-    project(camRot, camZoom) {
-
-        let u1 = this.u.project(camRot, camZoom);
-        let v1 = this.v.project(camRot, camZoom);
-        let w1 = this.w.project(camRot, camZoom);
-
-        return new Plane(u1, v1, w1);
+     * @param {Line} camRot
+     * @param {number} camZoom
+     */
+    depth(camRot, camZoom) {
+        return (
+            this.u.depth(camRot, camZoom) +
+            this.v.depth(camRot, camZoom) +
+            this.w.depth(camRot, camZoom)
+        ) / 3;
     }
 
-    depth() { return (this.u.depth() + this.v.depth() + this.w.depth()) / 3; }
-
-    draw() {
+    /**
+     * @param {Line} camRot
+     * @param {number} camZoom
+     */
+    draw(camRot, camZoom) {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
@@ -342,10 +363,14 @@ class Plane {
         ctx.fillStyle = '#CCDDFFCC';
         ctx.lineWidth = 1;
 
+        let u1 = this.u.project(camRot, camZoom);
+        let v1 = this.v.project(camRot, camZoom);
+        let w1 = this.w.project(camRot, camZoom);
+
         ctx.beginPath();
-        ctx.moveTo(this.u.x, this.u.y);
-        ctx.lineTo(this.v.x, this.v.y);
-        ctx.lineTo(this.w.x, this.w.y);
+        ctx.moveTo(u1.x, u1.y);
+        ctx.lineTo(v1.x, v1.y);
+        ctx.lineTo(w1.x, w1.y);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
@@ -383,43 +408,43 @@ class Polygon2 {
     }
 
     /**
-    * @param {Line} camRot
-    * @param {number} camZoom
-    */
-    project(camRot, camZoom) {
-        let projs = []
-        this.points.forEach((point) => { projs.push(point.project(camRot, camZoom)); });
-        return new Polygon2(projs, false);
-    }
-
-    depth() {
+     * @param {Line} camRot
+     * @param {number} camZoom
+     */
+    depth(camRot, camZoom) {
         let sum = 0;
-        this.points.forEach((point) => { sum += point.depth() });
+        this.points.forEach((point) => { sum += point.depth(camRot, camZoom) });
         return sum / this.points.length;
     }
 
-    draw() {
+    /**
+     * @param {Line} camRot
+     * @param {number} camZoom
+     */
+    draw(camRot, camZoom) {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#80a0e044';
+        ctx.strokeStyle = '#80a0e088';
         ctx.fillStyle = '#CCDDFFCC';
         ctx.lineWidth = 1;
 
 
+        let rotated = []
+        this.points.forEach((point) => { rotated.push(point.timesLine(camRot)); });
+
         let angles = [];
 
-        for (let i = 2; i < this.points.length; i++) {
-            let normal = new Vector3(0, 0, 1).timesLine(new Line(this.points[i - 1].minus(this.points[0]).unit(), this.points[i].minus(this.points[0])));
-            let angle = normal.timesXY(normal.xy().conjugate().unit()).xz().angle();
+        for (let i = 2; i < rotated.length; i++) {
+            let normal = new Vector3(0, 0, 1).timesLine(new Line(rotated[i - 1].minus(rotated[0]).unit(), rotated[i].minus(rotated[0])));
+            let angle = normal.timesXZ(normal.xz().conjugate().unit()).xy().angle();
             angles.push(angle);
         }
 
         let sum = 0;
         angles.forEach((angle) => { sum += Math.abs(angle); });
         let avg = sum / angles.length;
-
 
         let perc = avg / (Math.PI / 2);
 
@@ -433,15 +458,15 @@ class Polygon2 {
         ctx.fillStyle = `#${rHex}${gHex}${bHex}CC`;
 
 
-        console.log(this.points[1].minus(this.points[0]));
-
+        let projected = []
+        this.points.forEach((point) => { projected.push(point.project(camRot, camZoom)); });
 
         ctx.beginPath();
-        ctx.moveTo(this.points[0].x, this.points[0].y);
-        ctx.lineTo(this.points[1].x, this.points[1].y);
-        for (let i = 2; i < this.points.length; i++) { ctx.lineTo(this.points[i].x, this.points[i].y); }
+        ctx.moveTo(projected[0].x, projected[0].y);
+        ctx.lineTo(projected[1].x, projected[1].y);
+        for (let i = 2; i < projected.length; i++) { ctx.lineTo(projected[i].x, projected[i].y); }
         ctx.closePath();
         ctx.fill();
-        ctx.stroke();
+        // ctx.stroke();
     }
 }
