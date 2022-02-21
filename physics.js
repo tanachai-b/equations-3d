@@ -57,6 +57,35 @@ class Vector2 {
         ctx.arc(x1, y1, 1 * 10 ** (camZoom / 10), 0, Math.PI * 2);
         ctx.fill();
     }
+
+    /**
+    * @param {Line} camRot
+    * @param {number} camZoom
+    */
+    projectx(camRot, camZoom) {
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+
+        let x1 = this.x * 10 ** (camZoom / 10) + canvas.width / 2;
+        let y1 = -this.y * 10 ** (camZoom / 10) + canvas.height / 2;
+
+        return new Vector2(x1, y1);
+    }
+
+    drawx() {
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        ctx.strokeStyle = '#888888';
+        ctx.fillStyle = '#888888';
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+    }
 }
 
 class Vector3 {
@@ -237,6 +266,40 @@ class Vector3 {
 
         return new Vector2(x1, y1);
     }
+
+    /**
+    * @param {Line} camRot
+    * @param {number} camZoom
+    */
+    projectx(camRot, camZoom) {
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+
+        let v1 = this.timesLine(camRot);
+
+        let z1 = Math.max(v1.y + 1000 / 10 ** (camZoom / 10), 0);
+        let x1 = v1.x / z1 * 1000 + canvas.width / 2;
+        let y1 = -v1.z / z1 * 1000 + canvas.height / 2;
+
+        return new Vector3(x1, y1, z1);
+    }
+
+    drawx() {
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        ctx.strokeStyle = '#888888';
+        ctx.fillStyle = '#888888';
+        ctx.lineWidth = 1;
+
+        let rad = 1 / this.z * 1000;
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, rad, 0, Math.PI * 2);
+        ctx.fill();
+    }
 }
 
 class Line {
@@ -287,11 +350,11 @@ class Line {
         let v1 = this.v.project(camRot, camZoom);
         let w1 = this.w.project(camRot, camZoom);
 
-        let v1r = this.v.timesLine(camRot);
-        let vrad = 1 / Math.max(v1r.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
+        // let v1r = this.v.timesLine(camRot);
+        // let vrad = 1 / Math.max(v1r.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
 
-        let w1r = this.w.timesLine(camRot);
-        let wrad = 1 / Math.max(w1r.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
+        // let w1r = this.w.timesLine(camRot);
+        // let wrad = 1 / Math.max(w1r.y + 1000 / 10 ** (camZoom / 10), 0) * 1000;
 
         // ctx.beginPath();
         // ctx.arc(v1.x, v1.y, vrad, 0, Math.PI * 2);
@@ -304,6 +367,33 @@ class Line {
         ctx.beginPath();
         ctx.moveTo(v1.x, v1.y);
         ctx.lineTo(w1.x, w1.y);
+        ctx.stroke();
+    }
+
+    /**
+    * @param {Line} camRot
+    * @param {number} camZoom
+    */
+    projectx(camRot, camZoom) {
+
+        let v1 = this.v.projectx(camRot, camZoom);
+        let w1 = this.w.projectx(camRot, camZoom);
+
+        return new Line(v1, w1);
+    }
+
+    drawx() {
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        ctx.strokeStyle = '#888888';
+        ctx.fillStyle = '#888888';
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        ctx.moveTo(this.v.x, this.v.y);
+        ctx.lineTo(this.w.x, this.w.y);
         ctx.stroke();
     }
 }
@@ -343,6 +433,37 @@ class Plane {
         ctx.moveTo(u1.x, u1.y);
         ctx.lineTo(v1.x, v1.y);
         ctx.lineTo(w1.x, w1.y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+
+    /**
+    * @param {Line} camRot
+    * @param {number} camZoom
+    */
+    projectx(camRot, camZoom) {
+
+        let u1 = this.u.projectx(camRot, camZoom);
+        let v1 = this.v.projectx(camRot, camZoom);
+        let w1 = this.w.projectx(camRot, camZoom);
+
+        return new Plane(u1, v1, w1);
+    }
+
+    drawx() {
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        ctx.strokeStyle = '#888888';
+        ctx.fillStyle = '#CC4444';
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        ctx.moveTo(this.u.x, this.u.y);
+        ctx.lineTo(this.v.x, this.v.y);
+        ctx.lineTo(this.w.x, this.w.y);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();

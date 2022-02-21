@@ -70,6 +70,14 @@ window.onload = function () {
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        objects.forEach((object) => { object.draw(camRot, camZoom); });
+        let projected = [];
+
+        objects.forEach((object) => {
+            // object.draw(camRot, camZoom);
+            projected.push(object.projectx(camRot, camZoom));
+        });
+
+        projected.forEach((object) => { object.drawx(); });
+
     }, 1000 / 60);
 }
