@@ -451,11 +451,12 @@ class Polygon2 {
         let rDec = perc * (204 - 128) + 128;
         let gDec = perc * (221 - 160) + 160;
         let bDec = perc * (255 - 224) + 224;
+
         let rHex = Math.floor(rDec).toString(16).padStart(2, '0');
         let gHex = Math.floor(gDec).toString(16).padStart(2, '0');
         let bHex = Math.floor(bDec).toString(16).padStart(2, '0');
 
-        ctx.fillStyle = `#${rHex}${gHex}${bHex}CC`;
+        ctx.fillStyle = `#${rHex}${gHex}${bHex}FF`;
 
 
         let projected = []
@@ -467,6 +468,6 @@ class Polygon2 {
         for (let i = 2; i < projected.length; i++) { ctx.lineTo(projected[i].x, projected[i].y); }
         ctx.closePath();
         ctx.fill();
-        // ctx.stroke();
+        ctx.stroke();
     }
 }
