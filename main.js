@@ -115,6 +115,7 @@ function getGraph(layerStep, memory, xyBlocks, ylBlocks, xlBlocks, calcCount) {
     let blockStep = layerStep;
 
     for (let layer = -300; layer <= 300; layer += layerStep) {
+
         for (let x = -300; x <= 300; x += blockStep) {
             for (let y = -300; y <= 300; y += blockStep) {
 
@@ -275,10 +276,7 @@ function getGraph(layerStep, memory, xyBlocks, ylBlocks, xlBlocks, calcCount) {
 
     }
 
-
     return graphObjs;
-
-
 }
 
 
@@ -336,13 +334,10 @@ function drawFunction(x, y, z, memory) {
         return memory.get(`${x}|${y}|${z}`);
 
     } else {
-        // let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
-
+        let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
         // let value = 275 ** 2 > x ** 2 + y ** 2 + z ** 2;
-
         // let value = z ** 2 > x ** 2 + y ** 2 - 100 ** 2;
-
-        let value = z ** 2 > x ** 2 + y ** 2 + 100 ** 2;
+        // let value = z ** 2 > x ** 2 + y ** 2 + 100 ** 2;
 
         memory.set(`${x}|${y}|${z}`, value);
 
