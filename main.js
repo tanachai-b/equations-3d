@@ -59,9 +59,20 @@ window.onload = function () {
         // objects.push(new Line(new Vector3(300, 300, diff), new Vector3(300, 300, diff + step)));
     }
 
-    let blockSize = 20;
-    let memory = new Map();
-    objects = objects.concat(getGraph(blockSize, memory));
+    // let blockSize = 50;
+    // let memory = new Map();
+    // objects = objects.concat(getGraph(blockSize, memory));
+
+
+    objects.push(new Polygon2(
+        [
+            new Vector3(-300,-300,0),
+            new Vector3(300,-300,0),
+            new Vector3(-300,300,0),
+            new Vector3(300,300,0),
+        ]
+    ))
+
 
     console.log(objects.length);
 

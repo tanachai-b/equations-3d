@@ -222,7 +222,7 @@ class Vector3 {
         let x1 = v1.x / z1 * 1000 + canvas.width / 2;
         let y1 = -v1.z / z1 * 1000 + canvas.height / 2;
 
-        return new Vector3(x1, y1, z1);
+        return new Vector3(x1, y1, v1.y);
     }
 
     depth() { return this.z; }
@@ -383,18 +383,13 @@ class Polygon2 {
     }
 
     /**
-     * @param {Vector3[]} points
-     */
-    static fromSorted(points) { return new Polygon2(points, false); }
-
-    /**
     * @param {Line} camRot
     * @param {number} camZoom
     */
     project(camRot, camZoom) {
         let projs = []
         this.points.forEach((point) => { projs.push(point.project(camRot, camZoom)); });
-        return Polygon2.fromSorted(projs);
+        return new Polygon2(projs, false);
     }
 
     depth() {
@@ -408,9 +403,38 @@ class Polygon2 {
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#88AAEE';
+        ctx.strokeStyle = '#80a0e044';
         ctx.fillStyle = '#CCDDFFCC';
         ctx.lineWidth = 1;
+
+
+        let angles = [];
+
+        for (let i = 2; i < this.points.length; i++) {
+            let normal = new Vector3(0, 0, 1).timesLine(new Line(this.points[i - 1].minus(this.points[0]).unit(), this.points[i].minus(this.points[0])));
+            let angle = normal.timesXY(normal.xy().conjugate().unit()).xz().angle();
+            angles.push(angle);
+        }
+
+        let sum = 0;
+        angles.forEach((angle) => { sum += Math.abs(angle); });
+        let avg = sum / angles.length;
+
+
+        let perc = avg / (Math.PI / 2);
+
+        let rDec = perc * (204 - 128) + 128;
+        let gDec = perc * (221 - 160) + 160;
+        let bDec = perc * (255 - 224) + 224;
+        let rHex = Math.floor(rDec).toString(16).padStart(2, '0');
+        let gHex = Math.floor(gDec).toString(16).padStart(2, '0');
+        let bHex = Math.floor(bDec).toString(16).padStart(2, '0');
+
+        ctx.fillStyle = `#${rHex}${gHex}${bHex}CC`;
+
+
+        console.log(this.points[1].minus(this.points[0]));
+
 
         ctx.beginPath();
         ctx.moveTo(this.points[0].x, this.points[0].y);
