@@ -37,24 +37,24 @@ window.onload = function () {
     /** @type {(Vector2|Vector3|Line|Plane)[]} */
     let objects = [];
 
-    // objects.push(new Line(new Vector3(-300, 0, 0), new Vector3(300, 0, 0)));
-    // objects.push(new Line(new Vector3(0, -300, 0), new Vector3(0, 300, 0)));
-    // objects.push(new Line(new Vector3(0, 0, -300), new Vector3(0, 0, 300)));
+    objects.push(new Line(new Vector3(-300, 0, 0), new Vector3(300, 0, 0)));
+    objects.push(new Line(new Vector3(0, -300, 0), new Vector3(0, 300, 0)));
+    objects.push(new Line(new Vector3(0, 0, -300), new Vector3(0, 0, 300)));
 
-    // for (let i = -1; i <= 1; i += 2) {
-    //     for (let j = -1; j <= 1; j += 2) {
-    //         for (let k = -1; k <= 1; k += 2) {
-    //             let v1 = new Vector3(i * 300, j * 300, k * 300);
+    for (let i = -1; i <= 1; i += 2) {
+        for (let j = -1; j <= 1; j += 2) {
+            for (let k = -1; k <= 1; k += 2) {
+                let v1 = new Vector3(i * 300, j * 300, k * 300);
 
-    //             if (i < 1) { objects.push(new Line(v1, v1.plus(new Vector3(2 * 300, 0, 0)))); }
-    //             if (j < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 2 * 300, 0)))); }
-    //             if (k < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 0, 2 * 300)))); }
-    //         }
-    //     }
-    // }
+                if (i < 1) { objects.push(new Line(v1, v1.plus(new Vector3(2 * 300, 0, 0)))); }
+                if (j < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 2 * 300, 0)))); }
+                if (k < 1) { objects.push(new Line(v1, v1.plus(new Vector3(0, 0, 2 * 300)))); }
+            }
+        }
+    }
 
 
-    let blockSize = 100;
+    let blockSize = 20;
     let memory = new Map();
     objects = objects.concat(getGraph(blockSize, memory));
 

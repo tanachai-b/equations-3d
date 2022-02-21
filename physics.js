@@ -182,6 +182,8 @@ class Vector3 {
     overLine(line) {
 
         let yaw = line.v.xy().unit();
+        if (line.v.xy().magnitude2() == 0) { yaw = new Vector2(1, 0); }
+
         let pitch = line.v.timesXY(yaw.conjugate()).xz();
 
         let w1 = line.w.timesXY(yaw.conjugate());
@@ -285,14 +287,14 @@ class Line {
         return new Line(v1, w1);
     }
 
-    depth() { return Math.min(this.v.depth() + this.w.depth()); }
+    depth() { return Math.min(this.v.depth(), this.w.depth()); }
 
     draw() {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#888888';
+        ctx.strokeStyle = '#000000';
         ctx.fillStyle = '#888888';
         ctx.lineWidth = 1;
 
@@ -329,21 +331,89 @@ class Plane {
         return new Plane(u1, v1, w1);
     }
 
-    depth() { return Math.min(this.u.depth() + this.v.depth() + this.w.depth()); }
+    depth() { return Math.min(this.u.depth(), this.v.depth(), this.w.depth()); }
 
     draw() {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#888888';
-        ctx.fillStyle = '#FFFFFF';
+        ctx.strokeStyle = '#4488CC';
+        ctx.fillStyle = '#88CCFFCC';
         ctx.lineWidth = 1;
 
         ctx.beginPath();
         ctx.moveTo(this.u.x, this.u.y);
         ctx.lineTo(this.v.x, this.v.y);
         ctx.lineTo(this.w.x, this.w.y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+}
+
+
+class Polygon2 {
+
+    /**
+     * @param {Vector3[]} points
+     * @param {boolean} [sort]
+     */
+    constructor(points, sort = true) {
+
+        if (points.length == 3) { this.points = points; return; }
+        if (!sort) { this.points = points; return; }
+
+        let sortable = [];
+        points.forEach((point, index) => {
+            if (index == 0) {
+                sortable.push([-Number.MAX_SAFE_INTEGER, point]);
+            } else {
+                let flatten = point.minus(points[0]).overLine(new Line(points[1].minus(points[0]), points[2].minus(points[0])));
+                sortable.push([flatten.xy().angle(), point]);
+            }
+        });
+        sortable.sort((a, b) => { return b[0] - a[0]; });
+
+        let sorted = [];
+        sortable.forEach(sorting => { sorted.push(sorting[1]); });
+        this.points = sorted;
+    }
+
+    /**
+     * @param {Vector3[]} points
+     */
+    static fromSorted(points) { return new Polygon2(points, false); }
+
+    /**
+    * @param {Line} camRot
+    * @param {number} camZoom
+    */
+    project(camRot, camZoom) {
+        let projs = []
+        this.points.forEach((point) => { projs.push(point.project(camRot, camZoom)); });
+        return Polygon2.fromSorted(projs);
+    }
+
+    depth() {
+        let min = Number.MAX_SAFE_INTEGER;
+        this.points.forEach((point) => { if (point.depth() < min) { min = point.depth(); } });
+        return min;
+    }
+
+    draw() {
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        ctx.strokeStyle = '#4488CC';
+        ctx.fillStyle = '#88CCFFCC';
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        ctx.moveTo(this.points[0].x, this.points[0].y);
+        ctx.lineTo(this.points[1].x, this.points[1].y);
+        for (let i = 2; i < this.points.length; i++) { ctx.lineTo(this.points[i].x, this.points[i].y); }
         ctx.closePath();
         ctx.fill();
         ctx.stroke();

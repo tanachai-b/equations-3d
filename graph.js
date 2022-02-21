@@ -45,7 +45,7 @@ function getGraph(blockSize, memory) {
 
     let graphObjs = [];
 
-    let lineMem = new Set();
+    // let lineMem = new Set();
 
     blocks.forEach((block) => {
 
@@ -61,20 +61,28 @@ function getGraph(blockSize, memory) {
             calcPlane(new Vector3(block.x, block.y, block.z + blockSize), new Vector3(0, blockSize, 0), new Vector3(blockSize, 0, 0), memory),
         ];
 
+        let pointMem = new Set();
         let points = [];
 
         sides.forEach((side) => {
             if (side != null && side.length == 2) {
-                // side.forEach((point) => { graphObjs.push(point); });
 
-                if (!lineMem.has(`${side[0].x}|${side[0].y}|${side[0].z}||${side[1].x}|${side[1].y}|${side[1].z}`)) {
-                    lineMem.add(`${side[0].x}|${side[0].y}|${side[0].z}||${side[1].x}|${side[1].y}|${side[1].z}`);
-                    graphObjs.push(new Line(side[0], side[1]));
-                }
+                // if (!lineMem.has(`${side[0].x}|${side[0].y}|${side[0].z}||${side[1].x}|${side[1].y}|${side[1].z}`)) {
+                //     lineMem.add(`${side[0].x}|${side[0].y}|${side[0].z}||${side[1].x}|${side[1].y}|${side[1].z}`);
+                //     graphObjs.push(new Line(side[0], side[1]));
+                // }
 
-                side.forEach((point) => { points.push(point); });
+
+                side.forEach((/** @type {Vector3} */ point) => {
+                    if (!pointMem.has(`${point.x}|${point.y}|${point.z}`)) {
+                        pointMem.add(`${point.x}|${point.y}|${point.z}`);
+                        points.push(point);
+                    }
+                });
             }
         });
+
+        if (points.length >= 3) { graphObjs = graphObjs.concat(new Polygon2(points)); }
 
 
         // graphObjs.push(new Line(new Vector3(block.x, block.y, block.z), new Vector3(block.x, block.y + blockSize, block.z)));
@@ -172,11 +180,10 @@ function calcPoint(x, y, z, memory) {
     if (memory.has(`${x}|${y}|${z}`)) { return memory.get(`${x}|${y}|${z}`); }
 
 
-    // let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
-    // let value = 250 ** 2 > x ** 2 + y ** 2 + z ** 2;
-    // let value = z ** 2 > x ** 2 + y ** 2 - 250 ** 2;
-    // let value = z ** 2 > x ** 2 + y ** 2 + 100 ** 2;
     let value = 270 ** 2 > x ** 2 + y ** 2 + z ** 2;
+    // let value = z ** 2 > x ** 2 + y ** 2 - 100 ** 2;
+    // let value = z ** 2 > x ** 2 + y ** 2 + 100 ** 2;
+    // let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 200) ** 2 + z ** 2;
 
     memory.set(`${x}|${y}|${z}`, value);
     return value;
