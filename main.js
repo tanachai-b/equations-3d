@@ -37,27 +37,27 @@ window.onload = function () {
     /** @type {(Vector2|Vector3|Line|Plane|Polygon2)[]} */
     let objects = [];
 
-    let step = 10;
-    for (let i = -300; i < 300; i += step) {
-        objects.push(new Line(new Vector3(i, 0, 0), new Vector3(i + step, 0, 0)));
-        objects.push(new Line(new Vector3(0, i, 0), new Vector3(0, i + step, 0)));
-        objects.push(new Line(new Vector3(0, 0, i), new Vector3(0, 0, i + step)));
+    // let step = 10;
+    // for (let i = -300; i < 300; i += step) {
+    //     objects.push(new Line(new Vector3(i, 0, 0), new Vector3(i + step, 0, 0)));
+    //     objects.push(new Line(new Vector3(0, i, 0), new Vector3(0, i + step, 0)));
+    //     objects.push(new Line(new Vector3(0, 0, i), new Vector3(0, 0, i + step)));
 
-        objects.push(new Line(new Vector3(i, -300, -300), new Vector3(i + step, -300, -300)));
-        objects.push(new Line(new Vector3(i, 300, -300), new Vector3(i + step, 300, -300)));
-        objects.push(new Line(new Vector3(i, -300, 300), new Vector3(i + step, -300, 300)));
-        // objects.push(new Line(new Vector3(diff, 300, 300), new Vector3(diff + step, 300, 300)));
+    //     objects.push(new Line(new Vector3(i, -300, -300), new Vector3(i + step, -300, -300)));
+    //     objects.push(new Line(new Vector3(i, 300, -300), new Vector3(i + step, 300, -300)));
+    //     objects.push(new Line(new Vector3(i, -300, 300), new Vector3(i + step, -300, 300)));
+    //     // objects.push(new Line(new Vector3(diff, 300, 300), new Vector3(diff + step, 300, 300)));
 
-        objects.push(new Line(new Vector3(-300, i, -300), new Vector3(-300, i + step, -300)));
-        objects.push(new Line(new Vector3(300, i, -300), new Vector3(300, i + step, -300)));
-        objects.push(new Line(new Vector3(-300, i, 300), new Vector3(-300, i + step, 300)));
-        // objects.push(new Line(new Vector3(300, diff, 300), new Vector3(300, diff + step, 300)));
+    //     objects.push(new Line(new Vector3(-300, i, -300), new Vector3(-300, i + step, -300)));
+    //     objects.push(new Line(new Vector3(300, i, -300), new Vector3(300, i + step, -300)));
+    //     objects.push(new Line(new Vector3(-300, i, 300), new Vector3(-300, i + step, 300)));
+    //     // objects.push(new Line(new Vector3(300, diff, 300), new Vector3(300, diff + step, 300)));
 
-        objects.push(new Line(new Vector3(-300, -300, i), new Vector3(-300, -300, i + step)));
-        objects.push(new Line(new Vector3(300, -300, i), new Vector3(300, -300, i + step)));
-        objects.push(new Line(new Vector3(-300, 300, i), new Vector3(-300, 300, i + step)));
-        // objects.push(new Line(new Vector3(300, 300, diff), new Vector3(300, 300, diff + step)));
-    }
+    //     objects.push(new Line(new Vector3(-300, -300, i), new Vector3(-300, -300, i + step)));
+    //     objects.push(new Line(new Vector3(300, -300, i), new Vector3(300, -300, i + step)));
+    //     objects.push(new Line(new Vector3(-300, 300, i), new Vector3(-300, 300, i + step)));
+    //     // objects.push(new Line(new Vector3(300, 300, diff), new Vector3(300, 300, diff + step)));
+    // }
 
     let blockSize = 20;
     let memory = new Map();
@@ -80,7 +80,7 @@ window.onload = function () {
 
     let ctx = canvas.getContext('2d');
     setInterval(() => {
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#000000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         let sorting = [];

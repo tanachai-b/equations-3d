@@ -311,7 +311,7 @@ class Line {
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#00000044';
+        ctx.strokeStyle = '#FFFFFF44';
         ctx.fillStyle = '#888888';
         ctx.lineWidth = 1;
 
@@ -437,15 +437,15 @@ class Polygon2 {
         this.shade(camRot, (cameraAngle, lightAngle, specAngle) => {
 
             diffusePerc = (Math.PI / 2 - Math.min(lightAngle, Math.PI / 2)) / (Math.PI / 2);
-            specPerc = (Math.PI / 6 - Math.min(specAngle, Math.PI / 6)) / (Math.PI / 6);
+            specPerc = (Math.PI / 24 - Math.min(specAngle, Math.PI / 24)) / (Math.PI / 24);
         });
 
-        let rAmbient = 128;
-        let gAmbient = 160;
-        let bAmbient = 224;
+        let rAmbient = 8;
+        let gAmbient = 8;
+        let bAmbient = 64;
 
-        let rDiffuse = 204;
-        let gDiffuse = 221;
+        let rDiffuse = 32;
+        let gDiffuse = 128;
         let bDiffuse = 255;
 
         let rDec = (1 - specPerc) * (diffusePerc * (rDiffuse - rAmbient) + rAmbient) + (specPerc * 255);
@@ -456,7 +456,8 @@ class Polygon2 {
         let gHex = Math.floor(gDec).toString(16).padStart(2, '0');
         let bHex = Math.floor(bDec).toString(16).padStart(2, '0');
 
-        ctx.fillStyle = `#${rHex}${gHex}${bHex}CC`;
+        ctx.fillStyle = `#${rHex}${gHex}${bHex}FF`;
+        ctx.strokeStyle = `#${rHex}${gHex}${bHex}FF`;
 
 
         let projected = []
@@ -468,7 +469,7 @@ class Polygon2 {
         for (let i = 2; i < projected.length; i++) { ctx.lineTo(projected[i].x, projected[i].y); }
         ctx.closePath();
         ctx.fill();
-        // ctx.stroke();
+        ctx.stroke();
     }
 
     /**
@@ -494,11 +495,11 @@ class Polygon2 {
 
         let cameraAngle = Math.PI / 2 + avgNormal.timesXZ(avgNormal.xz().conjugate().unit()).xy().angle();
 
-        let vecLight = new Vector3(0, -1, 0);//.timesLine(camRot);
+        let vecLight = new Vector3(-1, -2, 1).timesLine(camRot);
         let vecBB = avgNormal.over(vecLight.unit());
         let lightAngle = vecBB.timesYZ(vecBB.yz().conjugate().unit()).xy().angle();
 
-        let vecSup = new Vector3(-1, -2, 1);//.timesLine(camRot);
+        let vecSup = new Vector3(-1, -2, 1).timesLine(camRot);
         let vecAA = avgNormal.over(vecSup.unit());
         let specAngle = vecAA.timesYZ(vecAA.yz().conjugate().unit()).xy().angle();
 
