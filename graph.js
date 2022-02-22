@@ -25,7 +25,7 @@ function getGraph(blockSize, memory) {
                 let isDraw = false;
 
                 checkDrawLoop:
-                for (let i = 0; i < adjPoint.length; i++) {
+                for (let i = 0; i < adjPoint.length - 1; i++) {
                     for (let j = i + 1; j < adjPoint.length; j++) {
                         let p1 = adjPoint[i];
                         let p2 = adjPoint[j];
