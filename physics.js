@@ -426,7 +426,7 @@ class Polygon2 {
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#80a0e088';
+        ctx.strokeStyle = '#88AAEE44';
         ctx.fillStyle = '#CCDDFFCC';
         ctx.lineWidth = 1;
 
@@ -437,7 +437,7 @@ class Polygon2 {
         this.shade(camRot, (cameraAngle, lightAngle, specAngle) => {
 
             diffusePerc = (Math.PI / 2 - Math.min(lightAngle, Math.PI / 2)) / (Math.PI / 2);
-            specPerc = (Math.PI / 15 - Math.min(specAngle, Math.PI / 15)) / (Math.PI / 15);
+            specPerc = (Math.PI / 6 - Math.min(specAngle, Math.PI / 6)) / (Math.PI / 6);
         });
 
         let rAmbient = 128;
@@ -480,17 +480,26 @@ class Polygon2 {
         this.points.forEach((point) => { rotated.push(point.timesLine(camRot)); });
 
 
-        let vecNormal = new Vector3(0, 0, 1).timesLine(new Line(rotated[1].minus(rotated[0]).unit(), rotated[2].minus(rotated[0])));
-        if (vecNormal.y > 0) vecNormal = vecNormal.timesScalar(-1);
+        let normalSum = new Vector3(0, 0, 0);
 
-        let cameraAngle = Math.PI / 2 + vecNormal.timesXZ(vecNormal.xz().conjugate().unit()).xy().angle();
+        for (let i = 2; i < rotated.length; i++) {
+            let vecNormal = new Vector3(0, 0, 1).timesLine(new Line(rotated[i - 1].minus(rotated[0]).unit(), rotated[i].minus(rotated[0])));
+            if (vecNormal.y > 0) vecNormal = vecNormal.timesScalar(-1);
+
+            normalSum = normalSum.plus(vecNormal);
+        }
+
+        let avgNormal = normalSum.overScalar(rotated.length - 2).unit();
+
+
+        let cameraAngle = Math.PI / 2 + avgNormal.timesXZ(avgNormal.xz().conjugate().unit()).xy().angle();
 
         let vecLight = new Vector3(0, -1, 0);//.timesLine(camRot);
-        let vecBB = vecNormal.over(vecLight.unit());
+        let vecBB = avgNormal.over(vecLight.unit());
         let lightAngle = vecBB.timesYZ(vecBB.yz().conjugate().unit()).xy().angle();
 
-        let vecSup = new Vector3(-1, -5, 1);//.timesLine(camRot);
-        let vecAA = vecNormal.over(vecSup.unit());
+        let vecSup = new Vector3(-1, -2, 1);//.timesLine(camRot);
+        let vecAA = avgNormal.over(vecSup.unit());
         let specAngle = vecAA.timesYZ(vecAA.yz().conjugate().unit()).xy().angle();
 
         callBack(cameraAngle, lightAngle, specAngle);
