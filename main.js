@@ -37,8 +37,8 @@ window.onload = function () {
     /** @type {(Vector2|Vector3|Line|Plane|Polygon2)[]} */
     let objects = [];
 
-    let step = 10;
-    for (let i = -350; i < 350; i += step) {
+    let step = 30;
+    for (let i = -360; i < 360; i += step) {
         objects.push(new Line(new Vector3(i, 0, 0), new Vector3(i + step, 0, 0)));
         objects.push(new Line(new Vector3(0, i, 0), new Vector3(0, i + step, 0)));
         objects.push(new Line(new Vector3(0, 0, i), new Vector3(0, 0, i + step)));
@@ -49,20 +49,20 @@ window.onload = function () {
         objects.push(new Line(new Vector3(i, -300, -300), new Vector3(i + step, -300, -300)));
         objects.push(new Line(new Vector3(i, 300, -300), new Vector3(i + step, 300, -300)));
         objects.push(new Line(new Vector3(i, -300, 300), new Vector3(i + step, -300, 300)));
-        // objects.push(new Line(new Vector3(diff, 300, 300), new Vector3(diff + step, 300, 300)));
+        objects.push(new Line(new Vector3(i, 300, 300), new Vector3(i + step, 300, 300)));
 
         objects.push(new Line(new Vector3(-300, i, -300), new Vector3(-300, i + step, -300)));
         objects.push(new Line(new Vector3(300, i, -300), new Vector3(300, i + step, -300)));
         objects.push(new Line(new Vector3(-300, i, 300), new Vector3(-300, i + step, 300)));
-        // objects.push(new Line(new Vector3(300, diff, 300), new Vector3(300, diff + step, 300)));
+        objects.push(new Line(new Vector3(300, i, 300), new Vector3(300, i + step, 300)));
 
         objects.push(new Line(new Vector3(-300, -300, i), new Vector3(-300, -300, i + step)));
         objects.push(new Line(new Vector3(300, -300, i), new Vector3(300, -300, i + step)));
         objects.push(new Line(new Vector3(-300, 300, i), new Vector3(-300, 300, i + step)));
-        // objects.push(new Line(new Vector3(300, 300, diff), new Vector3(300, 300, diff + step)));
+        objects.push(new Line(new Vector3(300, 300, i), new Vector3(300, 300, i + step)));
     }
 
-    let blockSize = 20;
+    let blockSize = 15;
     let memory = new Map();
     objects = objects.concat(getGraph(blockSize, memory));
 
