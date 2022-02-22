@@ -141,18 +141,20 @@ function calcLine(v1, v2, memory) {
     if (memory.has(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`)) { return memory.get(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`); }
 
 
+    let lineStep = 1;
+
     let direction = v2.minus(v1).unit();
     let blockSize = v2.minus(v1).magnitude();
 
     let initVal = calcPoint(v1.x, v1.y, v1.z, memory);
 
-    for (let i = 1; i <= blockSize; i += 1) {
+    for (let i = lineStep; i <= blockSize; i += lineStep) {
         let point = v1.plus(direction.timesScalar(i));
         let calc = calcPoint(point.x, point.y, point.z, memory);
 
         if (calc == initVal) { continue; }
 
-        let result = v1.plus(direction.timesScalar(i - 0.5));
+        let result = v1.plus(direction.timesScalar(i - lineStep / 2));
         memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, result);
         return result;
     }
@@ -180,6 +182,7 @@ function calcPoint(x, y, z, memory) {
     // let value = z > 10 * (x * y) / Math.E ** (x ** 2 + y ** 2)
     // let value = 2.5 ** 2 < x ** 2 - y ** 2 + z ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2;
+    // let value = z + 2 > x ** 2 + y ** 2;
     // let value = z < Math.sin(x + y) / 2 + Math.sin(x - y) / 5;
 
     memory.set(`${x}|${y}|${z}`, value);
