@@ -75,17 +75,6 @@ function getGraph(blockSize, memory) {
         });
 
 
-        // if (points.length > 3) {
-        //     let avgPoint = new Vector3(0, 0, 0);
-        //     points.forEach((point) => {
-        //         avgPoint = avgPoint.plus(point);
-        //     });
-
-        //     avgPoint = avgPoint.overScalar(points.length);
-        //     points = [avgPoint].concat(points);
-        // }
-
-
         if (points.length >= 3) { graphObjs = graphObjs.concat(new Polygon2(points)); }
     });
 
@@ -138,7 +127,9 @@ function calcPlane(v1, v2, v3, memory) {
  */
 function calcLine(v1, v2, memory) {
 
-    if (memory.has(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`)) { return memory.get(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`); }
+    if (memory.has(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`)) {
+        return memory.get(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`);
+    }
 
 
     let lineStep = 1;
