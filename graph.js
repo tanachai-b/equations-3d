@@ -43,6 +43,7 @@ function getGraph(blockSize, memory) {
 
 
     let graphObjs = [];
+    let totalPoints = 0;
 
     blocks.forEach((block) => {
 
@@ -74,8 +75,13 @@ function getGraph(blockSize, memory) {
         });
 
 
-        if (points.length >= 3) { graphObjs = graphObjs.concat(new Polygon2(points)); }
+        if (points.length >= 3) {
+            graphObjs = graphObjs.concat(new Polygon2(points));
+            totalPoints += points.length;
+        }
     });
+
+    console.log(totalPoints);
 
     return graphObjs;
 }
