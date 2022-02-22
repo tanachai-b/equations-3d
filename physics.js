@@ -426,83 +426,85 @@ class Polygon2 {
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#FFFFFF22';
+        ctx.strokeStyle = '#FFFFFF44';
         ctx.fillStyle = '#CCDDFFCC';
         ctx.lineWidth = 1;
 
 
-        let diffusePerc = 0;
-        let specularPerc = 0;
-        this.shade(camRot, (cameraAngle, diffuseAngle, specularAngle) => {
-            diffusePerc = (Math.PI / 2 - Math.min(diffuseAngle, Math.PI / 2)) / (Math.PI / 2);
-            specularPerc = (Math.PI / 12 - Math.min(specularAngle, Math.PI / 12)) / (Math.PI / 12);
-        });
-
-        let rDiffuse = 255 * 4 / 8;
-        let gDiffuse = 255 * 6 / 8;
-        let bDiffuse = 255 * 8 / 8;
-
-        let rAmbient = rDiffuse * 5 / 8;
-        let gAmbient = gDiffuse * 5 / 8;
-        let bAmbient = bDiffuse * 7 / 8;
-
-        let rDec = (1 - specularPerc) * (diffusePerc * (rDiffuse - rAmbient) + rAmbient) + (specularPerc * 255);
-        let gDec = (1 - specularPerc) * (diffusePerc * (gDiffuse - gAmbient) + gAmbient) + (specularPerc * 255);
-        let bDec = (1 - specularPerc) * (diffusePerc * (bDiffuse - bAmbient) + bAmbient) + (specularPerc * 255);
-
-        let rHex = Math.floor(rDec).toString(16).padStart(2, '0');
-        let gHex = Math.floor(gDec).toString(16).padStart(2, '0');
-        let bHex = Math.floor(bDec).toString(16).padStart(2, '0');
-
-        ctx.fillStyle = `#${rHex}${gHex}${bHex}EE`;
-        // ctx.strokeStyle = `#${rHex}${gHex}${bHex}EE`;
-
+        let rotated = [];
+        this.points.forEach((point) => { rotated.push(point.timesLine(camRot)); });
 
         let projected = []
         this.points.forEach((point) => { projected.push(point.project(camRot, camZoom)); });
 
+
+        for (let i = 2; i < rotated.length; i++) {
+
+            let normal = new Vector3(0, 0, 1).timesLine(new Line(rotated[i - 1].minus(rotated[0]).unit(), rotated[i].minus(rotated[0])));
+            if (normal.y > 0) normal = normal.timesScalar(-1);
+
+
+            let diffusePerc = 0;
+            let specularPerc = 0;
+            this.shade(normal, (diffuseAngle, specularAngle) => {
+                diffusePerc = (Math.PI / 2 - Math.min(diffuseAngle, Math.PI / 2)) / (Math.PI / 2);
+                specularPerc = (Math.PI / 12 - Math.min(specularAngle, Math.PI / 12)) / (Math.PI / 12);
+            });
+
+            let rDiffuse = 255 * 4 / 8;
+            let gDiffuse = 255 * 6 / 8;
+            let bDiffuse = 255 * 8 / 8;
+
+            let rAmbient = rDiffuse * 5 / 8;
+            let gAmbient = gDiffuse * 5 / 8;
+            let bAmbient = bDiffuse * 7 / 8;
+
+            let rDec = (1 - specularPerc) * (diffusePerc * (rDiffuse - rAmbient) + rAmbient) + (specularPerc * 255);
+            let gDec = (1 - specularPerc) * (diffusePerc * (gDiffuse - gAmbient) + gAmbient) + (specularPerc * 255);
+            let bDec = (1 - specularPerc) * (diffusePerc * (bDiffuse - bAmbient) + bAmbient) + (specularPerc * 255);
+
+            let rHex = Math.floor(rDec).toString(16).padStart(2, '0');
+            let gHex = Math.floor(gDec).toString(16).padStart(2, '0');
+            let bHex = Math.floor(bDec).toString(16).padStart(2, '0');
+
+            ctx.fillStyle = `#${rHex}${gHex}${bHex}FF`;
+            // ctx.strokeStyle = `#${rHex}${gHex}${bHex}FF`;
+
+            ctx.beginPath();
+            ctx.moveTo(projected[0].x, projected[0].y);
+            ctx.lineTo(projected[i - 1].x, projected[i - 1].y);
+            ctx.lineTo(projected[i].x, projected[i].y);
+            ctx.closePath();
+            ctx.fill();
+            // ctx.stroke();
+        }
+
+
+        ctx.strokeStyle = '#FFFFFF44';
         ctx.beginPath();
         ctx.moveTo(projected[0].x, projected[0].y);
         ctx.lineTo(projected[1].x, projected[1].y);
         for (let i = 2; i < projected.length; i++) { ctx.lineTo(projected[i].x, projected[i].y); }
         ctx.closePath();
-        ctx.fill();
         ctx.stroke();
     }
 
     /**
-     * @param {Line} camRot
-     * @param {{ (cameraAngle: number, diffuseAngle: number, specularAngle:number): void; }} callBack
+     * @param {Vector3} normal
+     * @param {{(diffuseAngle: number, specularAngle: number): void;}} callBack
      */
-    shade(camRot, callBack) {
-        let rotated = [];
-        this.points.forEach((point) => { rotated.push(point.timesLine(camRot)); });
-
-
-        let normalSum = new Vector3(0, 0, 0);
-
-        for (let i = 2; i < rotated.length; i++) {
-            let normal = new Vector3(0, 0, 1).timesLine(new Line(rotated[i - 1].minus(rotated[0]).unit(), rotated[i].minus(rotated[0])));
-            if (normal.y > 0) normal = normal.timesScalar(-1);
-
-            normalSum = normalSum.plus(normal);
-        }
-
-        let normalAvg = normalSum.overScalar(rotated.length - 2).unit();
-
-
-        let cameraAngle = Math.PI / 2 + normalAvg.timesXZ(normalAvg.xz().conjugate().unit()).xy().angle();
+    shade(normal, callBack) {
 
         let diffuseDir = new Vector3(-1, -2, 1);//.timesLine(camRot);
-        let diffuseNorm = diffuseDir.over(normalAvg.unit());
+        let diffuseNorm = diffuseDir.over(normal.unit());
         let diffuseAngle = diffuseNorm.timesYZ(diffuseNorm.yz().conjugate().unit()).xy().angle();
 
         let specularDir = new Vector3(-1, -2, 1);//.timesLine(camRot);
-        let reflectNorm = specularDir.over(normalAvg.unit()).conjugate();
-        let cameraNorm = new Vector3(0, -1, 0).over(normalAvg.unit());
+        let reflectNorm = specularDir.over(normal.unit()).conjugate();
+        let cameraNorm = new Vector3(0, -1, 0).over(normal.unit());
         let reflectCamera = reflectNorm.over(cameraNorm.unit());
         let specularAngle = reflectCamera.timesYZ(reflectCamera.yz().conjugate().unit()).xy().angle();
 
-        callBack(cameraAngle, diffuseAngle, specularAngle);
+        callBack(diffuseAngle, specularAngle);
     }
 }

@@ -158,13 +158,13 @@ function calcLine(v1, v2, memory) {
 
     let initVal = calcPoint(v1.x, v1.y, v1.z, memory);
 
-    for (let i = 0; i <= blockSize; i += 1) {
+    for (let i = 1; i <= blockSize; i += 1) {
         let point = v1.plus(direction.timesScalar(i));
         let calc = calcPoint(point.x, point.y, point.z, memory);
 
         if (calc == initVal) { continue; }
 
-        let result = point.plus(direction.timesScalar(-0.5));
+        let result = v1.plus(direction.timesScalar(i - 0.5));
         memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, result);
         return result;
     }
