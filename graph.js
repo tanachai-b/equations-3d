@@ -121,22 +121,22 @@ function calcPlane(v1, v2, v3, memory) {
     let points = []
 
     if (points.length < 2) {
-        let point = calcLine(v1, v1.plus(v2), memory)
+        let point = calcLine(v1, v2, memory)
         if (point != null) { points.push(point); }
     }
 
     if (points.length < 2) {
-        let point = calcLine(v1.plus(v3), v1.plus(v2).plus(v3), memory)
+        let point = calcLine(v1.plus(v3), v2, memory)
         if (point != null) { points.push(point); }
     }
 
     if (points.length < 2) {
-        let point = calcLine(v1, v1.plus(v3), memory)
+        let point = calcLine(v1, v3, memory)
         if (point != null) { points.push(point); }
     }
 
     if (points.length < 2) {
-        let point = calcLine(v1.plus(v2), v1.plus(v3).plus(v2), memory)
+        let point = calcLine(v1.plus(v2), v3, memory)
         if (point != null) { points.push(point); }
     }
 
@@ -158,8 +158,8 @@ function calcLine(v1, v2, memory) {
 
     let lineStep = 1;
 
-    let direction = v2.minus(v1).unit();
-    let blockSize = v2.minus(v1).magnitude();
+    let direction = v2.unit();
+    let blockSize = v2.magnitude();
 
     let initVal = calcPoint(v1.x, v1.y, v1.z, memory);
 
@@ -174,9 +174,30 @@ function calcLine(v1, v2, memory) {
         return result;
     }
 
+
+
+    // calcLineRecur(v1, v2, memory, 4);
+
+
+
+
+
+
+
+
     memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, null);
     return null;
 }
+
+// function calcLineRecur(v1, v2, memory, iter) {
+//     let calc1 = calcPoint(v1.x, v1.y, v1.z, memory);
+//     let calc2 = calcPoint(v2.x, v2.y, v2.z, memory);
+
+//     if (calc1 == calc2) { return null; }
+
+//     let midPoint = v2.minus.v1.timesScalar(0.5).plus
+// }
+
 
 /**
  * @param {number} x
@@ -205,8 +226,9 @@ function calcPoint(x, y, z, memory) {
 
     // let value = 0 < (x ** 2 + 9 / 4 * y ** 2 + z ** 2 - 1) ** 3 - (x ** 2 + 9 / 80 * y ** 2) * z ** 3 - 0;
 
-    let value = z < Math.E ** -(x ** 2 + y ** 2)*1.5
+    let value = z < Math.E ** -(x ** 2 + y ** 2) * 1.5
 
     memory.set(`${x}|${y}|${z}`, value);
     return value;
 }
+
