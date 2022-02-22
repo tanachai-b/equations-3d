@@ -473,7 +473,7 @@ class Polygon2 {
         let bHex = Math.floor(bAvg).toString(16).padStart(2, '0');
 
         ctx.fillStyle = `#${rHex}${gHex}${bHex}FF`;
-        // ctx.strokeStyle = `#${rHex}${gHex}${bHex}FF`;
+        ctx.strokeStyle = `#${rHex}${gHex}${bHex}FF`;
 
 
         let projected = []

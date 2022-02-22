@@ -186,9 +186,9 @@ function calcLine(v1, v2, memory) {
  */
 function calcPoint(x, y, z, memory) {
 
-    x = x / 100;
-    y = y / 100;
-    z = z / 100;
+    x = x / 200;
+    y = y / 200;
+    z = z / 200;
 
     if (memory.has(`${x}|${y}|${z}`)) { return memory.get(`${x}|${y}|${z}`); }
 
@@ -196,12 +196,14 @@ function calcPoint(x, y, z, memory) {
     // let value = 2.5 ** 4 > (x/1.2) ** 4 + y ** 4 + (z/0.8) ** 4;
     // let value = z ** 2 > x ** 2 + y ** 2 - 1 ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 + 1 ** 2;
-    let value = 1 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 2) ** 2 + z ** 2;
+    // let value = 1 > (Math.sqrt(x ** 2 + y ** 2) - 2) ** 2 + z ** 2;
     // let value = z > 10 * (x * y) / Math.E ** (x ** 2 + y ** 2)
-    // let value = 2.5 ** 2 < x ** 2 - y ** 2 + z ** 2;
+    // let value = 1 ** 2 < x ** 2 - y ** 2 + z ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2;
     // let value = z + 2 > x ** 2 + y ** 2;
     // let value = z < Math.sin(x + y) / 2 + Math.sin(x - y) / 5;
+
+    let value = 0 < (x ** 2 + 9 / 4 * y ** 2 + z ** 2 - 1) ** 3 - (x ** 2 + 9 / 80 * y ** 2) * z ** 3 - 0
 
     memory.set(`${x}|${y}|${z}`, value);
     return value;
