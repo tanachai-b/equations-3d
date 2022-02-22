@@ -158,6 +158,9 @@ function calcLine(v1, v2, memory) {
         memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, result);
         return result;
     }
+
+    memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, null);
+    return null;
 }
 
 /**
