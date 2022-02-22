@@ -156,47 +156,73 @@ function calcLine(v1, v2, memory) {
     }
 
 
-    let lineStep = 1;
+    // let lineStep = 1;
 
-    let direction = v2.unit();
-    let blockSize = v2.magnitude();
+    // let direction = v2.unit();
+    // let blockSize = v2.magnitude();
 
-    let initVal = calcPoint(v1.x, v1.y, v1.z, memory);
+    // let initVal = calcPoint(v1.x, v1.y, v1.z, memory);
 
-    for (let i = lineStep; i <= blockSize; i += lineStep) {
-        let point = v1.plus(direction.timesScalar(i));
-        let calc = calcPoint(point.x, point.y, point.z, memory);
+    // for (let i = lineStep; i <= blockSize; i += lineStep) {
+    //     let point = v1.plus(direction.timesScalar(i));
+    //     let calc = calcPoint(point.x, point.y, point.z, memory);
 
-        if (calc == initVal) { continue; }
+    //     if (calc == initVal) { continue; }
 
-        let result = v1.plus(direction.timesScalar(i - lineStep / 2));
-        memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, result);
-        return result;
+    //     let result = v1.plus(direction.timesScalar(i - lineStep / 2));
+    //     memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, result);
+    //     return result;
+    // }
+
+    // memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, null);
+    // return null;
+
+
+
+
+    let hit = calcLineRecur(v1, v2, memory, 0.01);
+
+    memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, hit);
+    return hit;
+}
+
+/**
+ * @param {Vector3} v1
+ * @param {Vector3} v2
+ * @param {Map<any, any>} memory
+ * @param {number} detail
+ */
+function calcLineRecur(v1, v2, memory, detail) {
+
+
+    if (memory.has(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`)) {
+        return memory.get(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`);
+    }
+
+    let calc1 = calcPoint(v1.x, v1.y, v1.z, memory);
+    let calc2 = calcPoint(v1.plus(v2).x, v1.plus(v2).y, v1.plus(v2).z, memory);
+
+
+    if (calc1 == calc2) {
+        memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, null);
+        return null;
+    }
+
+    let halfDiff = v2.timesScalar(0.5);
+
+    if (halfDiff.magnitude2() < detail ** 2) {
+        let hit = v1.plus(halfDiff);
+        memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, hit);
+        return hit;
     }
 
 
+    let hit = calcLineRecur(v1, halfDiff, memory, detail);
+    if (hit == null) { hit = calcLineRecur(v1.plus(halfDiff), halfDiff, memory, detail); }
 
-    // calcLineRecur(v1, v2, memory, 4);
-
-
-
-
-
-
-
-
-    memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, null);
-    return null;
+    memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, hit);
+    return hit;
 }
-
-// function calcLineRecur(v1, v2, memory, iter) {
-//     let calc1 = calcPoint(v1.x, v1.y, v1.z, memory);
-//     let calc2 = calcPoint(v2.x, v2.y, v2.z, memory);
-
-//     if (calc1 == calc2) { return null; }
-
-//     let midPoint = v2.minus.v1.timesScalar(0.5).plus
-// }
 
 
 /**
@@ -214,19 +240,18 @@ function calcPoint(x, y, z, memory) {
     if (memory.has(`${x}|${y}|${z}`)) { return memory.get(`${x}|${y}|${z}`); }
 
 
-    // let value = 2.5 ** 4 > (x/1.2) ** 4 + y ** 4 + (z/0.8) ** 4;
-    // let value = z ** 2 > x ** 2 + y ** 2 - 1 ** 2;
-    // let value = z ** 2 > x ** 2 + y ** 2 + 1 ** 2;
-    // let value = 1 > (Math.sqrt(x ** 2 + y ** 2) - 2) ** 2 + z ** 2;
-    // let value = z > 10 * (x * y) / Math.E ** (x ** 2 + y ** 2)
+    let value = 1.2 ** 4 > (x / 1.2) ** 4 + y ** 4 + (z / 0.8) ** 4;
+    // let value = z ** 2 > x ** 2 + y ** 2 - 0.5 ** 2;
+    // let value = z ** 2 > x ** 2 + y ** 2 + 0.5 ** 2;
+    // let value = 0.2 > (Math.sqrt(x ** 2 + y ** 2) - 1) ** 2 + z ** 2;
+    // let value = z > 7 * (x * y) / Math.E ** (x ** 2 + y ** 2)
     // let value = 1 ** 2 < x ** 2 - y ** 2 + z ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2;
-    // let value = z + 2 > x ** 2 + y ** 2;
-    // let value = z < Math.sin(x + y) / 2 + Math.sin(x - y) / 5;
-
+    // let value = z + 0.5 > x ** 2 + y ** 2;
+    // let value = z * 5 < Math.sin(x * 1.5 + y * 1.5) + Math.sin(x * 1.5 - y * 1.5);
     // let value = 0 < (x ** 2 + 9 / 4 * y ** 2 + z ** 2 - 1) ** 3 - (x ** 2 + 9 / 80 * y ** 2) * z ** 3 - 0;
-
-    let value = z < Math.E ** -(x ** 2 + y ** 2) * 1.5
+    // let value = z < Math.E ** -(x ** 2 + y ** 2) * 1.5;
+    // let value = z < x;
 
     memory.set(`${x}|${y}|${z}`, value);
     return value;
