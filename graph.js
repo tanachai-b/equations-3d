@@ -45,10 +45,7 @@ function getGraph(blockSize, memory) {
 
     let graphObjs = [];
 
-    // let lineMem = new Set();
-
     blocks.forEach((block) => {
-
 
         let sides = [
             calcPlane(new Vector3(block.x, block.y, block.z), new Vector3(0, blockSize, 0), new Vector3(0, 0, blockSize), memory),
@@ -61,17 +58,12 @@ function getGraph(blockSize, memory) {
             calcPlane(new Vector3(block.x, block.y, block.z + blockSize), new Vector3(0, blockSize, 0), new Vector3(blockSize, 0, 0), memory),
         ];
 
+
         let pointMem = new Set();
         let points = [];
 
         sides.forEach((side) => {
             if (side != null && side.length == 2) {
-
-                // if (!lineMem.has(`${side[0].x}|${side[0].y}|${side[0].z}||${side[1].x}|${side[1].y}|${side[1].z}`)) {
-                //     lineMem.add(`${side[0].x}|${side[0].y}|${side[0].z}||${side[1].x}|${side[1].y}|${side[1].z}`);
-                //     graphObjs.push(new Line(side[0], side[1]));
-                // }
-
 
                 side.forEach((/** @type {Vector3} */ point) => {
                     if (!pointMem.has(`${point.x}|${point.y}|${point.z}`)) {
@@ -82,23 +74,19 @@ function getGraph(blockSize, memory) {
             }
         });
 
+
+        // if (points.length > 3) {
+        //     let avgPoint = new Vector3(0, 0, 0);
+        //     points.forEach((point) => {
+        //         avgPoint = avgPoint.plus(point);
+        //     });
+
+        //     avgPoint = avgPoint.overScalar(points.length);
+        //     points = [avgPoint].concat(points);
+        // }
+
+
         if (points.length >= 3) { graphObjs = graphObjs.concat(new Polygon2(points)); }
-
-
-        // graphObjs.push(new Line(new Vector3(block.x, block.y, block.z), new Vector3(block.x, block.y + blockSize, block.z)));
-        // graphObjs.push(new Line(new Vector3(block.x, block.y, block.z + blockSize), new Vector3(block.x, block.y + blockSize, block.z + blockSize)));
-        // graphObjs.push(new Line(new Vector3(block.x, block.y, block.z), new Vector3(block.x, block.y, block.z + blockSize)));
-        // graphObjs.push(new Line(new Vector3(block.x, block.y + blockSize, block.z), new Vector3(block.x, block.y + blockSize, block.z + blockSize)));
-
-        // graphObjs.push(new Line(new Vector3(block.x + blockSize, block.y, block.z), new Vector3(block.x + blockSize, block.y + blockSize, block.z)));
-        // graphObjs.push(new Line(new Vector3(block.x + blockSize, block.y, block.z + blockSize), new Vector3(block.x + blockSize, block.y + blockSize, block.z + blockSize)));
-        // graphObjs.push(new Line(new Vector3(block.x + blockSize, block.y, block.z), new Vector3(block.x + blockSize, block.y, block.z + blockSize)));
-        // graphObjs.push(new Line(new Vector3(block.x + blockSize, block.y + blockSize, block.z), new Vector3(block.x + blockSize, block.y + blockSize, block.z + blockSize)));
-
-        // graphObjs.push(new Line(new Vector3(block.x, block.y, block.z), new Vector3(block.x + blockSize, block.y, block.z)));
-        // graphObjs.push(new Line(new Vector3(block.x, block.y + blockSize, block.z), new Vector3(block.x + blockSize, block.y + blockSize, block.z)));
-        // graphObjs.push(new Line(new Vector3(block.x, block.y, block.z + blockSize), new Vector3(block.x + blockSize, block.y, block.z + blockSize)));
-        // graphObjs.push(new Line(new Vector3(block.x, block.y + blockSize, block.z + blockSize), new Vector3(block.x + blockSize, block.y + blockSize, block.z + blockSize)));
     });
 
     return graphObjs;
