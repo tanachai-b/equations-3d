@@ -155,31 +155,6 @@ function calcLine(v1, v2, memory) {
         return memory.get(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`);
     }
 
-
-    // let lineStep = 1;
-
-    // let direction = v2.unit();
-    // let blockSize = v2.magnitude();
-
-    // let initVal = calcPoint(v1.x, v1.y, v1.z, memory);
-
-    // for (let i = lineStep; i <= blockSize; i += lineStep) {
-    //     let point = v1.plus(direction.timesScalar(i));
-    //     let calc = calcPoint(point.x, point.y, point.z, memory);
-
-    //     if (calc == initVal) { continue; }
-
-    //     let result = v1.plus(direction.timesScalar(i - lineStep / 2));
-    //     memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, result);
-    //     return result;
-    // }
-
-    // memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, null);
-    // return null;
-
-
-
-
     let hit = calcLineRecur(v1, v2, memory, 0.01);
 
     memory.set(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`, hit);
@@ -193,7 +168,6 @@ function calcLine(v1, v2, memory) {
  * @param {number} detail
  */
 function calcLineRecur(v1, v2, memory, detail) {
-
 
     if (memory.has(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`)) {
         return memory.get(`${v1.x}|${v1.y}|${v1.z}||${v2.x}|${v2.y}|${v2.z}`);
@@ -240,10 +214,10 @@ function calcPoint(x, y, z, memory) {
     if (memory.has(`${x}|${y}|${z}`)) { return memory.get(`${x}|${y}|${z}`); }
 
 
-    let value = 1.2 ** 4 > (x / 1.2) ** 4 + y ** 4 + (z / 0.8) ** 4;
+    // let value = 1.2 ** 4 > (x / 1.2) ** 4 + y ** 4 + (z / 0.8) ** 4;
     // let value = z ** 2 > x ** 2 + y ** 2 - 0.5 ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 + 0.5 ** 2;
-    // let value = 0.2 > (Math.sqrt(x ** 2 + y ** 2) - 1) ** 2 + z ** 2;
+    let value = 0.2 > (Math.sqrt(x ** 2 + y ** 2) - 1) ** 2 + z ** 2;
     // let value = z > 7 * (x * y) / Math.E ** (x ** 2 + y ** 2)
     // let value = 1 ** 2 < x ** 2 - y ** 2 + z ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2;
