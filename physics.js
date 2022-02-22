@@ -450,9 +450,9 @@ class Polygon2 {
 
             let diffusePerc = 0;
             let specularPerc = 0;
-            this.shade(normal, (diffuseAngle, specularAngle) => {
-                diffusePerc = (Math.PI / 2 - Math.min(diffuseAngle, Math.PI / 2)) / (Math.PI / 2);
-                specularPerc = (Math.PI / 12 - Math.min(specularAngle, Math.PI / 12)) / (Math.PI / 12);
+            this.shade(normal, camRot, (diffuseAngle, specularAngle) => {
+                diffusePerc = Math.max(0, (1 - (diffuseAngle / Math.PI)) * 2 - 1);
+                specularPerc = Math.max(0, (1 - (specularAngle / Math.PI)) * 10 - 9) ** (1 / 2);
             });
 
             let rDiffuse = 255 * 4 / 8;
@@ -490,9 +490,10 @@ class Polygon2 {
 
     /**
      * @param {Vector3} normal
+     * @param {Line} camRot
      * @param {{(diffuseAngle: number, specularAngle: number): void;}} callBack
      */
-    shade(normal, callBack) {
+    shade(normal, camRot, callBack) {
 
         let diffuseDir = new Vector3(-1, -2, 1);//.timesLine(camRot);
         let diffuseNorm = diffuseDir.over(normal.unit());
