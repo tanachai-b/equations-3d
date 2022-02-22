@@ -311,7 +311,7 @@ class Line {
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#00000044';
+        ctx.strokeStyle = '#00000022';
         ctx.fillStyle = '#888888';
         ctx.lineWidth = 1;
 
@@ -426,7 +426,7 @@ class Polygon2 {
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#FFFFFF44';
+        ctx.strokeStyle = '#FFFFFF22';
         ctx.fillStyle = '#CCDDFFCC';
         ctx.lineWidth = 1;
 
@@ -437,6 +437,10 @@ class Polygon2 {
         let projected = []
         this.points.forEach((point) => { projected.push(point.project(camRot, camZoom)); });
 
+
+        let rAvg = 0;
+        let gAvg = 0;
+        let bAvg = 0;
 
         for (let i = 2; i < rotated.length; i++) {
 
@@ -459,33 +463,28 @@ class Polygon2 {
             let gAmbient = gDiffuse * 5 / 8;
             let bAmbient = bDiffuse * 7 / 8;
 
-            let rDec = (1 - specularPerc) * (diffusePerc * (rDiffuse - rAmbient) + rAmbient) + (specularPerc * 255);
-            let gDec = (1 - specularPerc) * (diffusePerc * (gDiffuse - gAmbient) + gAmbient) + (specularPerc * 255);
-            let bDec = (1 - specularPerc) * (diffusePerc * (bDiffuse - bAmbient) + bAmbient) + (specularPerc * 255);
-
-            let rHex = Math.floor(rDec).toString(16).padStart(2, '0');
-            let gHex = Math.floor(gDec).toString(16).padStart(2, '0');
-            let bHex = Math.floor(bDec).toString(16).padStart(2, '0');
-
-            ctx.fillStyle = `#${rHex}${gHex}${bHex}FF`;
-            // ctx.strokeStyle = `#${rHex}${gHex}${bHex}FF`;
-
-            ctx.beginPath();
-            ctx.moveTo(projected[0].x, projected[0].y);
-            ctx.lineTo(projected[i - 1].x, projected[i - 1].y);
-            ctx.lineTo(projected[i].x, projected[i].y);
-            ctx.closePath();
-            ctx.fill();
-            // ctx.stroke();
+            rAvg += (1 - specularPerc) * (diffusePerc * (rDiffuse - rAmbient) + rAmbient) + (specularPerc * 255);
+            gAvg += (1 - specularPerc) * (diffusePerc * (gDiffuse - gAmbient) + gAmbient) + (specularPerc * 255);
+            bAvg += (1 - specularPerc) * (diffusePerc * (bDiffuse - bAmbient) + bAmbient) + (specularPerc * 255);
         }
 
+        rAvg = rAvg / (rotated.length - 2);
+        gAvg = gAvg / (rotated.length - 2);
+        bAvg = bAvg / (rotated.length - 2);
 
-        ctx.strokeStyle = '#FFFFFF44';
+        let rHex = Math.floor(rAvg).toString(16).padStart(2, '0');
+        let gHex = Math.floor(gAvg).toString(16).padStart(2, '0');
+        let bHex = Math.floor(bAvg).toString(16).padStart(2, '0');
+
+        ctx.fillStyle = `#${rHex}${gHex}${bHex}FF`;
+        // ctx.strokeStyle = `#${rHex}${gHex}${bHex}FF`;
+
         ctx.beginPath();
         ctx.moveTo(projected[0].x, projected[0].y);
         ctx.lineTo(projected[1].x, projected[1].y);
         for (let i = 2; i < projected.length; i++) { ctx.lineTo(projected[i].x, projected[i].y); }
         ctx.closePath();
+        ctx.fill();
         ctx.stroke();
     }
 
