@@ -37,8 +37,8 @@ window.onload = function () {
     /** @type {(Vector2|Vector3|Line|Plane|Polygon2)[]} */
     let objects = [];
 
-    let step = 30;
-    for (let i = -360; i < 360; i += step) {
+    let step = 25;
+    for (let i = -350; i < 350; i += step) {
         objects.push(new Line(new Vector3(i, 0, 0), new Vector3(i + step, 0, 0)));
         objects.push(new Line(new Vector3(0, i, 0), new Vector3(0, i + step, 0)));
         objects.push(new Line(new Vector3(0, 0, i), new Vector3(0, 0, i + step)));
@@ -62,7 +62,7 @@ window.onload = function () {
         objects.push(new Line(new Vector3(300, 300, i), new Vector3(300, 300, i + step)));
     }
 
-    let blockSize = 15;
+    let blockSize = 25;
     let memory = new Map();
     objects = objects.concat(getGraph(blockSize, memory));
 

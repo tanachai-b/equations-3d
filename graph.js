@@ -7,33 +7,39 @@
  */
 function getGraph(blockSize, memory) {
 
-    let blocks = [];
+    let bigBlockSize = blockSize * 2;
 
-    for (let x = -300; x < 300; x += blockSize) {
-        for (let y = -300; y < 300; y += blockSize) {
-            for (let z = -300; z < 300; z += blockSize) {
+    let bigBlocks = [];
 
-                if (
-                    (calcPoint(x, y, z, memory) != calcPoint(x + blockSize, y, z, memory)) ||
-                    (calcPoint(x, y + blockSize, z, memory) != calcPoint(x + blockSize, y + blockSize, z, memory)) ||
-                    (calcPoint(x, y, z + blockSize, memory) != calcPoint(x + blockSize, y, z + blockSize, memory)) ||
-                    (calcPoint(x, y + blockSize, z + blockSize, memory) != calcPoint(x + blockSize, y + blockSize, z + blockSize, memory))
-                ) { blocks.push(new Vector3(x, y, z)); continue; }
-                if (
-                    (calcPoint(x, y, z, memory) != calcPoint(x, y + blockSize, z, memory)) ||
-                    (calcPoint(x + blockSize, y, z, memory) != calcPoint(x + blockSize, y + blockSize, z, memory)) ||
-                    (calcPoint(x, y, z + blockSize, memory) != calcPoint(x, y + blockSize, z + blockSize, memory)) ||
-                    (calcPoint(x + blockSize, y, z + blockSize, memory) != calcPoint(x + blockSize, y + blockSize, z + blockSize, memory))
-                ) { blocks.push(new Vector3(x, y, z)); continue; }
-                if (
-                    (calcPoint(x, y, z, memory) != calcPoint(x, y, z + blockSize, memory)) ||
-                    (calcPoint(x + blockSize, y, z, memory) != calcPoint(x + blockSize, y, z + blockSize, memory)) ||
-                    (calcPoint(x, y + blockSize, z, memory) != calcPoint(x, y + blockSize, z + blockSize, memory)) ||
-                    (calcPoint(x + blockSize, y + blockSize, z, memory) != calcPoint(x + blockSize, y + blockSize, z + blockSize, memory))
-                ) { blocks.push(new Vector3(x, y, z)); continue; }
+    for (let x = -300; x < 300; x += bigBlockSize) {
+        for (let y = -300; y < 300; y += bigBlockSize) {
+            for (let z = -300; z < 300; z += bigBlockSize) {
+
+                if (checkBlock(x, y, z, bigBlockSize, memory)) {
+                    bigBlocks.push(new Vector3(x, y, z));
+                    continue;
+                }
             }
         }
     }
+
+
+    let blocks = [];
+
+    bigBlocks.forEach((bigBlock) => {
+        for (let x = bigBlock.x; x < bigBlock.x + bigBlockSize; x += blockSize) {
+            for (let y = bigBlock.y; y < bigBlock.y + bigBlockSize; y += blockSize) {
+                for (let z = bigBlock.z; z < bigBlock.z + bigBlockSize; z += blockSize) {
+
+                    if (checkBlock(x, y, z, blockSize, memory)) {
+                        blocks.push(new Vector3(x, y, z));
+                        continue;
+                    }
+                }
+            }
+        }
+    });
+
 
 
     let graphObjs = [];
@@ -72,6 +78,31 @@ function getGraph(blockSize, memory) {
     });
 
     return graphObjs;
+}
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @param {number} blockSize
+ * @param {Map<any, any>} memory
+ */
+function checkBlock(x, y, z, blockSize, memory) {
+
+    if ((calcPoint(x, y, z, memory) != calcPoint(x + blockSize, y, z, memory))) { return true; }
+    if ((calcPoint(x, y + blockSize, z, memory) != calcPoint(x + blockSize, y + blockSize, z, memory))) { return true; }
+    if ((calcPoint(x, y, z + blockSize, memory) != calcPoint(x + blockSize, y, z + blockSize, memory))) { return true; }
+    if ((calcPoint(x, y + blockSize, z + blockSize, memory) != calcPoint(x + blockSize, y + blockSize, z + blockSize, memory))) { return true; }
+
+    if ((calcPoint(x, y, z, memory) != calcPoint(x, y + blockSize, z, memory))) { return true; }
+    if ((calcPoint(x + blockSize, y, z, memory) != calcPoint(x + blockSize, y + blockSize, z, memory))) { return true; }
+    if ((calcPoint(x, y, z + blockSize, memory) != calcPoint(x, y + blockSize, z + blockSize, memory))) { return true; }
+    if ((calcPoint(x + blockSize, y, z + blockSize, memory) != calcPoint(x + blockSize, y + blockSize, z + blockSize, memory))) { return true; }
+
+    if ((calcPoint(x, y, z, memory) != calcPoint(x, y, z + blockSize, memory))) { return true; }
+    if ((calcPoint(x + blockSize, y, z, memory) != calcPoint(x + blockSize, y, z + blockSize, memory))) { return true; }
+    if ((calcPoint(x, y + blockSize, z, memory) != calcPoint(x, y + blockSize, z + blockSize, memory))) { return true; }
+    if ((calcPoint(x + blockSize, y + blockSize, z, memory) != calcPoint(x + blockSize, y + blockSize, z + blockSize, memory))) { return true; }
 }
 
 /**
