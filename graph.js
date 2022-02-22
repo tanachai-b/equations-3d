@@ -184,8 +184,8 @@ function calcPoint(x, y, z, memory) {
     // let value = 200 ** 2 > (x/1.2) ** 2 + y ** 2 + (z/0.8) ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 - 100 ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 + 100 ** 2;
-    let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 150) ** 2 + z ** 2;
-    // let value = (z / 150) > 7 * ((x / 150) * (y / 150)) / Math.E ** ((x / 150) ** 2 + (y / 150) ** 2)
+    // let value = 100 ** 2 > (Math.sqrt(x ** 2 + y ** 2 + 0 ** 2) - 150) ** 2 + z ** 2;
+    let value = (z / 150) > 7 * ((x / 150) * (y / 150)) / Math.E ** ((x / 150) ** 2 + (y / 150) ** 2)
     // let value = 250 ** 2 < x ** 2 - y ** 2 + z ** 2
 
     memory.set(`${x}|${y}|${z}`, value);

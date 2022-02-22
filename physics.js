@@ -431,32 +431,32 @@ class Polygon2 {
         ctx.lineWidth = 1;
 
 
-        let rotated = []
-        this.points.forEach((point) => { rotated.push(point.timesLine(camRot)); });
+        let diffusePerc = 0;
+        let specPerc = 0;
 
-        let angles = [];
+        this.shade(camRot, (cameraAngle, lightAngle, specAngle) => {
 
-        for (let i = 2; i < rotated.length; i++) {
-            let normal = new Vector3(0, 0, 1).timesLine(new Line(rotated[i - 1].minus(rotated[0]).unit(), rotated[i].minus(rotated[0])));
-            let angle = normal.timesXZ(normal.xz().conjugate().unit()).xy().angle();
-            angles.push(angle);
-        }
+            diffusePerc = (Math.PI / 2 - Math.min(lightAngle, Math.PI / 2)) / (Math.PI / 2);
+            specPerc = (Math.PI / 15 - Math.min(specAngle, Math.PI / 15)) / (Math.PI / 15);
+        });
 
-        let sum = 0;
-        angles.forEach((angle) => { sum += Math.abs(angle); });
-        let avg = sum / angles.length;
+        let rAmbient = 128;
+        let gAmbient = 160;
+        let bAmbient = 224;
 
-        let perc = avg / (Math.PI / 2);
+        let rDiffuse = 204;
+        let gDiffuse = 221;
+        let bDiffuse = 255;
 
-        let rDec = perc * (204 - 128) + 128;
-        let gDec = perc * (221 - 160) + 160;
-        let bDec = perc * (255 - 224) + 224;
+        let rDec = (1 - specPerc) * (diffusePerc * (rDiffuse - rAmbient) + rAmbient) + (specPerc * 255);
+        let gDec = (1 - specPerc) * (diffusePerc * (gDiffuse - gAmbient) + gAmbient) + (specPerc * 255);
+        let bDec = (1 - specPerc) * (diffusePerc * (bDiffuse - bAmbient) + bAmbient) + (specPerc * 255);
 
         let rHex = Math.floor(rDec).toString(16).padStart(2, '0');
         let gHex = Math.floor(gDec).toString(16).padStart(2, '0');
         let bHex = Math.floor(bDec).toString(16).padStart(2, '0');
 
-        ctx.fillStyle = `#${rHex}${gHex}${bHex}FF`;
+        ctx.fillStyle = `#${rHex}${gHex}${bHex}CC`;
 
 
         let projected = []
@@ -468,6 +468,31 @@ class Polygon2 {
         for (let i = 2; i < projected.length; i++) { ctx.lineTo(projected[i].x, projected[i].y); }
         ctx.closePath();
         ctx.fill();
-        ctx.stroke();
+        // ctx.stroke();
+    }
+
+    /**
+     * @param {Line} camRot
+     * @param {{ (cameraAngle: number, lightAngle: number, specAngle:number): void; }} callBack
+     */
+    shade(camRot, callBack) {
+        let rotated = [];
+        this.points.forEach((point) => { rotated.push(point.timesLine(camRot)); });
+
+
+        let vecNormal = new Vector3(0, 0, 1).timesLine(new Line(rotated[1].minus(rotated[0]).unit(), rotated[2].minus(rotated[0])));
+        if (vecNormal.y > 0) vecNormal = vecNormal.timesScalar(-1);
+
+        let cameraAngle = Math.PI / 2 + vecNormal.timesXZ(vecNormal.xz().conjugate().unit()).xy().angle();
+
+        let vecLight = new Vector3(0, -1, 0);//.timesLine(camRot);
+        let vecBB = vecNormal.over(vecLight.unit());
+        let lightAngle = vecBB.timesYZ(vecBB.yz().conjugate().unit()).xy().angle();
+
+        let vecSup = new Vector3(-1, -5, 1);//.timesLine(camRot);
+        let vecAA = vecNormal.over(vecSup.unit());
+        let specAngle = vecAA.timesYZ(vecAA.yz().conjugate().unit()).xy().angle();
+
+        callBack(cameraAngle, lightAngle, specAngle);
     }
 }
