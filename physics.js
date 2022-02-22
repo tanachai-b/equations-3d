@@ -433,14 +433,10 @@ class Polygon2 {
 
         let diffusePerc = 0;
         let specularPerc = 0;
-
         this.shade(camRot, (cameraAngle, diffuseAngle, specularAngle) => {
-
             diffusePerc = (Math.PI / 2 - Math.min(diffuseAngle, Math.PI / 2)) / (Math.PI / 2);
             specularPerc = (Math.PI / 12 - Math.min(specularAngle, Math.PI / 12)) / (Math.PI / 12);
         });
-
-
 
         let rDiffuse = 255 * 4 / 8;
         let gDiffuse = 255 * 6 / 8;
