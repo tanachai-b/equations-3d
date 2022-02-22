@@ -62,7 +62,7 @@ window.onload = function () {
         objects.push(new Line(new Vector3(300, 300, i), new Vector3(300, 300, i + step)));
     }
 
-    let blockSize = 30;
+    let blockSize = 15;
     let memory = new Map();
     objects = objects.concat(getGraph(blockSize, memory));
 

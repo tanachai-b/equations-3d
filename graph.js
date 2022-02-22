@@ -13,31 +13,24 @@ function getGraph(blockSize, memory) {
         for (let y = -300; y < 300; y += blockSize) {
             for (let z = -300; z < 300; z += blockSize) {
 
-                let adjPoint = [];
-                for (let x1 = 0; x1 <= blockSize; x1 += blockSize) {
-                    for (let y1 = 0; y1 <= blockSize; y1 += blockSize) {
-                        for (let z1 = 0; z1 <= blockSize; z1 += blockSize) {
-                            adjPoint.push(new Vector3(x + x1, y + y1, z + z1));
-                        }
-                    }
-                }
-
-                let isDraw = false;
-
-                checkDrawLoop:
-                for (let i = 0; i < adjPoint.length - 1; i++) {
-                    for (let j = i + 1; j < adjPoint.length; j++) {
-                        let p1 = adjPoint[i];
-                        let p2 = adjPoint[j];
-
-                        if (calcPoint(p1.x, p1.y, p1.z, memory) != calcPoint(p2.x, p2.y, p2.z, memory)) {
-                            isDraw = true;
-                            break checkDrawLoop;
-                        }
-                    }
-                }
-
-                if (isDraw) { blocks.push(new Vector3(x, y, z)); }
+                if (
+                    (calcPoint(x, y, z, memory) != calcPoint(x + blockSize, y, z, memory)) ||
+                    (calcPoint(x, y + blockSize, z, memory) != calcPoint(x + blockSize, y + blockSize, z, memory)) ||
+                    (calcPoint(x, y, z + blockSize, memory) != calcPoint(x + blockSize, y, z + blockSize, memory)) ||
+                    (calcPoint(x, y + blockSize, z + blockSize, memory) != calcPoint(x + blockSize, y + blockSize, z + blockSize, memory))
+                ) { blocks.push(new Vector3(x, y, z)); continue; }
+                if (
+                    (calcPoint(x, y, z, memory) != calcPoint(x, y + blockSize, z, memory)) ||
+                    (calcPoint(x + blockSize, y, z, memory) != calcPoint(x + blockSize, y + blockSize, z, memory)) ||
+                    (calcPoint(x, y, z + blockSize, memory) != calcPoint(x, y + blockSize, z + blockSize, memory)) ||
+                    (calcPoint(x + blockSize, y, z + blockSize, memory) != calcPoint(x + blockSize, y + blockSize, z + blockSize, memory))
+                ) { blocks.push(new Vector3(x, y, z)); continue; }
+                if (
+                    (calcPoint(x, y, z, memory) != calcPoint(x, y, z + blockSize, memory)) ||
+                    (calcPoint(x + blockSize, y, z, memory) != calcPoint(x + blockSize, y, z + blockSize, memory)) ||
+                    (calcPoint(x, y + blockSize, z, memory) != calcPoint(x, y + blockSize, z + blockSize, memory)) ||
+                    (calcPoint(x + blockSize, y + blockSize, z, memory) != calcPoint(x + blockSize, y + blockSize, z + blockSize, memory))
+                ) { blocks.push(new Vector3(x, y, z)); continue; }
             }
         }
     }

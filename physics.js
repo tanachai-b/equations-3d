@@ -434,10 +434,6 @@ class Polygon2 {
         let rotated = [];
         this.points.forEach((point) => { rotated.push(point.timesLine(camRot)); });
 
-        let projected = []
-        this.points.forEach((point) => { projected.push(point.project(camRot, camZoom)); });
-
-
         let rAvg = 0;
         let gAvg = 0;
         let bAvg = 0;
@@ -478,6 +474,10 @@ class Polygon2 {
 
         ctx.fillStyle = `#${rHex}${gHex}${bHex}FF`;
         // ctx.strokeStyle = `#${rHex}${gHex}${bHex}FF`;
+
+
+        let projected = []
+        this.points.forEach((point) => { projected.push(point.project(camRot, camZoom)); });
 
         ctx.beginPath();
         ctx.moveTo(projected[0].x, projected[0].y);
