@@ -39,6 +39,8 @@ window.onload = function () {
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+        camera.update();
+
         let sorting = [];
 
         objects.forEach((object) => {
@@ -121,10 +123,17 @@ class Camera {
         this.position = new Vector3(0, 0, 0);
 
         this.rotation = new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
-        this.rotation = this.rotation.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
-        this.rotation = this.rotation.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
+        // this.rotation = this.rotation.timesXZ(Vector2.polar(1, 1 * Math.PI / 180));
+        // this.rotation = this.rotation.timesYZ(Vector2.polar(1, 0 * Math.PI / 180));
+        // this.rotation = this.rotation.timesXY(Vector2.polar(1, 180 * Math.PI / 180));
 
         this.zoom = 0;
+
+
+        this.destPosition = this.position;
+        this.destRotation = this.rotation;
+        this.destZoom = this.zoom;
+
 
         this.addMouseListener();
     }
@@ -144,21 +153,46 @@ class Camera {
 
         canvas.addEventListener('mousemove', (event) => {
             if (mButtons == 1) {
-                this.rotation = this.rotation.timesXZ(Vector2.polar(1, -event.movementX / 2 * Math.PI / 180));
-                this.rotation = this.rotation.timesYZ(Vector2.polar(1, event.movementY / 2 * Math.PI / 180));
+                // this.rotation = this.rotation.timesXZ(Vector2.polar(1, -event.movementX / 2 * Math.PI / 180));
+                // this.rotation = this.rotation.timesYZ(Vector2.polar(1, event.movementY / 2 * Math.PI / 180));
+                this.destRotation = this.destRotation.timesXZ(Vector2.polar(1, -event.movementX / 2 * Math.PI / 180));
+                this.destRotation = this.destRotation.timesYZ(Vector2.polar(1, event.movementY / 2 * Math.PI / 180));
+                // this.destRotation = this.destRotation.timesXY(Vector2.polar(1, -event.movementX / 2 * Math.PI / 180));
             }
         });
         canvas.addEventListener('wheel', (event) => {
-            this.zoom -= Math.sign(event.deltaY);
+            // this.zoom -= Math.sign(event.deltaY);
+            this.destZoom -= Math.sign(event.deltaY);
         });
     }
 
     reset() {
-        let rotation = new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
-        rotation = rotation.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
-        rotation = rotation.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
+        let dr2 = Line.default()
+        dr2 = dr2.timesXZ(Vector2.polar(1, 0 * Math.PI / 180));
+        dr2 = dr2.timesYZ(Vector2.polar(1, 0 * Math.PI / 180));
+        this.destRotation = dr2;
 
-        this.rotation = rotation;
-        this.zoom = 0;
+        this.destZoom = 0;
+    }
+
+    update() {
+        let mvtFactor = 10;
+
+
+        let diffLine = this.destRotation.overLine(this.rotation);
+
+        let diffDir = diffLine.v.yz().unit();
+        let diffAngle = diffLine.v.timesYZ(diffDir.conjugate()).xy().angle();
+
+        let diffRoll = 0;
+        diffLine.angles((yaw, pitch, roll) => { diffRoll = roll.angle() });
+
+        let newV = Vector3.polar(1, diffAngle / mvtFactor, 0).timesYZ(diffDir);
+        let newW = Vector3.polar(1, Math.PI / 2, diffRoll / 1);
+        let stepRot = new Line(newV, newW);
+
+
+        this.rotation = stepRot.timesLine(this.rotation);
+        this.zoom += (this.destZoom - this.zoom) / mvtFactor;
     }
 }

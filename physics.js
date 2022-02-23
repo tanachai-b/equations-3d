@@ -254,7 +254,7 @@ class Line {
         this.w = w;
     }
 
-    static standard() { return new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0)); }
+    static default() { return new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0)); }
 
     magnitude2() { return this.v.magnitude2(); }
     magnitude() { return this.v.magnitude(); }
