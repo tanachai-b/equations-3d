@@ -217,8 +217,8 @@ class Vector3 {
         let canvas = document.getElementById('canvas');
 
         let v1 = this.timesLine(camRot);
-
         let z1 = Math.max(v1.y + 1000 / 10 ** (camZoom / 10), 0);
+
         let x1 = v1.x / z1 * 1000 + canvas.width / 2;
         let y1 = -v1.z / z1 * 1000 + canvas.height / 2;
 
@@ -248,19 +248,14 @@ class Vector3 {
         ctx.fillStyle = '#888888';
         ctx.lineWidth = 1;
 
+        let vp = this.project(camRot, camZoom);
 
         let v1 = this.timesLine(camRot);
-
         let z1 = Math.max(v1.y + 1000 / 10 ** (camZoom / 10), 0);
-        let x1 = v1.x / z1 * 1000 + canvas.width / 2;
-        let y1 = -v1.z / z1 * 1000 + canvas.height / 2;
-
-
-        let rad = 1 / this.z * 1000;
-
+        let rad = 1 / z1 * 1000;
 
         ctx.beginPath();
-        ctx.arc(x1, y1, rad, 0, Math.PI * 2);
+        ctx.arc(vp.x, vp.y, rad, 0, Math.PI * 2);
         ctx.fill();
     }
 }

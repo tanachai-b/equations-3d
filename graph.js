@@ -231,8 +231,8 @@ function calcPoint(x, y, z, memory) {
     // let value = z * 5 < Math.sin(x * 1.5 + y * 1.5) + Math.sin(x * 1.5 - y * 1.5);
     // let value = 0 < (x ** 2 + 9 / 4 * y ** 2 + z ** 2 - 1) ** 3 - (x ** 2 + 9 / 80 * y ** 2) * z ** 3 - 0;
     // let value = z < Math.E ** -(x ** 2 + y ** 2) * 1.5;
-    // let value = z < x+y;
     // let value = 1 < (Math.cos(x) ** 2 + Math.cos(y) ** 2 + Math.cos(z) ** 2)**0.5;
+    // let value = z < x ** 2;
 
     memory.set(`${x}|${y}|${z}`, value);
     return value;
