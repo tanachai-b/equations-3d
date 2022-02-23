@@ -21,7 +21,7 @@ window.onload = function () {
         equationInput.value = choice;
     }
 
-
+    compileEquation();
 
 
     /** @type {HTMLCanvasElement} */
