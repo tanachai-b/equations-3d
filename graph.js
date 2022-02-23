@@ -220,7 +220,7 @@ function calcPoint(x, y, z, memory) {
     if (memory.has(`${x}|${y}|${z}`)) { return memory.get(`${x}|${y}|${z}`); }
 
 
-    // let value = 1.2 ** 4 > (x / 1.2) ** 4 + y ** 4 + (z / 0.8) ** 4;
+    // let value = 1 > (x / 1.5) ** 8 + (y / 1) ** 2 + (z / 1) ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 - 0.5 ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 + 0.5 ** 2;
     let value = 0.2 > (Math.sqrt(x ** 2 + y ** 2) - 1) ** 2 + z ** 2;
@@ -231,7 +231,8 @@ function calcPoint(x, y, z, memory) {
     // let value = z * 5 < Math.sin(x * 1.5 + y * 1.5) + Math.sin(x * 1.5 - y * 1.5);
     // let value = 0 < (x ** 2 + 9 / 4 * y ** 2 + z ** 2 - 1) ** 3 - (x ** 2 + 9 / 80 * y ** 2) * z ** 3 - 0;
     // let value = z < Math.E ** -(x ** 2 + y ** 2) * 1.5;
-    // let value = z < x;
+    // let value = z < x+y;
+    // let value = 1 < (Math.cos(x) ** 2 + Math.cos(y) ** 2 + Math.cos(z) ** 2)**0.5;
 
     memory.set(`${x}|${y}|${z}`, value);
     return value;

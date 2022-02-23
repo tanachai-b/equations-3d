@@ -443,7 +443,6 @@ class Polygon2 {
             let normal = new Vector3(0, 0, 1).timesLine(new Line(rotated[i - 1].minus(rotated[0]).unit(), rotated[i].minus(rotated[0])));
             if (normal.y > 0) normal = normal.timesScalar(-1);
 
-
             let diffusePerc = 0;
             let specularPerc = 0;
             this.shade(normal, camRot, (diffuseAngle, specularAngle) => {
@@ -496,14 +495,14 @@ class Polygon2 {
     shade(normal, camRot, callBack) {
 
         let diffuseDir = new Vector3(-1, -2, 1);//.timesLine(camRot);
-        let diffuseNorm = diffuseDir.over(normal.unit());
-        let diffuseAngle = diffuseNorm.timesYZ(diffuseNorm.yz().conjugate().unit()).xy().angle();
+        let diffuseNorm = diffuseDir.over(normal);
+        let diffuseAngle = diffuseNorm.timesYZ(diffuseNorm.yz().conjugate()).xy().angle();
 
         let specularDir = new Vector3(-1, -2, 1);//.timesLine(camRot);
-        let reflectNorm = specularDir.over(normal.unit()).conjugate();
-        let cameraNorm = new Vector3(0, -1, 0).over(normal.unit());
-        let reflectCamera = reflectNorm.over(cameraNorm.unit());
-        let specularAngle = reflectCamera.timesYZ(reflectCamera.yz().conjugate().unit()).xy().angle();
+        let reflectNorm = specularDir.over(normal).conjugate();
+        let cameraNorm = new Vector3(0, -1, 0).over(normal);
+        let reflectCamera = reflectNorm.over(cameraNorm);
+        let specularAngle = reflectCamera.timesYZ(reflectCamera.yz().conjugate()).xy().angle();
 
         callBack(diffuseAngle, specularAngle);
     }
