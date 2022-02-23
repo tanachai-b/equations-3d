@@ -183,8 +183,14 @@ class Camera {
         let diffDir = diffLine.v.yz().unit();
         let diffAngle = diffLine.v.timesYZ(diffDir.conjugate()).xy().angle();
 
-        let diffRoll = 0;
-        diffLine.angles((yaw, pitch, roll) => { diffRoll = roll.angle() });
+
+        let rollLine = diffLine.w;
+        rollLine.timesYZ(diffDir.conjugate());
+        rollLine.timesXY(diffLine.v.timesYZ(diffDir.conjugate()).xy().conjugate());
+        rollLine.timesYZ(diffDir);
+
+        let diffRoll = rollLine.yz().angle();
+
 
         let newV = Vector3.polar(1, diffAngle / mvtFactor, 0).timesYZ(diffDir);
         let newW = Vector3.polar(1, Math.PI / 2, diffRoll / mvtFactor).times(newV);
