@@ -172,7 +172,7 @@ class Vector3 {
             let v1 = this.timesXY(yaw.conjugate());
             let v2 = v1.timesXZ(pitch.conjugate());
             let v3 = v2.timesYZ(roll.conjugate());
-            result = v3.timesScalar(line.v.magnitude());
+            result = v3.overScalar(line.v.magnitude2());
         });
 
         return result;
