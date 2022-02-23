@@ -13,9 +13,7 @@ window.onload = function () {
 
     canvas.focus();
     canvas.addEventListener('keypress', (event) => {
-        switch (event.key) {
-            case ' ': camera.reset(); break;
-        }
+        switch (event.key) { case ' ': camera.reset(); break; }
     });
 
 
@@ -52,52 +50,6 @@ window.onload = function () {
         sorting.forEach((object) => { object[0].draw(camera); });
 
     }, 1000 / 60);
-}
-
-class Camera {
-    constructor() {
-        this.position = new Vector3(0, 0, 0);
-        this.rotation = new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
-        this.zoom = 0;
-
-        this.rotation = this.rotation.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
-        this.rotation = this.rotation.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
-
-        this.addMouseListener();
-    }
-
-    addMouseListener() {
-        /** @type {HTMLCanvasElement} */
-        // @ts-ignore
-        let canvas = document.getElementById('canvas');
-
-        let mButtons = 0;
-
-        canvas.oncontextmenu = function (event) { event.preventDefault(); event.stopPropagation(); };
-        canvas.addEventListener('mousedown', (event) => { mButtons = event.buttons; });
-        canvas.addEventListener('mouseup', (event) => { mButtons = event.buttons; });
-        canvas.addEventListener('mouseleave', (event) => { mButtons = event.buttons; });
-        canvas.addEventListener('mouseenter', (event) => { mButtons = event.buttons; });
-
-        canvas.addEventListener('mousemove', (event) => {
-            if (mButtons == 1) {
-                this.rotation = this.rotation.timesXZ(Vector2.polar(1, -event.movementX / 2 * Math.PI / 180));
-                this.rotation = this.rotation.timesYZ(Vector2.polar(1, event.movementY / 2 * Math.PI / 180));
-            }
-        });
-        canvas.addEventListener('wheel', (event) => {
-            this.zoom -= Math.sign(event.deltaY);
-        });
-    }
-
-    reset() {
-        let rotation = new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
-        rotation = rotation.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
-        rotation = rotation.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
-
-        this.rotation = rotation;
-        this.zoom = 0;
-    }
 }
 
 /**
@@ -161,5 +113,52 @@ function drawFrame(objects, frameSize, step) {
         objects.push(new Line(new Vector3(frameSize, -frameSize, i), new Vector3(frameSize, -frameSize, i + step)));
         objects.push(new Line(new Vector3(-frameSize, frameSize, i), new Vector3(-frameSize, frameSize, i + step)));
         objects.push(new Line(new Vector3(frameSize, frameSize, i), new Vector3(frameSize, frameSize, i + step)));
+    }
+}
+
+class Camera {
+    constructor() {
+        this.position = new Vector3(0, 0, 0);
+
+        this.rotation = new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
+        this.rotation = this.rotation.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
+        this.rotation = this.rotation.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
+
+        this.zoom = 0;
+
+        this.addMouseListener();
+    }
+
+    addMouseListener() {
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+
+        let mButtons = 0;
+
+        canvas.oncontextmenu = function (event) { event.preventDefault(); event.stopPropagation(); };
+        canvas.addEventListener('mousedown', (event) => { mButtons = event.buttons; });
+        canvas.addEventListener('mouseup', (event) => { mButtons = event.buttons; });
+        canvas.addEventListener('mouseleave', (event) => { mButtons = event.buttons; });
+        canvas.addEventListener('mouseenter', (event) => { mButtons = event.buttons; });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (mButtons == 1) {
+                this.rotation = this.rotation.timesXZ(Vector2.polar(1, -event.movementX / 2 * Math.PI / 180));
+                this.rotation = this.rotation.timesYZ(Vector2.polar(1, event.movementY / 2 * Math.PI / 180));
+            }
+        });
+        canvas.addEventListener('wheel', (event) => {
+            this.zoom -= Math.sign(event.deltaY);
+        });
+    }
+
+    reset() {
+        let rotation = new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
+        rotation = rotation.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
+        rotation = rotation.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
+
+        this.rotation = rotation;
+        this.zoom = 0;
     }
 }
