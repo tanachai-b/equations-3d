@@ -217,10 +217,10 @@ class Vector3 {
         let canvas = document.getElementById('canvas');
 
         let v1 = this.timesLine(camRot);
-        let z1 = Math.max(-v1.z + 1000000 / 10 ** (camZoom / 10), 0);
+        let z1 = Math.max(-v1.z + 1000 / 10 ** (camZoom / 10), 0);
 
-        let x1 = v1.x / z1 * 1000000 + canvas.width / 2;
-        let y1 = -v1.y / z1 * 1000000 + canvas.height / 2;
+        let x1 = v1.x / z1 * 1000 + canvas.width / 2;
+        let y1 = -v1.y / z1 * 1000 + canvas.height / 2;
 
         return new Vector2(x1, y1);
     }
@@ -231,7 +231,7 @@ class Vector3 {
      */
     depth(camRot, camZoom) {
         let v1 = this.timesLine(camRot);
-        let z1 = Math.max(-v1.z + 1000000 / 10 ** (camZoom / 10), 0);
+        let z1 = Math.max(-v1.z + 1000 / 10 ** (camZoom / 10), 0);
         return z1;
     }
 
@@ -251,8 +251,8 @@ class Vector3 {
         let vp = this.project(camRot, camZoom);
 
         let v1 = this.timesLine(camRot);
-        let z1 = Math.max(-v1.z + 1000000 / 10 ** (camZoom / 10), 0);
-        let rad = 1 / z1 * 1000000;
+        let z1 = Math.max(-v1.z + 1000 / 10 ** (camZoom / 10), 0);
+        let rad = 1 / z1 * 1000;
 
         ctx.beginPath();
         ctx.arc(vp.x, vp.y, rad, 0, Math.PI * 2);
@@ -501,4 +501,42 @@ class Polygon2 {
 
         callBack(diffuseAngle, specularAngle);
     }
+}
+
+class Text3 {
+
+    /**
+     * @param {Vector3} position
+     * @param {string} text
+     */
+    constructor(position, text) {
+        this.position = position;
+        this.text = text;
+    }
+
+    /**
+     * @param {Line} camRot
+     * @param {number} camZoom
+     */
+    depth(camRot, camZoom) {
+        return this.position.depth(camRot, camZoom)
+    }
+
+    /**
+     * @param {Line} camRot
+     * @param {number} camZoom
+     */
+    draw(camRot, camZoom) {
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        ctx.strokeStyle = '#000000';
+        ctx.fillStyle = '#000000';
+        ctx.lineWidth = 1;
+        ctx.font = '12px sans-serif';
+
+        ctx.fillText('hsad', 5, 12);
+    }
+
 }
