@@ -24,11 +24,17 @@ class Vector2 {
     /** @param {Vector2} vector2 */
     minus(vector2) { return new Vector2(this.x - vector2.x, this.y - vector2.y); }
 
+    /** @param {number} number */
+    timesScalar(number) { return new Vector2(this.x * number, this.y * number); }
+
+    /** @param {number} number */
+    overScalar(number) { return new Vector2(this.x / number, this.y / number); }
+
     /** @param {Vector2} vector2 */
     times(vector2) { return new Vector2(this.x * vector2.x - this.y * vector2.y, this.x * vector2.y + this.y * vector2.x); }
 
     /** @param {Vector2} vector2 */
-    over(vector2) { return this.times(vector2.conjugate()).times(new Vector2(1 / vector2.magnitude2(), 0)); }
+    over(vector2) { return this.times(vector2.conjugate()).timesScalar(1 / vector2.magnitude2()); }
 
     /**
      * @param {number} magnitude
@@ -510,9 +516,9 @@ class Text3 {
         let position1 = this.position.project(camera);
         let rotation1 = this.rotation.timesLine(camera.rotation).xy().unit();
 
-        let o1 = this.offset.times(new Vector2(10 ** (camera.zoom / 10), 0));
+        let o1 = this.offset.timesScalar(10 ** (camera.zoom / 10));
         o1 = o1.times(rotation1).conjugate().plus(position1);
-        o1 = o1.plus(new Vector2(0, 0.4).times(new Vector2(fontSize, 0)));
+        o1 = o1.plus(new Vector2(0, 0.4).timesScalar(fontSize));
 
         ctx.fillText(this.text, o1.x, o1.y);
     }
@@ -554,7 +560,7 @@ class Polygon2 {
         let rotation1 = this.rotation.timesLine(camera.rotation).xy().unit();
 
         let p1 = [];
-        this.point2s.forEach((point) => { p1.push(point.times(new Vector2(10 ** (camera.zoom / 10), 0))); });
+        this.point2s.forEach((point) => { p1.push(point.timesScalar(10 ** (camera.zoom / 10))); });
 
         let p2 = [];
         p1.forEach((point) => { p2.push(point.times(rotation1).conjugate().plus(position1)); });
