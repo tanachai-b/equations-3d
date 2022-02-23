@@ -135,20 +135,19 @@ class Vector3 {
     times(vector3) {
 
         let yaw = vector3.xy().unit();
-        let pitch = vector3.timesXY(yaw.conjugate()).xz();
+        let pitch = vector3.timesXY(yaw.conjugate()).xz().unit();
 
-        /** @type {Vector3} */
         let v1 = this.timesXZ(pitch);
         let v2 = v1.timesXY(yaw);
 
-        return v2;
+        return v2.timesScalar(vector3.magnitude());
     }
 
     /** @param {Vector3} vector3 */
     over(vector3) {
 
         let yaw = vector3.xy().unit();
-        let pitch = vector3.timesXY(yaw.conjugate()).xz();
+        let pitch = vector3.timesXY(yaw.conjugate()).xz().unit();
 
         let v1 = this.timesXY(yaw.conjugate());
         let v2 = v1.timesXZ(pitch.conjugate());
@@ -160,7 +159,7 @@ class Vector3 {
     timesLine(line) {
 
         let yaw = line.v.xy().unit();
-        let pitch = line.v.timesXY(yaw.conjugate()).xz();
+        let pitch = line.v.timesXY(yaw.conjugate()).xz().unit();
 
         let w1 = line.w.timesXY(yaw.conjugate());
         let w2 = w1.timesXZ(pitch.conjugate());
@@ -170,7 +169,7 @@ class Vector3 {
         let v2 = v1.timesXZ(pitch);
         let v3 = v2.timesXY(yaw);
 
-        return v3;
+        return v3.timesScalar(line.v.magnitude());
     }
 
     /** @param {Line} line */
@@ -179,7 +178,7 @@ class Vector3 {
         let yaw = line.v.xy().unit();
         if (line.v.xy().magnitude2() == 0) { yaw = new Vector2(1, 0); }
 
-        let pitch = line.v.timesXY(yaw.conjugate()).xz();
+        let pitch = line.v.timesXY(yaw.conjugate()).xz().unit();
 
         let w1 = line.w.timesXY(yaw.conjugate());
         let w2 = w1.timesXZ(pitch.conjugate());
@@ -364,7 +363,7 @@ class Polygon3 {
         if (points.length == 3) { this.points = points; return; }
         if (!sort) { this.points = points; return; }
 
-        let axisLine = new Line(points[1].minus(points[0]).unit(), points[2].minus(points[0]));
+        let axisLine = new Line(points[1].minus(points[0]), points[2].minus(points[0]));
 
         let sortable = [];
         points.forEach((point, index) => {
