@@ -13,7 +13,6 @@ window.onload = function () {
     equationInput.value = urlEquation;
     if (equationInput.value == '') equationInput.value = 'y = x + 5';
 
-
     let sampleDropdown = document.getElementById('sample');
     sampleDropdown.onchange = function () {
         // @ts-ignore 
@@ -30,14 +29,13 @@ window.onload = function () {
     let canvas = document.getElementById('canvas');
 
 
-    let camera = new Camera();
-
-
     canvas.focus();
     canvas.addEventListener('keypress', (event) => {
         switch (event.key) { case ' ': camera.reset(); break; }
     });
 
+
+    let camera = new Camera();
 
     /** @type {(Vector2|Vector3|Line|Plane|Polygon3|Text3|Polygon2)[]} */
     let objects = [];
