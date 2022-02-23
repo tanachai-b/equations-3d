@@ -13,7 +13,13 @@ class Vector2 {
 
     magnitude2() { return this.x ** 2 + this.y ** 2 }
     magnitude() { return Math.sqrt(this.magnitude2()); }
-    unit() { return new Vector2(this.x / this.magnitude(), this.y / this.magnitude()); }
+    unit() {
+        if (this.magnitude2() == 0) {
+            return new Vector2(0, 0);
+        } else {
+            return new Vector2(this.x / this.magnitude(), this.y / this.magnitude());
+        }
+    }
     conjugate() { return new Vector2(this.x, -this.y); }
 
     angle() { return Math.atan2(this.y, this.x); }
@@ -85,7 +91,13 @@ class Vector3 {
 
     magnitude2() { return this.x ** 2 + this.y ** 2 + this.z ** 2; }
     magnitude() { return Math.sqrt(this.magnitude2()); }
-    unit() { return new Vector3(this.x / this.magnitude(), this.y / this.magnitude(), this.z / this.magnitude()); }
+    unit() {
+        if (this.magnitude2() == 0) {
+            return new Vector3(0, 0, 0);
+        } else {
+            return new Vector3(this.x / this.magnitude(), this.y / this.magnitude(), this.z / this.magnitude());
+        }
+    }
     conjugate() { return new Vector3(this.x, -this.y, -this.z); }
 
     yaw() { return this.xy().unit(); }
