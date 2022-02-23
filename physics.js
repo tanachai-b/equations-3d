@@ -88,6 +88,9 @@ class Vector3 {
     unit() { return new Vector3(this.x / this.magnitude(), this.y / this.magnitude(), this.z / this.magnitude()); }
     conjugate() { return new Vector3(this.x, -this.y, -this.z); }
 
+    yaw() { return this.xy().unit(); }
+    pitch() { return new Vector2(this.xy().magnitude(), this.z).unit(); }
+
     xy() { return new Vector2(this.x, this.y); }
     xz() { return new Vector2(this.x, this.z); }
     yz() { return new Vector2(this.y, this.z); }
@@ -133,62 +136,46 @@ class Vector3 {
 
     /** @param {Vector3} vector3 */
     times(vector3) {
-
-        let yaw = vector3.xy().unit();
-        let pitch = new Vector2(vector3.xy().magnitude(), vector3.z).unit();
-
-        let v1 = this.timesXZ(pitch);
-        let v2 = v1.timesXY(yaw);
+        let v1 = this.timesXZ(vector3.pitch());
+        let v2 = v1.timesXY(vector3.yaw());
 
         return v2.timesScalar(vector3.magnitude());
     }
 
     /** @param {Vector3} vector3 */
     over(vector3) {
-
-        let yaw = vector3.xy().unit();
-        let pitch = new Vector2(vector3.xy().magnitude(), vector3.z).unit();
-
-        let v1 = this.timesXY(yaw.conjugate());
-        let v2 = v1.timesXZ(pitch.conjugate());
+        let v1 = this.timesXY(vector3.yaw().conjugate());
+        let v2 = v1.timesXZ(vector3.pitch().conjugate());
 
         return v2.overScalar(vector3.magnitude2());
     }
 
     /** @param {Line} line */
     timesLine(line) {
+        let result = new Vector3(1, 0, 0);
 
-        let yaw = line.v.xy().unit();
-        let pitch = new Vector2(line.v.xy().magnitude(), line.v.z).unit();
+        line.angles((yaw, pitch, roll) => {
+            let v1 = this.timesYZ(roll);
+            let v2 = v1.timesXZ(pitch);
+            let v3 = v2.timesXY(yaw);
+            result = v3.timesScalar(line.v.magnitude());
+        });
 
-        let w1 = line.w.timesXY(yaw.conjugate());
-        let w2 = w1.timesXZ(pitch.conjugate());
-        let roll = w2.yz().unit();
-
-        let v1 = this.timesYZ(roll);
-        let v2 = v1.timesXZ(pitch);
-        let v3 = v2.timesXY(yaw);
-
-        return v3.timesScalar(line.v.magnitude());
+        return result;
     }
 
     /** @param {Line} line */
     overLine(line) {
+        let result = new Vector3(1, 0, 0);
 
-        let yaw = line.v.xy().unit();
-        if (line.v.xy().magnitude2() == 0) { yaw = new Vector2(1, 0); }
+        line.angles((yaw, pitch, roll) => {
+            let v1 = this.timesXY(yaw.conjugate());
+            let v2 = v1.timesXZ(pitch.conjugate());
+            let v3 = v2.timesYZ(roll.conjugate());
+            result = v3.timesScalar(line.v.magnitude());
+        });
 
-        let pitch = new Vector2(line.v.xy().magnitude(), line.v.z).unit();
-
-        let w1 = line.w.timesXY(yaw.conjugate());
-        let w2 = w1.timesXZ(pitch.conjugate());
-        let roll = w2.yz().unit();
-
-        let v1 = this.timesXY(yaw.conjugate());
-        let v2 = v1.timesXZ(pitch.conjugate());
-        let v3 = v2.timesYZ(roll.conjugate());
-
-        return v3.overScalar(line.v.magnitude2());
+        return result;
     }
 
     /**
@@ -260,6 +247,18 @@ class Line {
     magnitude2() { return this.v.magnitude2(); }
     magnitude() { return this.v.magnitude(); }
     unit() { return new Line(this.v.unit(), this.w.unit()); }
+
+    /** @param {(yaw: Vector2, pitch: Vector2, roll: Vector2) => void} callBack */
+    angles(callBack) {
+        let yaw = this.v.yaw();
+        let pitch = this.v.pitch();
+
+        let w1 = this.w.timesXY(yaw.conjugate());
+        w1 = w1.timesXZ(pitch.conjugate());
+        let roll = w1.yz().unit();
+
+        callBack(yaw, pitch, roll);
+    }
 
     /** @param {Vector2} vector2 */
     timesXY(vector2) { return new Line(this.v.timesXY(vector2), this.w.timesXY(vector2)); }
