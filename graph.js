@@ -2,18 +2,19 @@
 'use strict';
 
 /**
+ * @param {number} boxSize
  * @param {number} blockSize
  * @param {Map<any, any>} memory
  */
-function getGraph(blockSize, memory) {
+function getGraph(boxSize, blockSize, memory) {
 
     let bigBlockSize = blockSize * 2;
 
     let bigBlocks = [];
 
-    for (let x = -300; x < 300; x += bigBlockSize) {
-        for (let y = -300; y < 300; y += bigBlockSize) {
-            for (let z = -300; z < 300; z += bigBlockSize) {
+    for (let x = -boxSize; x < boxSize; x += bigBlockSize) {
+        for (let y = -boxSize; y < boxSize; y += bigBlockSize) {
+            for (let z = -boxSize; z < boxSize; z += bigBlockSize) {
 
                 if (checkBlock(x, y, z, bigBlockSize, memory)) {
                     bigBlocks.push(new Vector3(x, y, z));
@@ -213,9 +214,9 @@ function calcLineRecur(v1, v2, memory, detail) {
  */
 function calcPoint(x, y, z, memory) {
 
-    x = x / 200;
-    y = y / 200;
-    z = z / 200;
+    x = x / 125;
+    y = y / 125;
+    z = z / 125;
 
     if (memory.has(`${x}|${y}|${z}`)) { return memory.get(`${x}|${y}|${z}`); }
 
@@ -223,7 +224,7 @@ function calcPoint(x, y, z, memory) {
     // let value = 1 > (x / 1.5) ** 8 + (y / 1) ** 2 + (z / 1) ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 - 0.5 ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 + 0.5 ** 2;
-    let value = 0.2 > (Math.sqrt(x ** 2 + y ** 2) - 1) ** 2 + z ** 2;
+    // let value = 0.5 > (Math.sqrt(x ** 2 + y ** 2) - 1.25) ** 2 + z ** 2;
     // let value = z > 7 * (x * y) / Math.E ** (x ** 2 + y ** 2)
     // let value = 1 ** 2 < x ** 2 - y ** 2 + z ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2;
@@ -232,7 +233,8 @@ function calcPoint(x, y, z, memory) {
     // let value = 0 < (x ** 2 + 9 / 4 * y ** 2 + z ** 2 - 1) ** 3 - (x ** 2 + 9 / 80 * y ** 2) * z ** 3 - 0;
     // let value = z < Math.E ** -(x ** 2 + y ** 2) * 1.5;
     // let value = 1 < (Math.cos(x) ** 2 + Math.cos(y) ** 2 + Math.cos(z) ** 2)**0.5;
-    // let value = z < x ** 2;
+    let value = 0 < (x ** 4 + y ** 4 + z ** 4 - 1 ** 4) ** (1 / 4) + 0 ** 1
+    // let value = 0 < x ** 2 - y ** 2 + z ** 2 + 0.001 ** 2
 
     memory.set(`${x}|${y}|${z}`, value);
     return value;

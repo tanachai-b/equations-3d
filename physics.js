@@ -217,10 +217,10 @@ class Vector3 {
         let canvas = document.getElementById('canvas');
 
         let v1 = this.timesLine(camRot);
-        let z1 = Math.max(v1.y + 1000 / 10 ** (camZoom / 10), 0);
+        let z1 = Math.max(-v1.z + 1000000 / 10 ** (camZoom / 10), 0);
 
-        let x1 = v1.x / z1 * 1000 + canvas.width / 2;
-        let y1 = -v1.z / z1 * 1000 + canvas.height / 2;
+        let x1 = v1.x / z1 * 1000000 + canvas.width / 2;
+        let y1 = -v1.y / z1 * 1000000 + canvas.height / 2;
 
         return new Vector2(x1, y1);
     }
@@ -231,7 +231,7 @@ class Vector3 {
      */
     depth(camRot, camZoom) {
         let v1 = this.timesLine(camRot);
-        let z1 = Math.max(v1.y + 1000 / 10 ** (camZoom / 10), 0);
+        let z1 = Math.max(-v1.z + 1000000 / 10 ** (camZoom / 10), 0);
         return z1;
     }
 
@@ -251,8 +251,8 @@ class Vector3 {
         let vp = this.project(camRot, camZoom);
 
         let v1 = this.timesLine(camRot);
-        let z1 = Math.max(v1.y + 1000 / 10 ** (camZoom / 10), 0);
-        let rad = 1 / z1 * 1000;
+        let z1 = Math.max(-v1.z + 1000000 / 10 ** (camZoom / 10), 0);
+        let rad = 1 / z1 * 1000000;
 
         ctx.beginPath();
         ctx.arc(vp.x, vp.y, rad, 0, Math.PI * 2);
@@ -436,7 +436,7 @@ class Polygon2 {
         for (let i = 2; i < rotated.length; i++) {
 
             let normal = new Vector3(0, 0, 1).timesLine(new Line(rotated[i - 1].minus(rotated[0]).unit(), rotated[i].minus(rotated[0])));
-            if (normal.y > 0) normal = normal.timesScalar(-1);
+            if (normal.z < 0) normal = normal.timesScalar(-1);
 
             let diffusePerc = 0;
             let specularPerc = 0;
@@ -489,13 +489,13 @@ class Polygon2 {
      */
     shade(normal, camRot, callBack) {
 
-        let diffuseDir = new Vector3(-1, -2, 1);//.timesLine(camRot);
+        let diffuseDir = new Vector3(-1, 1, 2);//.timesLine(camRot);
         let diffuseNorm = diffuseDir.over(normal);
         let diffuseAngle = diffuseNorm.timesYZ(diffuseNorm.yz().conjugate()).xy().angle();
 
-        let specularDir = new Vector3(-1, -2, 1);//.timesLine(camRot);
+        let specularDir = new Vector3(-1, 1, 2);//.timesLine(camRot);
         let reflectNorm = specularDir.over(normal).conjugate();
-        let cameraNorm = new Vector3(0, -1, 0).over(normal);
+        let cameraNorm = new Vector3(0, 0, 1).over(normal);
         let reflectCamera = reflectNorm.over(cameraNorm);
         let specularAngle = reflectCamera.timesYZ(reflectCamera.yz().conjugate()).xy().angle();
 
