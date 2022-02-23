@@ -11,7 +11,18 @@ window.onload = function () {
     // @ts-ignore
     let equationInput = document.getElementById('equation');
     equationInput.value = urlEquation;
-    if (equationInput.value == '') equationInput.value = '0.5 = (sqrt(x ^ 2 + y ^ 2) - 1.25) ^ 2 + z ^ 2';
+    if (equationInput.value == '') equationInput.value = 'y = x + 5';
+
+
+    let sampleDropdown = document.getElementById('sample');
+    sampleDropdown.onchange = function () {
+        // @ts-ignore 
+        let choice = sampleDropdown.options[sampleDropdown.selectedIndex].innerHTML;
+        // @ts-ignore
+        equationInput.value = choice;
+    }
+
+
 
 
     /** @type {HTMLCanvasElement} */

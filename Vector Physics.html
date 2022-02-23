@@ -52,14 +52,12 @@
     <div class="flex-container">
         <div class="canvas-space"><canvas id="canvas" tabindex="1"></canvas></canvas></div>
         <div class="side-bar">
+            <!-- <label for="sample">Sample Equations:</label><br><br> -->
+            <select name="sample" id="sample" style="width: 100%;" onchange="myFunction()">
+                <option value="">Sample Equations</option>
+                <option value="">0.5 = (sqrt(x ^ 2 + y ^ 2) - 1.25) ^ 2 + z ^ 2</option>
+            </select><br><br>
             <form id="form">
-                <label for="cars">Sample Equations:</label><br><br>
-                <select name="cars" id="cars" style="width: 100%;">
-                  <option value="volvo">Volvo</option>
-                  <option value="saab">Saab</option>
-                  <option value="opel">Opel</option>
-                  <option value="audi">Audi</option>
-                </select><br><br><br>
                 <label for="equation">Equation: </label><br><br>
                 <input type="text" id="equation" name="equation" style="width: 97%;"><br><br>
                 <input type="submit" value="Submit">
