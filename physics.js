@@ -36,17 +36,14 @@ class Vector2 {
      */
     static polar(magnitude, angle) { return new Vector2(magnitude * Math.cos(angle), magnitude * Math.sin(angle)); }
 
-    /**
-    * @param {Line} camRot
-    * @param {number} camZoom
-    */
-    project(camRot, camZoom) {
+    /** @param {Camera} camera */
+    project(camera) {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
 
-        let x1 = this.x * 10 ** (camZoom / 10) + canvas.width / 2;
-        let y1 = -this.y * 10 ** (camZoom / 10) + canvas.height / 2;
+        let x1 = this.x * 10 ** (camera.zoom / 10) + canvas.width / 2;
+        let y1 = -this.y * 10 ** (camera.zoom / 10) + canvas.height / 2;
 
         return new Vector2(x1, y1);
     }
@@ -128,9 +125,7 @@ class Vector3 {
         return new Vector3(x1, y1, z1);
     }
 
-    /**
-     * @param {Vector3} vector3
-     */
+    /** @param {Vector3} vector3 */
     times(vector3) {
 
         let yaw = vector3.xy().unit();
@@ -143,9 +138,7 @@ class Vector3 {
         return v2;
     }
 
-    /**
-     * @param {Vector3} vector3
-     */
+    /** @param {Vector3} vector3 */
     over(vector3) {
 
         let yaw = vector3.xy().unit();
@@ -157,9 +150,7 @@ class Vector3 {
         return v2.overScalar(vector3.magnitude2());
     }
 
-    /**
-     * @param {Line} line
-     */
+    /** @param {Line} line */
     timesLine(line) {
 
         let yaw = line.v.xy().unit();
@@ -176,9 +167,7 @@ class Vector3 {
         return v3;
     }
 
-    /**
-     * @param {Line} line
-     */
+    /** @param {Line} line */
     overLine(line) {
 
         let yaw = line.v.xy().unit();
@@ -207,17 +196,14 @@ class Vector3 {
         return v1.timesXY(Vector2.polar(1, yaw));
     }
 
-    /**
-     * @param {Line} camRot
-     * @param {number} camZoom
-     */
-    project(camRot, camZoom) {
+    /** @param {Camera} camera */
+    project(camera) {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
 
-        let v1 = this.timesLine(camRot);
-        let z1 = Math.max(-v1.z + 1000 / 10 ** (camZoom / 10), 0);
+        let v1 = this.timesLine(camera.rotation);
+        let z1 = Math.max(-v1.z + 1000 / 10 ** (camera.zoom / 10), 0);
 
         let x1 = v1.x / z1 * 1000 + canvas.width / 2;
         let y1 = -v1.y / z1 * 1000 + canvas.height / 2;
@@ -225,21 +211,15 @@ class Vector3 {
         return new Vector2(x1, y1);
     }
 
-    /**
-     * @param {Line} [camRot]
-     * @param {number} [camZoom]
-     */
-    depth(camRot, camZoom) {
-        let v1 = this.timesLine(camRot);
-        let z1 = Math.max(-v1.z + 1000 / 10 ** (camZoom / 10), 0);
+    /** @param {Camera} camera */
+    depth(camera) {
+        let v1 = this.timesLine(camera.rotation);
+        let z1 = Math.max(-v1.z + 1000 / 10 ** (camera.zoom / 10), 0);
         return z1;
     }
 
-    /**
-     * @param {Line} camRot
-     * @param {number} camZoom
-     */
-    draw(camRot, camZoom) {
+    /** @param {Camera} camera */
+    draw(camera) {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
@@ -248,10 +228,10 @@ class Vector3 {
         ctx.fillStyle = '#888888';
         ctx.lineWidth = 1;
 
-        let vp = this.project(camRot, camZoom);
+        let vp = this.project(camera);
 
-        let v1 = this.timesLine(camRot);
-        let z1 = Math.max(-v1.z + 1000 / 10 ** (camZoom / 10), 0);
+        let v1 = this.timesLine(camera.rotation);
+        let z1 = Math.max(-v1.z + 1000 / 10 ** (camera.zoom / 10), 0);
         let rad = 1 / z1 * 1000;
 
         ctx.beginPath();
@@ -297,17 +277,11 @@ class Line {
     /** @param {Line} line */
     overLine(line) { return new Line(this.v.overLine(line), this.w.overLine(line)); }
 
-    /**
-     * @param {Line} camRot
-     * @param {number} camZoom
-     */
-    depth(camRot, camZoom) { return (this.v.depth(camRot, camZoom) + this.w.depth(camRot, camZoom)) / 2; }
+    /** @param {Camera} camera */
+    depth(camera) { return (this.v.depth(camera) + this.w.depth(camera)) / 2; }
 
-    /**
-     * @param {Line} camRot
-     * @param {any} camZoom
-     */
-    draw(camRot, camZoom) {
+    /** @param {Camera} camera */
+    draw(camera) {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
@@ -316,8 +290,8 @@ class Line {
         ctx.fillStyle = '#00000022';
         ctx.lineWidth = 1;
 
-        let v1 = this.v.project(camRot, camZoom);
-        let w1 = this.w.project(camRot, camZoom);
+        let v1 = this.v.project(camera);
+        let w1 = this.w.project(camera);
 
         ctx.beginPath();
         ctx.moveTo(v1.x, v1.y);
@@ -339,23 +313,17 @@ class Plane {
         this.w = w;
     }
 
-    /**
-     * @param {Line} camRot
-     * @param {number} camZoom
-     */
-    depth(camRot, camZoom) {
+    /** @param {Camera} camera */
+    depth(camera) {
         return (
-            this.u.depth(camRot, camZoom) +
-            this.v.depth(camRot, camZoom) +
-            this.w.depth(camRot, camZoom)
+            this.u.depth(camera) +
+            this.v.depth(camera) +
+            this.w.depth(camera)
         ) / 3;
     }
 
-    /**
-     * @param {Line} camRot
-     * @param {number} camZoom
-     */
-    draw(camRot, camZoom) {
+    /** @param {Camera} camera */
+    draw(camera) {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
@@ -364,9 +332,9 @@ class Plane {
         ctx.fillStyle = '#CCDDFFCC';
         ctx.lineWidth = 1;
 
-        let u1 = this.u.project(camRot, camZoom);
-        let v1 = this.v.project(camRot, camZoom);
-        let w1 = this.w.project(camRot, camZoom);
+        let u1 = this.u.project(camera);
+        let v1 = this.v.project(camera);
+        let w1 = this.w.project(camera);
 
         ctx.beginPath();
         ctx.moveTo(u1.x, u1.y);
@@ -408,21 +376,15 @@ class Polygon3 {
         this.points = sorted;
     }
 
-    /**
-     * @param {Line} camRot
-     * @param {number} camZoom
-     */
-    depth(camRot, camZoom) {
+    /** @param {Camera} camera */
+    depth(camera) {
         let sum = 0;
-        this.points.forEach((point) => { sum += point.depth(camRot, camZoom) });
+        this.points.forEach((point) => { sum += point.depth(camera) });
         return sum / this.points.length;
     }
 
-    /**
-     * @param {Line} camRot
-     * @param {number} camZoom
-     */
-    draw(camRot, camZoom) {
+    /** @param {Camera} camera */
+    draw(camera) {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
@@ -433,7 +395,7 @@ class Polygon3 {
 
 
         let rotated = [];
-        this.points.forEach((point) => { rotated.push(point.timesLine(camRot)); });
+        this.points.forEach((point) => { rotated.push(point.timesLine(camera.rotation)); });
 
         let rAvg = 0;
         let gAvg = 0;
@@ -446,7 +408,7 @@ class Polygon3 {
 
             let diffusePerc = 0;
             let specularPerc = 0;
-            this.shade(normal, camRot, (diffuseAngle, specularAngle) => {
+            this.shade(normal, camera, (diffuseAngle, specularAngle) => {
                 diffusePerc = Math.max(0, (1 - (diffuseAngle / Math.PI)) * 2 - 1);
                 specularPerc = Math.max(0, (1 - (specularAngle / Math.PI)) * 10 - 9) ** (1 / 2);
             });
@@ -477,7 +439,7 @@ class Polygon3 {
 
 
         let projected = []
-        this.points.forEach((point) => { projected.push(point.project(camRot, camZoom)); });
+        this.points.forEach((point) => { projected.push(point.project(camera)); });
 
         ctx.beginPath();
         ctx.moveTo(projected[0].x, projected[0].y);
@@ -490,16 +452,16 @@ class Polygon3 {
 
     /**
      * @param {Vector3} normal
-     * @param {Line} camRot
+     * @param {Camera} camera
      * @param {{(diffuseAngle: number, specularAngle: number): void;}} callBack
      */
-    shade(normal, camRot, callBack) {
+    shade(normal, camera, callBack) {
 
-        let diffuseDir = new Vector3(-1, 1, 2);//.timesLine(camRot);
+        let diffuseDir = new Vector3(-1, 1, 2);//.timesLine(camera.rotation);
         let diffuseNorm = diffuseDir.over(normal);
         let diffuseAngle = diffuseNorm.timesYZ(diffuseNorm.yz().conjugate()).xy().angle();
 
-        let specularDir = new Vector3(-1, 1, 2);//.timesLine(camRot);
+        let specularDir = new Vector3(-1, 1, 2);//.timesLine(camera.rotation);
         let reflectNorm = specularDir.over(normal).conjugate();
         let cameraNorm = new Vector3(0, 0, 1).over(normal);
         let reflectCamera = reflectNorm.over(cameraNorm);
@@ -525,16 +487,14 @@ class Text3 {
     }
 
     /**
-     * @param {Line} camRot
-     * @param {number} camZoom
+     * @param {Camera} camera
      */
-    depth(camRot, camZoom) { return this.position.depth(camRot, camZoom); }
+    depth(camera) { return this.position.depth(camera); }
 
     /**
-     * @param {Line} camRot
-     * @param {number} camZoom
+     * @param {Camera} camera
      */
-    draw(camRot, camZoom) {
+    draw(camera) {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
@@ -543,14 +503,14 @@ class Text3 {
         ctx.fillStyle = '#00000044';
         ctx.lineWidth = 1;
 
-        let fontSize = 12 * 10 ** (camZoom / 10);
+        let fontSize = 12 * 10 ** (camera.zoom / 10);
         ctx.font = `${fontSize}px sans-serif`;
         ctx.textAlign = 'center';
 
-        let position1 = this.position.project(camRot, camZoom);
-        let rotation1 = this.rotation.timesLine(camRot).xy().unit();
+        let position1 = this.position.project(camera);
+        let rotation1 = this.rotation.timesLine(camera.rotation).xy().unit();
 
-        let o1 = this.offset.times(new Vector2(10 ** (camZoom / 10), 0));
+        let o1 = this.offset.times(new Vector2(10 ** (camera.zoom / 10), 0));
         o1 = o1.times(rotation1).conjugate().plus(position1);
         o1 = o1.plus(new Vector2(0, 0.4).times(new Vector2(fontSize, 0)));
 
@@ -573,16 +533,14 @@ class Polygon2 {
     }
 
     /**
-     * @param {Line} camRot
-     * @param {number} camZoom
+     * @param {Camera} camera
      */
-    depth(camRot, camZoom) { return this.position.depth(camRot, camZoom); }
+    depth(camera) { return this.position.depth(camera); }
 
     /**
-     * @param {Line} camRot
-     * @param {number} camZoom
+     * @param {Camera} camera
      */
-    draw(camRot, camZoom) {
+    draw(camera) {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
@@ -592,11 +550,11 @@ class Polygon2 {
         ctx.lineWidth = 1;
 
 
-        let position1 = this.position.project(camRot, camZoom);
-        let rotation1 = this.rotation.timesLine(camRot).xy().unit();
+        let position1 = this.position.project(camera);
+        let rotation1 = this.rotation.timesLine(camera.rotation).xy().unit();
 
         let p1 = [];
-        this.point2s.forEach((point) => { p1.push(point.times(new Vector2(10 ** (camZoom / 10), 0))); });
+        this.point2s.forEach((point) => { p1.push(point.times(new Vector2(10 ** (camera.zoom / 10), 0))); });
 
         let p2 = [];
         p1.forEach((point) => { p2.push(point.times(rotation1).conjugate().plus(position1)); });

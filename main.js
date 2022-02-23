@@ -8,41 +8,13 @@ window.onload = function () {
     let canvas = document.getElementById('canvas');
 
 
-    let mButtons = 0;
+    let camera = new Camera();
 
-    let camPos = new Vector3(0, 0, 0);
-    let camRot = new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
-    let camZoom = 0;
-
-    camRot = camRot.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
-    camRot = camRot.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
-
-    canvas.oncontextmenu = function (event) { event.preventDefault(); event.stopPropagation(); }
-    canvas.addEventListener('mousedown', (event) => { mButtons = event.buttons; });
-    canvas.addEventListener('mouseup', (event) => { mButtons = event.buttons; });
-    canvas.addEventListener('mouseleave', (event) => { mButtons = event.buttons; });
-    canvas.addEventListener('mouseenter', (event) => { mButtons = event.buttons; });
-    canvas.addEventListener('mousemove', (event) => {
-        if (mButtons == 1) {
-            camRot = camRot.timesXZ(Vector2.polar(1, -event.movementX / 2 * Math.PI / 180));
-            camRot = camRot.timesYZ(Vector2.polar(1, event.movementY / 2 * Math.PI / 180));
-        }
-    });
-    canvas.addEventListener('wheel', (event) => {
-        camZoom -= Math.sign(event.deltaY);
-    });
 
     canvas.focus();
     canvas.addEventListener('keypress', (event) => {
         switch (event.key) {
-            case ' ':
-                camRot = new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
-                camZoom = 0;
-
-                camRot = camRot.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
-                camRot = camRot.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
-
-                break;
+            case ' ': camera.reset(); break;
         }
     });
 
@@ -72,14 +44,60 @@ window.onload = function () {
         let sorting = [];
 
         objects.forEach((object) => {
-            let depth = object.depth(camRot, camZoom);
+            let depth = object.depth(camera);
             sorting.push([object, depth]);
         });
 
         sorting.sort((a, b) => { return b[1] - a[1]; });
-        sorting.forEach((object) => { object[0].draw(camRot, camZoom); });
+        sorting.forEach((object) => { object[0].draw(camera); });
 
     }, 1000 / 60);
+}
+
+class Camera {
+    constructor() {
+        this.position = new Vector3(0, 0, 0);
+        this.rotation = new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
+        this.zoom = 0;
+
+        this.rotation = this.rotation.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
+        this.rotation = this.rotation.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
+
+        this.addMouseListener();
+    }
+
+    addMouseListener() {
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+
+        let mButtons = 0;
+
+        canvas.oncontextmenu = function (event) { event.preventDefault(); event.stopPropagation(); };
+        canvas.addEventListener('mousedown', (event) => { mButtons = event.buttons; });
+        canvas.addEventListener('mouseup', (event) => { mButtons = event.buttons; });
+        canvas.addEventListener('mouseleave', (event) => { mButtons = event.buttons; });
+        canvas.addEventListener('mouseenter', (event) => { mButtons = event.buttons; });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (mButtons == 1) {
+                this.rotation = this.rotation.timesXZ(Vector2.polar(1, -event.movementX / 2 * Math.PI / 180));
+                this.rotation = this.rotation.timesYZ(Vector2.polar(1, event.movementY / 2 * Math.PI / 180));
+            }
+        });
+        canvas.addEventListener('wheel', (event) => {
+            this.zoom -= Math.sign(event.deltaY);
+        });
+    }
+
+    reset() {
+        let rotation = new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
+        rotation = rotation.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
+        rotation = rotation.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
+
+        this.rotation = rotation;
+        this.zoom = 0;
+    }
 }
 
 /**
