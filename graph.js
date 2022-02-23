@@ -78,7 +78,7 @@ function plotGraph(boxSize, blockSize) {
 
 
         if (points.length >= 3) {
-            graphObjs = graphObjs.concat(new Polygon2(points));
+            graphObjs = graphObjs.concat(new Polygon3(points));
             totalPoints += points.length;
         }
     });
@@ -240,4 +240,3 @@ function calcPoint(x, y, z, memory) {
     memory.set(`${x}|${y}|${z}`, value);
     return value;
 }
-

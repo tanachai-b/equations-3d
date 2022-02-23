@@ -285,6 +285,12 @@ class Line {
     /** @param {Vector2} vector2 */
     timesYZ(vector2) { return new Line(this.v.timesYZ(vector2), this.w.timesYZ(vector2)); }
 
+    /** @param {Vector3} vector3 */
+    times(vector3) { return new Line(this.v.times(vector3), this.w.times(vector3)); }
+
+    /** @param {Vector3} vector3 */
+    over(vector3) { return new Line(this.v.over(vector3), this.w.over(vector3)); }
+
     /** @param {Line} line */
     timesLine(line) { return new Line(this.v.timesLine(line), this.w.timesLine(line)); }
 
@@ -307,7 +313,7 @@ class Line {
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
         ctx.strokeStyle = '#00000022';
-        ctx.fillStyle = '#888888';
+        ctx.fillStyle = '#00000022';
         ctx.lineWidth = 1;
 
         let v1 = this.v.project(camRot, camZoom);
@@ -373,7 +379,7 @@ class Plane {
 }
 
 
-class Polygon2 {
+class Polygon3 {
 
     /**
      * @param {Vector3[]} points
@@ -507,10 +513,14 @@ class Text3 {
 
     /**
      * @param {Vector3} position
+     * @param {Vector3} rotation
+     * @param {Vector2} offset
      * @param {string} text
      */
-    constructor(position, text) {
+    constructor(position, rotation, offset, text) {
         this.position = position;
+        this.rotation = rotation;
+        this.offset = offset;
         this.text = text;
     }
 
@@ -518,9 +528,7 @@ class Text3 {
      * @param {Line} camRot
      * @param {number} camZoom
      */
-    depth(camRot, camZoom) {
-        return this.position.depth(camRot, camZoom)
-    }
+    depth(camRot, camZoom) { return this.position.depth(camRot, camZoom); }
 
     /**
      * @param {Line} camRot
@@ -531,12 +539,75 @@ class Text3 {
         // @ts-ignore
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#000000';
-        ctx.fillStyle = '#000000';
+        ctx.strokeStyle = '#00000044';
+        ctx.fillStyle = '#00000044';
         ctx.lineWidth = 1;
-        ctx.font = '12px sans-serif';
 
-        ctx.fillText('hsad', 5, 12);
+        let fontSize = 12 * 10 ** (camZoom / 10);
+        ctx.font = `${fontSize}px sans-serif`;
+        ctx.textAlign = 'center';
+
+        let position1 = this.position.project(camRot, camZoom);
+        let rotation1 = this.rotation.timesLine(camRot).xy().unit();
+
+        let o1 = this.offset.times(new Vector2(10 ** (camZoom / 10), 0));
+        o1 = o1.times(rotation1).conjugate().plus(position1);
+        o1 = o1.plus(new Vector2(0, 0.4).times(new Vector2(fontSize, 0)));
+
+        ctx.fillText(this.text, o1.x, o1.y);
     }
 
+}
+
+class Polygon2 {
+
+    /**
+     * @param {Vector3} position
+     * @param {Vector3} rotation
+     * @param {Vector2[]} point2s
+     */
+    constructor(position, rotation, point2s) {
+        this.position = position;
+        this.rotation = rotation;
+        this.point2s = point2s;
+    }
+
+    /**
+     * @param {Line} camRot
+     * @param {number} camZoom
+     */
+    depth(camRot, camZoom) { return this.position.depth(camRot, camZoom); }
+
+    /**
+     * @param {Line} camRot
+     * @param {number} camZoom
+     */
+    draw(camRot, camZoom) {
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        ctx.strokeStyle = '#00000022';
+        ctx.fillStyle = '#00000022';
+        ctx.lineWidth = 1;
+
+
+        let position1 = this.position.project(camRot, camZoom);
+        let rotation1 = this.rotation.timesLine(camRot).xy().unit();
+
+        let p1 = [];
+        this.point2s.forEach((point) => { p1.push(point.times(new Vector2(10 ** (camZoom / 10), 0))); });
+
+        let p2 = [];
+        p1.forEach((point) => { p2.push(point.times(rotation1).conjugate().plus(position1)); });
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(p2[0].x, p2[0].y);
+        p2.forEach((point) => { ctx.lineTo(point.x, point.y); });
+        ctx.closePath();
+        // ctx.fill();
+        ctx.stroke();
+    }
 }
