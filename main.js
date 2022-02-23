@@ -122,10 +122,9 @@ class Camera {
     constructor() {
         this.position = new Vector3(0, 0, 0);
 
-        this.rotation = new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
-        // this.rotation = this.rotation.timesXZ(Vector2.polar(1, 1 * Math.PI / 180));
-        // this.rotation = this.rotation.timesYZ(Vector2.polar(1, 0 * Math.PI / 180));
-        // this.rotation = this.rotation.timesXY(Vector2.polar(1, 180 * Math.PI / 180));
+        this.rotation = Line.default();
+        this.rotation = this.rotation.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
+        this.rotation = this.rotation.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
 
         this.zoom = 0;
 
@@ -168,15 +167,15 @@ class Camera {
 
     reset() {
         let dr2 = Line.default()
-        dr2 = dr2.timesXZ(Vector2.polar(1, 0 * Math.PI / 180));
-        dr2 = dr2.timesYZ(Vector2.polar(1, 0 * Math.PI / 180));
+        dr2 = dr2.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
+        dr2 = dr2.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
         this.destRotation = dr2;
 
         this.destZoom = 0;
     }
 
     update() {
-        let mvtFactor = 10;
+        let mvtFactor = 3;
 
 
         let diffLine = this.destRotation.overLine(this.rotation);
@@ -188,7 +187,7 @@ class Camera {
         diffLine.angles((yaw, pitch, roll) => { diffRoll = roll.angle() });
 
         let newV = Vector3.polar(1, diffAngle / mvtFactor, 0).timesYZ(diffDir);
-        let newW = Vector3.polar(1, Math.PI / 2, diffRoll / 1);
+        let newW = Vector3.polar(1, Math.PI / 2, diffRoll / mvtFactor).times(newV);
         let stepRot = new Line(newV, newW);
 
 
