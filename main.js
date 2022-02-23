@@ -3,6 +3,17 @@
 
 window.onload = function () {
 
+    let queryString = window.location.search;
+    let urlParams = new URLSearchParams(queryString);
+    let urlEquation = urlParams.get('equation')
+
+    /** @type {HTMLInputElement} */
+    // @ts-ignore
+    let equationInput = document.getElementById('equation');
+    equationInput.value = urlEquation;
+    if (equationInput.value == '') equationInput.value = '0.5 = (sqrt(x ^ 2 + y ^ 2) - 1.25) ^ 2 + z ^ 2';
+
+
     /** @type {HTMLCanvasElement} */
     // @ts-ignore
     let canvas = document.getElementById('canvas');
@@ -33,8 +44,8 @@ window.onload = function () {
 
     let ctx = canvas.getContext('2d');
     setInterval(() => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
 
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -148,7 +159,7 @@ class Camera {
         canvas.addEventListener('mousedown', (event) => { mButtons = event.buttons; });
         canvas.addEventListener('mouseup', (event) => { mButtons = event.buttons; });
         canvas.addEventListener('mouseleave', (event) => { mButtons = event.buttons; });
-        canvas.addEventListener('mouseenter', (event) => { mButtons = event.buttons; });
+        canvas.addEventListener('mouseenter', (event) => { mButtons = event.buttons; mButtons = 0; });
 
         canvas.addEventListener('mousemove', (event) => {
             if (mButtons == 1) {
