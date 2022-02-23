@@ -135,7 +135,7 @@ class Vector3 {
     times(vector3) {
 
         let yaw = vector3.xy().unit();
-        let pitch = vector3.timesXY(yaw.conjugate()).xz().unit();
+        let pitch = new Vector2(vector3.xy().magnitude(), vector3.z).unit();
 
         let v1 = this.timesXZ(pitch);
         let v2 = v1.timesXY(yaw);
@@ -147,7 +147,7 @@ class Vector3 {
     over(vector3) {
 
         let yaw = vector3.xy().unit();
-        let pitch = vector3.timesXY(yaw.conjugate()).xz().unit();
+        let pitch = new Vector2(vector3.xy().magnitude(), vector3.z).unit();
 
         let v1 = this.timesXY(yaw.conjugate());
         let v2 = v1.timesXZ(pitch.conjugate());
@@ -159,7 +159,7 @@ class Vector3 {
     timesLine(line) {
 
         let yaw = line.v.xy().unit();
-        let pitch = line.v.timesXY(yaw.conjugate()).xz().unit();
+        let pitch = new Vector2(line.v.xy().magnitude(), line.v.z).unit();
 
         let w1 = line.w.timesXY(yaw.conjugate());
         let w2 = w1.timesXZ(pitch.conjugate());
@@ -178,7 +178,7 @@ class Vector3 {
         let yaw = line.v.xy().unit();
         if (line.v.xy().magnitude2() == 0) { yaw = new Vector2(1, 0); }
 
-        let pitch = line.v.timesXY(yaw.conjugate()).xz().unit();
+        let pitch = new Vector2(line.v.xy().magnitude(), line.v.z).unit();
 
         let w1 = line.w.timesXY(yaw.conjugate());
         let w2 = w1.timesXZ(pitch.conjugate());
