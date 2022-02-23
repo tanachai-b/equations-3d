@@ -32,20 +32,33 @@ window.onload = function () {
         camZoom -= Math.sign(event.deltaY);
     });
 
+    canvas.focus();
+    canvas.addEventListener('keypress', (event) => {
+        switch (event.key) {
+            case ' ':
+                camRot = new Line(new Vector3(1, 0, 0), new Vector3(0, 1, 0));
+                camZoom = 0;
+
+                camRot = camRot.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
+                camRot = camRot.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
+
+                break;
+        }
+    });
+
 
     /** @type {(Vector2|Vector3|Line|Plane|Polygon3|Text3|Polygon2)[]} */
     let objects = [];
 
     let axisSize = 300;
-    let boxSize = 250;
+    let frameSize = 250;
     let step = 20;
 
-    drawAxis(objects, axisSize, boxSize, step);
-    drawFrame(objects, boxSize, step);
-
+    drawAxis(objects, axisSize, frameSize, step);
+    drawFrame(objects, frameSize, step);
 
     let blockSize = 25;
-    objects = objects.concat(plotGraph(boxSize, blockSize));
+    objects = objects.concat(plotGraph(frameSize, blockSize));
 
 
     let ctx = canvas.getContext('2d');
@@ -72,10 +85,10 @@ window.onload = function () {
 /**
  * @param {(Vector3 | Line | Vector2 | Plane | Polygon3 | Text3 | Polygon2)[]} objects
  * @param {number} axisSize
- * @param {number} boxSize
+ * @param {number} frameSize
  * @param {number} step
  */
-function drawAxis(objects, axisSize, boxSize, step) {
+function drawAxis(objects, axisSize, frameSize, step) {
 
     for (let i = -axisSize; i < axisSize; i += step) {
         objects.push(new Line(new Vector3(i, 0, 0), new Vector3(i + step, 0, 0)));
@@ -83,10 +96,10 @@ function drawAxis(objects, axisSize, boxSize, step) {
         objects.push(new Line(new Vector3(0, 0, i), new Vector3(0, 0, i + step)));
     }
 
-
-    objects.push(new Polygon2(new Vector3(axisSize, 0, 0), new Vector3(1, 0, 0), [new Vector2(0, 5), new Vector2(20, 0), new Vector2(0, -5)]));
-    objects.push(new Polygon2(new Vector3(0, axisSize, 0), new Vector3(0, 1, 0), [new Vector2(0, 5), new Vector2(20, 0), new Vector2(0, -5)]));
-    objects.push(new Polygon2(new Vector3(0, 0, axisSize), new Vector3(0, 0, 1), [new Vector2(0, 5), new Vector2(20, 0), new Vector2(0, -5)]));
+    let arrowHead = [new Vector2(0, 5), new Vector2(20, 0), new Vector2(0, -5)];
+    objects.push(new Polygon2(new Vector3(axisSize, 0, 0), new Vector3(1, 0, 0), arrowHead));
+    objects.push(new Polygon2(new Vector3(0, axisSize, 0), new Vector3(0, 1, 0), arrowHead));
+    objects.push(new Polygon2(new Vector3(0, 0, axisSize), new Vector3(0, 0, 1), arrowHead));
 
     objects.push(new Text3(new Vector3(axisSize, 0, 0), new Vector3(1, 0, 0), new Vector2(30, 0), `x`));
     objects.push(new Text3(new Vector3(0, axisSize, 0), new Vector3(0, 1, 0), new Vector2(30, 0), `y`));
@@ -95,7 +108,7 @@ function drawAxis(objects, axisSize, boxSize, step) {
 
     objects.push(new Text3(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector2(0, -12), `0`));
 
-    for (let i = -boxSize; i <= boxSize; i += 125) {
+    for (let i = -frameSize; i <= frameSize; i += 125) {
         if (i == 0) continue;
 
         objects.push(new Polygon2(new Vector3(i, 0, 0), new Vector3(1, 0, 0), [new Vector2(0, -5), new Vector2(0, 0)]));
@@ -110,25 +123,25 @@ function drawAxis(objects, axisSize, boxSize, step) {
 
 /**
  * @param {(Vector3 | Line | Vector2 | Plane | Polygon3 | Text3 | Polygon2)[]} objects
- * @param {number} boxSize
+ * @param {number} frameSize
  * @param {number} step
  */
-function drawFrame(objects, boxSize, step) {
+function drawFrame(objects, frameSize, step) {
 
-    for (let i = -boxSize; i < boxSize; i += step) {
-        objects.push(new Line(new Vector3(i, -boxSize, -boxSize), new Vector3(i + step, -boxSize, -boxSize)));
-        objects.push(new Line(new Vector3(i, boxSize, -boxSize), new Vector3(i + step, boxSize, -boxSize)));
-        objects.push(new Line(new Vector3(i, -boxSize, boxSize), new Vector3(i + step, -boxSize, boxSize)));
-        objects.push(new Line(new Vector3(i, boxSize, boxSize), new Vector3(i + step, boxSize, boxSize)));
+    for (let i = -frameSize; i < frameSize; i += step) {
+        objects.push(new Line(new Vector3(i, -frameSize, -frameSize), new Vector3(i + step, -frameSize, -frameSize)));
+        objects.push(new Line(new Vector3(i, frameSize, -frameSize), new Vector3(i + step, frameSize, -frameSize)));
+        objects.push(new Line(new Vector3(i, -frameSize, frameSize), new Vector3(i + step, -frameSize, frameSize)));
+        objects.push(new Line(new Vector3(i, frameSize, frameSize), new Vector3(i + step, frameSize, frameSize)));
 
-        objects.push(new Line(new Vector3(-boxSize, i, -boxSize), new Vector3(-boxSize, i + step, -boxSize)));
-        objects.push(new Line(new Vector3(boxSize, i, -boxSize), new Vector3(boxSize, i + step, -boxSize)));
-        objects.push(new Line(new Vector3(-boxSize, i, boxSize), new Vector3(-boxSize, i + step, boxSize)));
-        objects.push(new Line(new Vector3(boxSize, i, boxSize), new Vector3(boxSize, i + step, boxSize)));
+        objects.push(new Line(new Vector3(-frameSize, i, -frameSize), new Vector3(-frameSize, i + step, -frameSize)));
+        objects.push(new Line(new Vector3(frameSize, i, -frameSize), new Vector3(frameSize, i + step, -frameSize)));
+        objects.push(new Line(new Vector3(-frameSize, i, frameSize), new Vector3(-frameSize, i + step, frameSize)));
+        objects.push(new Line(new Vector3(frameSize, i, frameSize), new Vector3(frameSize, i + step, frameSize)));
 
-        objects.push(new Line(new Vector3(-boxSize, -boxSize, i), new Vector3(-boxSize, -boxSize, i + step)));
-        objects.push(new Line(new Vector3(boxSize, -boxSize, i), new Vector3(boxSize, -boxSize, i + step)));
-        objects.push(new Line(new Vector3(-boxSize, boxSize, i), new Vector3(-boxSize, boxSize, i + step)));
-        objects.push(new Line(new Vector3(boxSize, boxSize, i), new Vector3(boxSize, boxSize, i + step)));
+        objects.push(new Line(new Vector3(-frameSize, -frameSize, i), new Vector3(-frameSize, -frameSize, i + step)));
+        objects.push(new Line(new Vector3(frameSize, -frameSize, i), new Vector3(frameSize, -frameSize, i + step)));
+        objects.push(new Line(new Vector3(-frameSize, frameSize, i), new Vector3(-frameSize, frameSize, i + step)));
+        objects.push(new Line(new Vector3(frameSize, frameSize, i), new Vector3(frameSize, frameSize, i + step)));
     }
 }

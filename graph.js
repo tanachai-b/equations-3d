@@ -2,10 +2,10 @@
 'use strict';
 
 /**
- * @param {number} boxSize
+ * @param {number} frameSize
  * @param {number} blockSize
  */
-function plotGraph(boxSize, blockSize) {
+function plotGraph(frameSize, blockSize) {
 
     let memory = new Map();
 
@@ -13,9 +13,9 @@ function plotGraph(boxSize, blockSize) {
 
     let bigBlocks = [];
 
-    for (let x = -boxSize; x < boxSize; x += bigBlockSize) {
-        for (let y = -boxSize; y < boxSize; y += bigBlockSize) {
-            for (let z = -boxSize; z < boxSize; z += bigBlockSize) {
+    for (let x = -frameSize; x < frameSize; x += bigBlockSize) {
+        for (let y = -frameSize; y < frameSize; y += bigBlockSize) {
+            for (let z = -frameSize; z < frameSize; z += bigBlockSize) {
 
                 if (checkBlock(x, y, z, bigBlockSize, memory)) {
                     bigBlocks.push(new Vector3(x, y, z));
@@ -225,7 +225,7 @@ function calcPoint(x, y, z, memory) {
     // let value = 1 > (x / 1.5) ** 8 + (y / 1) ** 2 + (z / 1) ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 - 0.5 ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 + 0.5 ** 2;
-    // let value = 0.5 > (Math.sqrt(x ** 2 + y ** 2) - 1.25) ** 2 + z ** 2;
+    let value = 0.5 > (Math.sqrt(x ** 2 + y ** 2) - 1.25) ** 2 + z ** 2;
     // let value = z > 7 * (x * y) / Math.E ** (x ** 2 + y ** 2)
     // let value = 1 ** 2 < x ** 2 - y ** 2 + z ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2;
@@ -234,7 +234,7 @@ function calcPoint(x, y, z, memory) {
     // let value = 0 < (x ** 2 + 9 / 4 * y ** 2 + z ** 2 - 1) ** 3 - (x ** 2 + 9 / 80 * y ** 2) * z ** 3 - 0;
     // let value = z < Math.E ** -(x ** 2 + y ** 2) * 1.5;
     // let value = 1 < (Math.cos(x) ** 2 + Math.cos(y) ** 2 + Math.cos(z) ** 2)**0.5;
-    let value = 0 < (x ** 4 + y ** 4 + z ** 4 - 1 ** 4) ** (1 / 4) - 0 ** 1
+    // let value = 0 < (x ** 4 + y ** 4 + z ** 4 - 1 ** 4) ** (1 / 4) - 0 ** 1
     // let value = 0 < x ** 2 - y ** 2 + z ** 2 + 0.001 ** 2
 
     memory.set(`${x}|${y}|${z}`, value);
