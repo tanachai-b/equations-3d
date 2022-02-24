@@ -2,36 +2,45 @@
 'use strict';
 
 function compileEquation() {
-    let input = '55 = x - 5 * y + c';
 
+    let input = '3+2*4=4^3';
+    console.log(input);
 
-    let symbols = new Map([
-        ['(', { type: 'bracket', order: 0 }],
-        [')', { type: 'bracket', order: 0 }],
-        ['^', { type: 'operator', order: 2 }],
-        ['*', { type: 'operator', order: 3 }],
-        ['/', { type: 'operator', order: 3 }],
-        ['+', { type: 'operator', order: 4 }],
-        ['-', { type: 'operator', order: 4 }],
-        ['=', { type: 'bracket', order: 9 }],
-    ]);
+    let tokens = tokenize(input);
+    console.log(tokens);
+}
 
-
-    let numbers = /[0123456789]/g;
-    let letters = /[A-Za-z]/g;
-    let opeartors = /[\+\-\*\/\^]/g;
-    let braces = /[\(\)]/g;
-
+/** @param {string} input */
+function tokenize(input) {
     input = input.replace(/ /g, '');
 
-    for (let i = 0; i < input.length; i++) {
-        let char = input.charAt(i);
-        console.log(char);
+    let symbols = new Set(['+', '-', '*', '/', '^', '(', ')', '=', 'sqrt', 'sin', 'cos', 'e', 'pi',]);
 
-        
+    let tokens = [];
+
+    let curToken = '';
+    while (input.length > 0) {
+
+        let isMatchSymbol = '';
+        symbols.forEach((symbol) => {
+            if (input.startsWith(symbol)) {
+                isMatchSymbol = symbol;
+            }
+        });
+
+        if (isMatchSymbol.length > 0) {
+            if (curToken.length > 0) tokens.push([curToken, 'value']);
+            curToken = '';
+            tokens.push([isMatchSymbol, 'symbol']);
+            input = input.slice(isMatchSymbol.length);
+            continue;
+
+        } else {
+            curToken += input.charAt(0);
+            input = input.slice(1);
+        }
     }
+    if (curToken.length > 0) tokens.push([curToken, 'value']);
 
-
-
-    console.log(input);
+    return tokens
 }
