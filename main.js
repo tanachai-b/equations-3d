@@ -42,7 +42,7 @@ window.onload = function () {
 
     let axisSize = 300;
     let frameSize = 250;
-    let step = 20;
+    let step = 25;
 
     drawAxis(objects, axisSize, frameSize, step);
     drawFrame(objects, frameSize, step);

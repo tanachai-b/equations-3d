@@ -15,7 +15,7 @@ class Vector2 {
     magnitude() { return Math.sqrt(this.magnitude2()); }
     unit() {
         if (this.magnitude2() == 0) {
-            return new Vector2(0, 0);
+            return new Vector2(1, 0);
         } else {
             return new Vector2(this.x / this.magnitude(), this.y / this.magnitude());
         }
@@ -93,7 +93,7 @@ class Vector3 {
     magnitude() { return Math.sqrt(this.magnitude2()); }
     unit() {
         if (this.magnitude2() == 0) {
-            return new Vector3(0, 0, 0);
+            return new Vector3(1, 0, 0);
         } else {
             return new Vector3(this.x / this.magnitude(), this.y / this.magnitude(), this.z / this.magnitude());
         }
@@ -159,7 +159,7 @@ class Vector3 {
         let v1 = this.timesXY(vector3.yaw().conjugate());
         let v2 = v1.timesXZ(vector3.pitch().conjugate());
 
-        return v2.overScalar(vector3.magnitude2());
+        return v2.overScalar(vector3.magnitude());
     }
 
     /** @param {Line} line */
@@ -184,7 +184,7 @@ class Vector3 {
             let v1 = this.timesXY(yaw.conjugate());
             let v2 = v1.timesXZ(pitch.conjugate());
             let v3 = v2.timesYZ(roll.conjugate());
-            result = v3.overScalar(line.v.magnitude2());
+            result = v3.overScalar(line.v.magnitude());
         });
 
         return result;
@@ -386,6 +386,7 @@ class Polygon3 {
             }
         });
         sortable.sort((a, b) => { return b[0] - a[0]; });
+
 
         let sorted = [];
         sortable.forEach(sorting => { sorted.push(sorting[1]); });

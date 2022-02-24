@@ -226,7 +226,7 @@ function calcPoint(x, y, z, memory) {
     // let value = z ** 2 > x ** 2 + y ** 2 - 0.5 ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2 + 0.5 ** 2;
     let value = 0.5 > (Math.sqrt(x ** 2 + y ** 2) - 1.25) ** 2 + z ** 2;
-    // let value = z > 7 * (x * y) / Math.E ** (x ** 2 + y ** 2)
+    // let value = z > 7 * (x * y) / Math.E ** (x ** 2 + y ** 2);
     // let value = 1 ** 2 < x ** 2 - y ** 2 + z ** 2;
     // let value = z ** 2 > x ** 2 + y ** 2;
     // let value = z + 0.5 > x ** 2 + y ** 2;
@@ -234,8 +234,9 @@ function calcPoint(x, y, z, memory) {
     // let value = 0 < (x ** 2 + 9 / 4 * y ** 2 + z ** 2 - 1) ** 3 - (x ** 2 + 9 / 80 * y ** 2) * z ** 3 - 0;
     // let value = z < Math.E ** -(x ** 2 + y ** 2) * 1.5;
     // let value = 1 < (Math.cos(x) ** 2 + Math.cos(y) ** 2 + Math.cos(z) ** 2)**0.5;
-    // let value = 0 < (x ** 4 + y ** 4 + z ** 4 - 1 ** 4) ** (1 / 4) - 0 ** 1
-    // let value = 0 < x ** 2 - y ** 2 + z ** 2 - 1.001 ** 2
+    // let value = 0 < (x ** 4 + y ** 4 + z ** 4 - 1 ** 4) ** (1 / 4) - 0 ** 1;
+    // let value = 0 < x ** 2 - y ** 2 + z ** 2 - 1.001 ** 2;
+    // let value = x < 0;
 
     memory.set(`${x}|${y}|${z}`, value);
     return value;
