@@ -26,7 +26,7 @@ function tokenize(input) {
     input = input.replace(/ /g, '') + '$';
     input = input.toLowerCase();
 
-    let symbols = new Set(['+', '-', '*', '/', '^', '(', ')', '=', '>', '<', 'abs', 'sqrt', 'sin', 'cos', 'e', 'pi', '$', 'x', 'y', 'z',]);
+    let symbols = new Set(['+', '-', '*', '/', '^', '(', ')', '=', '>', '<', 'abs', 'sqrt', 'sin', 'cos', '$']);
 
     let tokens = [];
 
@@ -64,9 +64,7 @@ function substConst(tokens) {
     let constants = new Set(['e', 'pi',]);
 
     tokens.forEach((token) => {
-        if (token[1] == 'symbol' && constants.has(token[0])) {
-            token[1] = 'value';
-
+        if (token[1] == 'value' && constants.has(token[0])) {
             switch (token[0]) {
                 case 'e': token[0] = Math.E; break;
                 case 'pi': token[0] = Math.PI; break;
@@ -81,9 +79,7 @@ function substVar(tokens, x = 0, y = 0, z = 0) {
     let constants = new Set(['x', 'y', 'z',]);
 
     tokens.forEach((token) => {
-        if (token[1] == 'symbol' && constants.has(token[0])) {
-            token[1] = 'value';
-
+        if (token[1] == 'value' && constants.has(token[0])) {
             switch (token[0]) {
                 case 'x': token[0] = x; break;
                 case 'y': token[0] = y; break;
@@ -125,9 +121,9 @@ class CalcBox {
                 let valid = new Set(['+', '-', '*', '/', '^', '=', '>', '<',]);
 
                 if (
-                    trailing[0][1] == 'value' &&
+                    trailing[0][1] == 'value' && !isNaN(trailing[0][0]) &&
                     trailing[1][1] == 'symbol' && valid.has(trailing[1][0]) &&
-                    trailing[2][1] == 'value' &&
+                    trailing[2][1] == 'value' && !isNaN(trailing[2][0]) &&
                     trailing[3][1] == 'symbol'
                 ) {
                     let ooo1 = ooo.get(trailing[1][0]);
@@ -148,7 +144,7 @@ class CalcBox {
                 if (
                     trailing[0][1] == 'symbol' &&
                     trailing[1][0] == '-' &&
-                    trailing[2][1] == 'value'
+                    trailing[2][1] == 'value' && !isNaN(trailing[2][0])
                 ) {
                     this.tokens = this.tokens.slice(0, -3);
                     this.tokens.push(trailing[0]);
@@ -178,7 +174,7 @@ class CalcBox {
 
                 if (
                     trailing[0][1] == 'symbol' && valid.has(trailing[0][0]) &&
-                    trailing[1][1] == 'value'
+                    trailing[1][1] == 'value' && !isNaN(trailing[1][0])
                 ) {
                     this.tokens = this.tokens.slice(0, -2);
                     this.tokens.push([func(trailing[0][0], trailing[1][0]), 'value']);
@@ -202,21 +198,15 @@ class CalcBox {
  * @param {any} value2
  */
 function operate(value1, symbol, value2) {
-
-    if (isNaN(value1) || isNaN(value2)) { return value1 + symbol + value2; }
-
-    let v1 = Number(value1);
-    let v2 = Number(value2);
-
     switch (symbol) {
-        case '+': return v1 + v2;
-        case '-': return v1 - v2;
-        case '*': return v1 * v2;
-        case '/': return v1 / v2;
-        case '^': return v1 ** v2;
-        case '=': return v1 == v2;
-        case '>': return v1 > v2;
-        case '<': return v1 < v2;
+        case '+': return value1 + value2;
+        case '-': return value1 - value2;
+        case '*': return value1 * value2;
+        case '/': return value1 / value2;
+        case '^': return value1 ** value2;
+        case '=': return value1 == value2;
+        case '>': return value1 > value2;
+        case '<': return value1 < value2;
         default: return value1 + symbol + value2;
     }
 }
@@ -226,16 +216,11 @@ function operate(value1, symbol, value2) {
  * @param {number} value
  */
 function func(symbol, value) {
-
-    if (isNaN(value)) { return symbol + value; }
-
-    let v = Number(value);
-
     switch (symbol) {
-        case 'abs': return Math.abs(v);
-        case 'sqrt': return Math.sqrt(v);
-        case 'sin': return Math.sin(v);
-        case 'cos': return Math.cos(v);
+        case 'abs': return Math.abs(value);
+        case 'sqrt': return Math.sqrt(value);
+        case 'sin': return Math.sin(value);
+        case 'cos': return Math.cos(value);
         default: return symbol + value;
     }
 }
