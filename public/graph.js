@@ -238,7 +238,8 @@ function calcPoint(equation, x, y, z, memory) {
     // let value = 1 < (Math.cos(x) ** 2 + Math.cos(y) ** 2 + Math.cos(z) ** 2)**0.5;
     // let value = 0 < (x ** 4 + y ** 4 + z ** 4 - 1 ** 4) ** (1 / 4) - 0 ** 1;
     // let value = 0 < x ** 2 - y ** 2 + z ** 2 - 1.001 ** 2;
-    // let value = x < 0;
+    // let value = 0 < (x ** 2 + y ** 2 + z ** 2 - 1) ** 0.5 + x;
+    // let value = 0<( x ** 2 + y ** 2 + z ** 2 - 1 ) ** 0.5 + x + 0.1 
 
 
     // memory.set(`${x}|${y}|${z}`, value);
