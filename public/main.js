@@ -13,6 +13,8 @@ window.onload = function () {
     equationInput.value = urlEquation;
     if (equationInput.value == '') equationInput.value = '( sqrt ( x ^ 2 + y ^ 2 ) - 1.25 ) ^ 2 + z ^ 2 - 0.5 = 0';
 
+    /** @type {HTMLSelectElement} */
+    // @ts-ignore
     let sampleDropdown = document.getElementById('sample');
     sampleDropdown.onchange = function () {
         // @ts-ignore 
@@ -23,6 +25,7 @@ window.onload = function () {
         // @ts-ignore
         document.getElementById('form').submit();
     }
+    // sampleDropdown.value = '1';
 
 
     let equation = Expression.fromStrings(equationInput.value);
