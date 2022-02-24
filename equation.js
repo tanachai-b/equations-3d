@@ -1,15 +1,25 @@
 //@ts-check
 'use strict';
 
-class Equation {
+class Expression {
 
     /** @param { string[][]} tokens */
     constructor(tokens) { this.tokens = tokens; }
 
     /** @param {string} input */
     static fromStrings(input) {
-        let tokens = Equation.tokenize(input);
-        return new Equation(tokens);
+        let tokens = Expression.tokenize(input);
+        return new Expression(tokens);
+    }
+
+    toStrings() {
+        let result = '';
+        this.tokens.forEach(token => { result += token[0] + ' '; });
+        result = result.replace(/\$/g, '');
+        // result = result.replace(/\( /g, '\(');
+        // result = result.replace(/ \)/g, '\)');
+        result = result.trim();
+        return result;
     }
 
     /** @param {string} input */
@@ -25,12 +35,7 @@ class Equation {
         while (input.length > 0) {
 
             let isMatchSymbol = '';
-            symbols.forEach((symbol) => {
-                if (input.startsWith(symbol)) {
-                    isMatchSymbol = symbol;
-                    return;
-                }
-            });
+            symbols.forEach((symbol) => { if (input.startsWith(symbol)) { isMatchSymbol = symbol; return; } });
 
             if (isMatchSymbol.length > 0) {
                 if (curToken.length > 0) tokens.push([curToken, 'value']);
@@ -49,7 +54,7 @@ class Equation {
         return tokens
     }
 
-    substConst() {
+    substConstants() {
         let constants = new Set(['e', 'pi',]);
 
         let result = [];
@@ -65,10 +70,10 @@ class Equation {
             }
         });
 
-        return new Equation(result);
+        return new Expression(result);
     }
 
-    substVar(x = 0, y = 0, z = 0) {
+    substVariables(x = 0, y = 0, z = 0) {
         let constants = new Set(['x', 'y', 'z',]);
 
         let result = [];
@@ -85,13 +90,13 @@ class Equation {
             }
         });
 
-        return new Equation(result);
+        return new Expression(result);
     }
 
     solve() {
         let calcBox = new CalcBox();
         for (let i = 0; i < this.tokens.length; i++) { calcBox.push([this.tokens[i][0], this.tokens[i][1]]); }
-        return new Equation(calcBox.tokens);
+        return new Expression(calcBox.tokens);
     }
 }
 

@@ -22,24 +22,18 @@ window.onload = function () {
     }
 
 
-    let equation = Equation.fromStrings(equationInput.value);
-    console.log('fromStrings');
-    equation.tokens.forEach(token => { console.log(token); });
+    let expression = Expression.fromStrings(equationInput.value);
+    equationInput.value = expression.toStrings();
+    expression = expression.substConstants();
 
-    equation = equation.substConst();
-    console.log('substConst');
-    equation.tokens.forEach(token => { console.log(token); });
+    let chkExp = expression.substVariables(1, 1, 1).solve().toStrings();
 
-    equation = equation.substVar(1, 1, 1);
-    console.log('substVar');
-    equation.tokens.forEach(token => { console.log(token); });
-
-    equation = equation.solve();
-    console.log('solve');
-    equation.tokens.forEach(token => { console.log(token); });
-
-
-
+    if (chkExp != 'true' && chkExp != 'false') {
+        /** @type {HTMLInputElement} */
+        // @ts-ignore
+        let equationMsg = document.getElementById('equation-message');
+        equationMsg.innerHTML = 'Invalid Equation';
+    }
 
 
 
