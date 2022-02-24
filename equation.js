@@ -1,15 +1,19 @@
 //@ts-check
 'use strict';
 
-function compileEquation() {
+/** @param {string} input */
+function compileEquation(input) {
 
-    let input = ' 0.5 > (sqrt(x ^ 2 + y ^ 2) - 1.25) ^ 2 + z ^ 2';
+    // let input = ' 0.5 > (sqrt(x ^ 2 + y ^ 2) - 1.25) ^ 2 + z ^ 2';
     console.log(input);
 
     let tokens = tokenize(input);
-
     substConst(tokens);
-    substVar(tokens, 1, 1, 1);
+    // substVar(tokens, 1, 1, 1);
+
+    console.log('tokens');
+    tokens.forEach(token => { console.log(token); });
+
 
     tokens = solve(tokens);
 
@@ -20,6 +24,7 @@ function compileEquation() {
 /** @param {string} input */
 function tokenize(input) {
     input = input.replace(/ /g, '') + '$';
+    input = input.toLowerCase();
 
     let symbols = new Set(['+', '-', '*', '/', '^', '(', ')', '=', '>', '<', 'abs', 'sqrt', 'sin', 'cos', 'e', 'pi', '$', 'x', 'y', 'z',]);
 
@@ -63,13 +68,12 @@ function substConst(tokens) {
             token[1] = 'value';
 
             switch (token[0]) {
-                case 'e': token[0] = Math.E;
-                case 'pi': token[0] = Math.PI;
+                case 'e': token[0] = Math.E; break;
+                case 'pi': token[0] = Math.PI; break;
             }
         }
     });
 }
-
 
 /** @param {any[]} tokens */
 function substVar(tokens, x = 0, y = 0, z = 0) {
@@ -81,9 +85,9 @@ function substVar(tokens, x = 0, y = 0, z = 0) {
             token[1] = 'value';
 
             switch (token[0]) {
-                case 'x': token[0] = x;
-                case 'y': token[0] = y;
-                case 'z': token[0] = z;
+                case 'x': token[0] = x; break;
+                case 'y': token[0] = y; break;
+                case 'z': token[0] = z; break;
             }
         }
     });
@@ -110,7 +114,7 @@ class CalcBox {
     }
 
     evaluate() {
-        let ooo = new Map([['^', 3], ['*', 4], ['/', 4], ['+', 5], ['-', 5], [')', 9], ['=', 99], ['>', 99], ['<', 99], ['$', 999],]);
+        let ooo = new Map([['^', 1], ['*', 2], ['/', 2], ['+', 3], ['-', 3], [')', 4], ['=', 5], ['>', 5], ['<', 5], ['$', 6],]);
 
         while (true) {
             let isUpdated = false;
@@ -135,6 +139,21 @@ class CalcBox {
                         this.tokens.push(trailing[3]);
                         isUpdated = true;
                     }
+                }
+            }
+
+            if (isUpdated == false && this.tokens.length >= 3) {
+                let trailing = this.tokens.slice(-3);
+
+                if (
+                    trailing[0][1] == 'symbol' &&
+                    trailing[1][0] == '-' &&
+                    trailing[2][1] == 'value'
+                ) {
+                    this.tokens = this.tokens.slice(0, -3);
+                    this.tokens.push(trailing[0]);
+                    this.tokens.push([-trailing[2][0], 'value']);
+                    isUpdated = true;
                 }
             }
 
