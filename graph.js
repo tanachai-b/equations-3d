@@ -84,7 +84,7 @@ function plotGraph(frameSize, blockSize, equation) {
         }
     });
 
-    console.log(totalPoints);
+    // console.log(totalPoints);
 
     return graphObjs;
 }

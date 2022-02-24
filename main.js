@@ -11,7 +11,7 @@ window.onload = function () {
     // @ts-ignore
     let equationInput = document.getElementById('equation');
     equationInput.value = urlEquation;
-    if (equationInput.value == '') equationInput.value = 'y = x + 5';
+    if (equationInput.value == '') equationInput.value = '( sqrt ( x ^ 2 + y ^ 2 ) - 1.25 ) ^ 2 + z ^ 2 - 0.5 = 0';
 
     let sampleDropdown = document.getElementById('sample');
     sampleDropdown.onchange = function () {
