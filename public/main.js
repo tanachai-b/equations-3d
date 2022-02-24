@@ -35,9 +35,10 @@ window.onload = function () {
         let equationMsg = document.getElementById('equation-message');
         equationMsg.innerHTML = 'Invalid Equation';
     }
+    // console.log(chkValid)
 
     let eq1 = Expression.fromStrings(equationInput.value.replace(/\=/g, '>')).substConstants();
-
+    // console.log(eq1.toStrings())
 
 
 

@@ -15,7 +15,7 @@ class Expression {
     toStrings() {
         let result = '';
         this.tokens.forEach(token => { result += token[0] + ' '; });
-        result = result.replace(/\$/g, '');
+        result = result.replace(/[\@\$]/g, '');
         // result = result.replace(/\( /g, '\(');
         // result = result.replace(/ \)/g, '\)');
         result = result.trim();
@@ -24,10 +24,9 @@ class Expression {
 
     /** @param {string} input */
     static tokenize(input) {
-        input = input.replace(/ /g, '') + '$';
-        input = input.toLowerCase();
+        input = '@' + input.replace(/ /g, '').toLowerCase() + '$';
 
-        let symbols = new Set(['+', '-', '*', '/', '^', '(', ')', '=', '>', '<', 'abs', 'sqrt', 'sin', 'cos', '$']);
+        let symbols = new Set(['+', '-', '*', '/', '^', '(', ')', '=', '>', '<', 'abs', 'sqrt', 'sin', 'cos', '@', '$']);
 
         let tokens = [];
 
