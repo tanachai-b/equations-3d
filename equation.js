@@ -1,99 +1,98 @@
 //@ts-check
 'use strict';
 
-/** @param {string} input */
-function compileEquation(input) {
+class Equation {
 
-    // let input = ' 0.5 > (sqrt(x ^ 2 + y ^ 2) - 1.25) ^ 2 + z ^ 2';
-    console.log(input);
+    /** @param { string[][]} tokens */
+    constructor(tokens) { this.tokens = tokens; }
 
-    let tokens = tokenize(input);
-    substConst(tokens);
-    // substVar(tokens, 1, 1, 1);
+    /** @param {string} input */
+    static fromStrings(input) {
+        let tokens = Equation.tokenize(input);
+        return new Equation(tokens);
+    }
 
-    console.log('tokens');
-    tokens.forEach(token => { console.log(token); });
+    /** @param {string} input */
+    static tokenize(input) {
+        input = input.replace(/ /g, '') + '$';
+        input = input.toLowerCase();
 
+        let symbols = new Set(['+', '-', '*', '/', '^', '(', ')', '=', '>', '<', 'abs', 'sqrt', 'sin', 'cos', '$']);
 
-    tokens = solve(tokens);
+        let tokens = [];
 
-    console.log('result');
-    tokens.forEach(token => { console.log(token); });
-}
+        let curToken = '';
+        while (input.length > 0) {
 
-/** @param {string} input */
-function tokenize(input) {
-    input = input.replace(/ /g, '') + '$';
-    input = input.toLowerCase();
+            let isMatchSymbol = '';
+            symbols.forEach((symbol) => {
+                if (input.startsWith(symbol)) {
+                    isMatchSymbol = symbol;
+                    return;
+                }
+            });
 
-    let symbols = new Set(['+', '-', '*', '/', '^', '(', ')', '=', '>', '<', 'abs', 'sqrt', 'sin', 'cos', '$']);
+            if (isMatchSymbol.length > 0) {
+                if (curToken.length > 0) tokens.push([curToken, 'value']);
+                curToken = '';
+                tokens.push([isMatchSymbol, 'symbol']);
+                input = input.slice(isMatchSymbol.length);
+                continue;
 
-    let tokens = [];
+            } else {
+                curToken += input.charAt(0);
+                input = input.slice(1);
+            }
+        }
+        if (curToken.length > 0) tokens.push([curToken, 'value']);
 
-    let curToken = '';
-    while (input.length > 0) {
+        return tokens
+    }
 
-        let isMatchSymbol = '';
-        symbols.forEach((symbol) => {
-            if (input.startsWith(symbol)) {
-                isMatchSymbol = symbol;
-                return;
+    substConst() {
+        let constants = new Set(['e', 'pi',]);
+
+        let result = [];
+
+        this.tokens.forEach((/** @type {any[]} */ token) => {
+            if (token[1] == 'value' && constants.has(token[0])) {
+                switch (token[0]) {
+                    case 'e': result.push([Math.E, 'value']); break;
+                    case 'pi': result.push([Math.PI, 'value']); break;
+                }
+            } else {
+                result.push([token[0], token[1]]);
             }
         });
 
-        if (isMatchSymbol.length > 0) {
-            if (curToken.length > 0) tokens.push([curToken, 'value']);
-            curToken = '';
-            tokens.push([isMatchSymbol, 'symbol']);
-            input = input.slice(isMatchSymbol.length);
-            continue;
-
-        } else {
-            curToken += input.charAt(0);
-            input = input.slice(1);
-        }
+        return new Equation(result);
     }
-    if (curToken.length > 0) tokens.push([curToken, 'value']);
 
-    return tokens
-}
+    substVar(x = 0, y = 0, z = 0) {
+        let constants = new Set(['x', 'y', 'z',]);
 
-/** @param {any[]} tokens */
-function substConst(tokens) {
+        let result = [];
 
-    let constants = new Set(['e', 'pi',]);
-
-    tokens.forEach((token) => {
-        if (token[1] == 'value' && constants.has(token[0])) {
-            switch (token[0]) {
-                case 'e': token[0] = Math.E; break;
-                case 'pi': token[0] = Math.PI; break;
+        this.tokens.forEach((/** @type {any[]} */ token) => {
+            if (token[1] == 'value' && constants.has(token[0])) {
+                switch (token[0]) {
+                    case 'x': result.push([x, 'value']); break;
+                    case 'y': result.push([y, 'value']); break;
+                    case 'z': result.push([z, 'value']); break;
+                }
+            } else {
+                result.push([token[0], token[1]]);
             }
-        }
-    });
-}
+        });
 
-/** @param {any[]} tokens */
-function substVar(tokens, x = 0, y = 0, z = 0) {
+        return new Equation(result);
+    }
 
-    let constants = new Set(['x', 'y', 'z',]);
-
-    tokens.forEach((token) => {
-        if (token[1] == 'value' && constants.has(token[0])) {
-            switch (token[0]) {
-                case 'x': token[0] = x; break;
-                case 'y': token[0] = y; break;
-                case 'z': token[0] = z; break;
-            }
-        }
-    });
-}
-
-/** @param {string[][]} tokens */
-function solve(tokens) {
-    let calcBox = new CalcBox();
-    for (let i = 0; i < tokens.length; i++) { calcBox.push(tokens[i]); }
-    return calcBox.tokens;
+    solve() {
+        let calcBox = new CalcBox();
+        for (let i = 0; i < this.tokens.length; i++) { calcBox.push([this.tokens[i][0], this.tokens[i][1]]); }
+        return new Equation(calcBox.tokens);
+    }
 }
 
 class CalcBox {
@@ -101,10 +100,10 @@ class CalcBox {
 
     /** @param {string[]} token */
     push(token) {
-        console.log('input: ' + token[0]);
+        // console.log('input: ' + token[0]);
 
         this.tokens.push(token);
-        this.tokens.forEach(token => { console.log(token); });
+        // this.tokens.forEach(token => { console.log(token); });
 
         this.evaluate();
     }
@@ -131,7 +130,7 @@ class CalcBox {
 
                     if (ooo1 <= ooo2) {
                         this.tokens = this.tokens.slice(0, -4);
-                        this.tokens.push(operate(trailing[0][0], trailing[1][0], trailing[2][0]));
+                        this.tokens.push(CalcBox.operate(trailing[0][0], trailing[1][0], trailing[2][0]));
                         this.tokens.push(trailing[3]);
                         isUpdated = true;
                     }
@@ -177,54 +176,57 @@ class CalcBox {
                     trailing[1][1] == 'value' && !isNaN(trailing[1][0])
                 ) {
                     this.tokens = this.tokens.slice(0, -2);
-                    this.tokens.push([func(trailing[0][0], trailing[1][0]), 'value']);
+                    this.tokens.push([CalcBox.func(trailing[0][0], trailing[1][0]), 'value']);
                     isUpdated = true;
                 }
             }
 
-            if (isUpdated) {
-                console.log('re-eval');
-                this.tokens.forEach(token => { console.log(token); });
-            }
+            // if (isUpdated) {
+            //     console.log('re-eval');
+            //     this.tokens.forEach(token => { console.log(token); });
+            // }
 
             if (!isUpdated) break;
         }
     }
-}
 
-/**
- * @param {number} value1
- * @param {any} symbol
- * @param {number} value2
- */
-function operate(value1, symbol, value2) {
+    /**
+     * @param {number} value1
+     * @param {any} symbol
+     * @param {number} value2
+     */
+    static operate(value1, symbol, value2) {
 
-    let v1 = 1 * value1;
-    let v2 = 1 * value2;
+        let v1 = 1 * value1;
+        let v2 = 1 * value2;
 
-    switch (symbol) {
-        case '+': return [v1 + v2, 'value'];
-        case '-': return [v1 - v2, 'value'];
-        case '*': return [v1 * v2, 'value'];
-        case '/': return [v1 / v2, 'value'];
-        case '^': return [v1 ** v2, 'value'];
-        case '=': return [v1 == v2, 'result'];
-        case '>': return [v1 > v2, 'result'];
-        case '<': return [v1 < v2, 'result'];
-        default: return [value1 + symbol + value2, 'value'];
+        switch (symbol) {
+            case '+': return [v1 + v2, 'value'];
+            case '-': return [v1 - v2, 'value'];
+            case '*': return [v1 * v2, 'value'];
+            case '/': return [v1 / v2, 'value'];
+            case '^': return [v1 ** v2, 'value'];
+
+            case '=': return [v1 == v2, 'result'];
+            case '>': return [v1 > v2, 'result'];
+            case '<': return [v1 < v2, 'result'];
+
+            default: return [value1 + symbol + value2, 'value'];
+        }
+    }
+
+    /**
+     * @param {any} symbol
+     * @param {number} value
+     */
+    static func(symbol, value) {
+        switch (symbol) {
+            case 'abs': return Math.abs(value);
+            case 'sqrt': return Math.sqrt(value);
+            case 'sin': return Math.sin(value);
+            case 'cos': return Math.cos(value);
+            default: return symbol + value;
+        }
     }
 }
 
-/**
- * @param {any} symbol
- * @param {number} value
- */
-function func(symbol, value) {
-    switch (symbol) {
-        case 'abs': return Math.abs(value);
-        case 'sqrt': return Math.sqrt(value);
-        case 'sin': return Math.sin(value);
-        case 'cos': return Math.cos(value);
-        default: return symbol + value;
-    }
-}

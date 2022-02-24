@@ -21,7 +21,30 @@ window.onload = function () {
         equationInput.value = choice;
     }
 
-    compileEquation(equationInput.value);
+
+    let equation = Equation.fromStrings(equationInput.value);
+    console.log('fromStrings');
+    equation.tokens.forEach(token => { console.log(token); });
+
+    equation = equation.substConst();
+    console.log('substConst');
+    equation.tokens.forEach(token => { console.log(token); });
+
+    equation = equation.substVar(1, 1, 1);
+    console.log('substVar');
+    equation.tokens.forEach(token => { console.log(token); });
+
+    equation = equation.solve();
+    console.log('solve');
+    equation.tokens.forEach(token => { console.log(token); });
+
+
+
+
+
+
+
+
 
 
     /** @type {HTMLCanvasElement} */
