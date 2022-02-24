@@ -19,23 +19,24 @@ window.onload = function () {
         let choice = sampleDropdown.options[sampleDropdown.selectedIndex].innerHTML;
         // @ts-ignore
         equationInput.value = choice;
+
+        // @ts-ignore
+        document.getElementById('form').submit();
     }
 
 
-    let expression = Expression.fromStrings(equationInput.value);
-    equationInput.value = expression.toStrings();
-    expression = expression.substConstants();
+    let equation = Expression.fromStrings(equationInput.value);
+    equationInput.value = equation.toStrings();
 
-    let chkExp = expression.substVariables(1, 1, 1).solve().toStrings();
-
-    if (chkExp != 'true' && chkExp != 'false') {
+    let chkValid = equation.substConstants().substVariables(1, 1, 1).solve().toStrings();
+    if (chkValid != 'true' && chkValid != 'false') {
         /** @type {HTMLInputElement} */
         // @ts-ignore
         let equationMsg = document.getElementById('equation-message');
         equationMsg.innerHTML = 'Invalid Equation';
     }
 
-
+    let eq1 = Expression.fromStrings(equationInput.value.replace(/\=/g, '>')).substConstants();
 
 
 
@@ -65,7 +66,7 @@ window.onload = function () {
     drawFrame(objects, frameSize, step);
 
     let blockSize = 25;
-    objects = objects.concat(plotGraph(frameSize, blockSize));
+    objects = objects.concat(plotGraph(frameSize, blockSize, eq1));
 
 
     let ctx = canvas.getContext('2d');
@@ -160,8 +161,9 @@ class Camera {
         this.position = new Vector3(0, 0, 0);
 
         this.rotation = Line.default();
-        this.rotation = this.rotation.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
-        this.rotation = this.rotation.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
+        this.rotation = this.rotation.timesYZ(Vector2.polar(1, -90 * Math.PI / 180));
+        this.rotation = this.rotation.timesXZ(Vector2.polar(1, 10 * Math.PI / 180));
+        this.rotation = this.rotation.timesYZ(Vector2.polar(1, 10 * Math.PI / 180));
 
         this.zoom = 0;
 
@@ -204,8 +206,9 @@ class Camera {
 
     reset() {
         let dr2 = Line.default()
-        dr2 = dr2.timesXZ(Vector2.polar(1, 30 * Math.PI / 180));
-        dr2 = dr2.timesYZ(Vector2.polar(1, 30 * Math.PI / 180));
+        dr2 = dr2.timesYZ(Vector2.polar(1, -90 * Math.PI / 180));
+        dr2 = dr2.timesXZ(Vector2.polar(1, 10 * Math.PI / 180));
+        dr2 = dr2.timesYZ(Vector2.polar(1, 10 * Math.PI / 180));
         this.destRotation = dr2;
 
         this.destZoom = 0;
