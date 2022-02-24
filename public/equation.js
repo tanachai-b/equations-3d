@@ -26,7 +26,7 @@ class Expression {
     static tokenize(input) {
         input = '@' + input.replace(/ /g, '').toLowerCase() + '$';
 
-        let symbols = new Set(['+', '-', '*', '/', '^', '(', ')', '=', '>', '<', 'abs', 'sqrt', 'sin', 'cos', '@', '$']);
+        let symbols = new Set(['+', '-', '*', '/', '^', '(', ')', '=', '>', '<', 'abs', 'sqrt', 'log', 'sin', 'cos', '@', '$']);
 
         let tokens = [];
 
@@ -173,7 +173,7 @@ class CalcBox {
             if (isUpdated == false && this.tokens.length >= 2) {
                 let trailing = this.tokens.slice(-2);
 
-                let valid = new Set(['abs', 'sqrt', 'sin', 'cos',]);
+                let valid = new Set(['abs', 'sqrt', 'log', 'sin', 'cos',]);
 
                 if (
                     trailing[0][1] == 'symbol' && valid.has(trailing[0][0]) &&
@@ -227,6 +227,7 @@ class CalcBox {
         switch (symbol) {
             case 'abs': return Math.abs(value);
             case 'sqrt': return Math.sqrt(value);
+            case 'log': return Math.log(value);
             case 'sin': return Math.sin(value);
             case 'cos': return Math.cos(value);
             default: return symbol + value;
