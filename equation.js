@@ -131,7 +131,7 @@ class CalcBox {
 
                     if (ooo1 <= ooo2) {
                         this.tokens = this.tokens.slice(0, -4);
-                        this.tokens.push([operate(trailing[0][0], trailing[1][0], trailing[2][0]), 'value']);
+                        this.tokens.push(operate(trailing[0][0], trailing[1][0], trailing[2][0]));
                         this.tokens.push(trailing[3]);
                         isUpdated = true;
                     }
@@ -193,21 +193,25 @@ class CalcBox {
 }
 
 /**
- * @param {any} value1
+ * @param {number} value1
  * @param {any} symbol
- * @param {any} value2
+ * @param {number} value2
  */
 function operate(value1, symbol, value2) {
+
+    let v1 = 1 * value1;
+    let v2 = 1 * value2;
+
     switch (symbol) {
-        case '+': return value1 + value2;
-        case '-': return value1 - value2;
-        case '*': return value1 * value2;
-        case '/': return value1 / value2;
-        case '^': return value1 ** value2;
-        case '=': return value1 == value2;
-        case '>': return value1 > value2;
-        case '<': return value1 < value2;
-        default: return value1 + symbol + value2;
+        case '+': return [v1 + v2, 'value'];
+        case '-': return [v1 - v2, 'value'];
+        case '*': return [v1 * v2, 'value'];
+        case '/': return [v1 / v2, 'value'];
+        case '^': return [v1 ** v2, 'value'];
+        case '=': return [v1 == v2, 'result'];
+        case '>': return [v1 > v2, 'result'];
+        case '<': return [v1 < v2, 'result'];
+        default: return [value1 + symbol + value2, 'value'];
     }
 }
 
