@@ -418,10 +418,15 @@ class Polygon3 {
         let gAvg = 0;
         let bAvg = 0;
 
+        let totalArea = 0;
+
         for (let i = 2; i < rotated.length; i++) {
 
             let normal = new Vector3(0, 0, 1).timesLine(new Line(rotated[i - 1].minus(rotated[0]).unit(), rotated[i].minus(rotated[0])));
             if (normal.z < 0) normal = normal.timesScalar(-1);
+
+            let area = rotated[i].minus(rotated[0]).overLine(new Line(rotated[i - 1].minus(rotated[0]), rotated[i].minus(rotated[0]))).xy().y * rotated[i - 1].minus(rotated[0]).magnitude2();
+            totalArea += area;
 
             let diffusePerc = 0;
             let specularPerc = 0;
@@ -438,14 +443,14 @@ class Polygon3 {
             let gAmbient = gDiffuse * 5 / 8;
             let bAmbient = bDiffuse * 7 / 8;
 
-            rAvg += (1 - specularPerc) * (diffusePerc * (rDiffuse - rAmbient) + rAmbient) + (specularPerc * 255);
-            gAvg += (1 - specularPerc) * (diffusePerc * (gDiffuse - gAmbient) + gAmbient) + (specularPerc * 255);
-            bAvg += (1 - specularPerc) * (diffusePerc * (bDiffuse - bAmbient) + bAmbient) + (specularPerc * 255);
+            rAvg += ((1 - specularPerc) * (diffusePerc * (rDiffuse - rAmbient) + rAmbient) + (specularPerc * 255)) * area;
+            gAvg += ((1 - specularPerc) * (diffusePerc * (gDiffuse - gAmbient) + gAmbient) + (specularPerc * 255)) * area;
+            bAvg += ((1 - specularPerc) * (diffusePerc * (bDiffuse - bAmbient) + bAmbient) + (specularPerc * 255)) * area;
         }
 
-        rAvg = rAvg / (rotated.length - 2);
-        gAvg = gAvg / (rotated.length - 2);
-        bAvg = bAvg / (rotated.length - 2);
+        rAvg = rAvg / (totalArea);
+        gAvg = gAvg / (totalArea);
+        bAvg = bAvg / (totalArea);
 
         let rHex = Math.floor(rAvg).toString(16).padStart(2, '0');
         let gHex = Math.floor(gAvg).toString(16).padStart(2, '0');

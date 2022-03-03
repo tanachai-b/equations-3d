@@ -46,7 +46,7 @@ function plotGraph(frameSize, blockSize, equation) {
 
 
     let graphObjs = [];
-    let totalPoints = 0;
+    let totalSurface = 0;
 
     blocks.forEach((block) => {
 
@@ -80,11 +80,12 @@ function plotGraph(frameSize, blockSize, equation) {
 
         if (points.length >= 3) {
             graphObjs = graphObjs.concat(new Polygon3(points));
-            totalPoints += points.length;
+            totalSurface += 1;
         }
     });
 
-    // console.log(totalPoints);
+    console.log('totalSurface');
+    console.log(totalSurface);
 
     return graphObjs;
 }
