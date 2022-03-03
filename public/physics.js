@@ -431,8 +431,8 @@ class Polygon3 {
             let diffusePerc = 0;
             let specularPerc = 0;
             this.shade(normal, camera, (diffuseAngle, specularAngle) => {
-                diffusePerc = Math.max(0, (1 - (diffuseAngle / Math.PI)) * 2 - 1);
-                specularPerc = Math.max(0, (1 - (specularAngle / Math.PI)) * 10 - 9) ** (1 / 2);
+                diffusePerc = Math.max(0, Math.cos(diffuseAngle));
+                specularPerc = Math.max(0, Math.cos(specularAngle) * 100 - 99);
             });
 
             let rDiffuse = 255 * 4 / 8;
@@ -479,11 +479,11 @@ class Polygon3 {
      */
     shade(normal, camera, callBack) {
 
-        let diffuseDir = new Vector3(-1, 1, 2);//.timesLine(camera.rotation);
+        let diffuseDir = new Vector3(-1, 1, 1);//.timesLine(camera.rotation);
         let diffuseNorm = diffuseDir.over(normal);
         let diffuseAngle = diffuseNorm.timesYZ(diffuseNorm.yz().conjugate()).xy().angle();
 
-        let specularDir = new Vector3(-1, 1, 2);//.timesLine(camera.rotation);
+        let specularDir = new Vector3(-1, 1, 1);//.timesLine(camera.rotation);
         let reflectNorm = specularDir.over(normal).conjugate();
         let cameraNorm = new Vector3(0, 0, 1).over(normal);
         let reflectCamera = reflectNorm.over(cameraNorm);
