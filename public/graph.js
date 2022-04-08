@@ -6,7 +6,7 @@
  * @param {number} blockSize
  * @param {Expression} equation
  */
-function plotGraph(frameSize, blockSize, equation) {
+async function plotGraph(frameSize, blockSize, equation) {
 
     let memory = new Map();
 
@@ -91,6 +91,7 @@ function plotGraph(frameSize, blockSize, equation) {
 }
 
 /**
+ * @param {Expression} equation
  * @param {number} x
  * @param {number} y
  * @param {number} z
@@ -116,6 +117,7 @@ function checkBlock(equation, x, y, z, blockSize, memory) {
 }
 
 /**
+ * @param {Expression} equation
  * @param {Vector3} v1
  * @param {Vector3} v2
  * @param {Vector3} v3
@@ -155,6 +157,7 @@ function calcPlane(equation, v1, v2, v3, memory) {
 }
 
 /**
+ * @param {any} equation
  * @param {Vector3} v1
  * @param {Vector3} v2
  * @param {Map<any, any>} memory
@@ -172,6 +175,7 @@ function calcLine(equation, v1, v2, memory) {
 }
 
 /**
+ * @param {Expression} equation
  * @param {Vector3} v1
  * @param {Vector3} v2
  * @param {Map<any, any>} memory

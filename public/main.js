@@ -3,162 +3,187 @@
 
 window.onload = function () {
 
-    let queryString = window.location.search;
-    let urlParams = new URLSearchParams(queryString);
-    let urlEquation = urlParams.get('equation')
-
-    /** @type {HTMLInputElement} */
-    // @ts-ignore
+    /** @ts-ignore @type {HTMLSelectElement} */
+    let sampleDropdown = document.getElementById('sample');
+    /** @ts-ignore @type {HTMLInputElement} */
     let equationInput = document.getElementById('equation');
-    equationInput.value = urlEquation;
+    /** @ts-ignore @type {HTMLInputElement} */
+    let equationMsg = document.getElementById('equation-message');
+    /** @ts-ignore @type {HTMLInputElement} */
+    let submitButton = document.getElementById('submit');
+
     if (equationInput.value == '') equationInput.value = '( sqrt ( x ^ 2 + y ^ 2 ) - 1.25 ) ^ 2 + z ^ 2 - 0.5 = 0';
 
-    /** @type {HTMLSelectElement} */
-    // @ts-ignore
-    let sampleDropdown = document.getElementById('sample');
+    let equation = Expression.fromStrings(equationInput.value.replace(/\=/g, '>')).substConstants();
+    let plotArea = new PlotArea();
+    plotArea.setEquation(equation);
+
+
     sampleDropdown.onchange = function () {
-        // @ts-ignore 
-        let choice = sampleDropdown.options[sampleDropdown.selectedIndex].innerHTML;
-        // @ts-ignore
+        let selected = sampleDropdown.options[sampleDropdown.selectedIndex];
+        if (selected.value == 'x') return;
+
+        let choice = selected.innerHTML;
         equationInput.value = choice;
 
-        // @ts-ignore
-        document.getElementById('form').submit();
+        submit();
     }
-    // sampleDropdown.value = '1';
 
-
-    let equation = Expression.fromStrings(equationInput.value);
-    equationInput.value = equation.toStrings();
-
-    let chkValid = equation.substConstants().substVariables(1, 1, 1).solve().toStrings();
-    if (chkValid != 'true' && chkValid != 'false') {
-        /** @type {HTMLInputElement} */
-        // @ts-ignore
-        let equationMsg = document.getElementById('equation-message');
-        equationMsg.innerHTML = 'Invalid Equation';
+    equationInput.onchange = function () {
+        sampleDropdown.selectedIndex = 0;
     }
-    // console.log(chkValid)
 
-    let eq1 = Expression.fromStrings(equationInput.value.replace(/\=/g, '>')).substConstants();
-    // console.log(eq1.toStrings())
+    equationInput.onkeydown = function (event) {
+        if (event.key != 'Enter') return;
+        submit();
+    }
 
+    submitButton.onclick = function () {
+        submit();
+    }
 
+    let submit = () => {
+        equationMsg.innerHTML = '';
 
+        let inputEquation = Expression.fromStrings(equationInput.value);
+        equationInput.value = inputEquation.toStrings();
 
-    /** @type {HTMLCanvasElement} */
-    // @ts-ignore
-    let canvas = document.getElementById('canvas');
+        let chkValid = inputEquation.substConstants().substVariables(1, 1, 1).solve().toStrings();
+        if (chkValid != 'true' && chkValid != 'false') {
+            equationMsg.innerHTML = 'Invalid Equation';
+        }
 
+        let equation = Expression.fromStrings(equationInput.value.replace(/\=/g, '>')).substConstants();
+        plotArea.setEquation(equation);
+    }
+}
 
-    canvas.focus();
-    canvas.addEventListener('keypress', (event) => {
-        switch (event.key) { case ' ': camera.reset(); break; }
-    });
+class PlotArea {
 
+    constructor() {
 
-    let camera = new Camera();
+        /** @type {HTMLCanvasElement} */
+        // @ts-ignore
+        let canvas = document.getElementById('canvas');
 
-    /** @type {(Vector2|Vector3|Line|Plane|Polygon3|Text3|Polygon2)[]} */
-    let objects = [];
-
-    let axisSize = 300;
-    let frameSize = 250;
-    let step = 25;
-
-    drawAxis(objects, axisSize, frameSize, step);
-    drawFrame(objects, frameSize, step);
-
-    let blockSize = 25;
-    objects = objects.concat(plotGraph(frameSize, blockSize, eq1));
-
-
-    let ctx = canvas.getContext('2d');
-    setInterval(() => {
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        camera.update();
-
-        let sorting = [];
-
-        objects.forEach((object) => {
-            let depth = object.depth(camera);
-            sorting.push([object, depth]);
+        canvas.focus();
+        canvas.addEventListener('keypress', (event) => {
+            switch (event.key) { case ' ': this.camera.reset(); break; }
         });
 
-        sorting.sort((a, b) => { return b[1] - a[1]; });
-        sorting.forEach((object) => { object[0].draw(camera); });
+        this.camera = new Camera();
 
-    }, 1000 / 60);
-}
+        /** @type {(Vector2|Vector3|Line|Plane|Polygon3|Text3|Polygon2)[]} */
+        this.objects = [];
 
-/**
- * @param {(Vector3 | Line | Vector2 | Plane | Polygon3 | Text3 | Polygon2)[]} objects
- * @param {number} axisSize
- * @param {number} frameSize
- * @param {number} step
- */
-function drawAxis(objects, axisSize, frameSize, step) {
+        let ctx = canvas.getContext('2d');
+        setInterval(() => {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
 
-    for (let i = -axisSize; i < axisSize; i += step) {
-        objects.push(new Line(new Vector3(i, 0, 0), new Vector3(i + step, 0, 0)));
-        objects.push(new Line(new Vector3(0, i, 0), new Vector3(0, i + step, 0)));
-        objects.push(new Line(new Vector3(0, 0, i), new Vector3(0, 0, i + step)));
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            this.camera.update();
+
+            let sorting = [];
+
+            this.objects.forEach((object) => {
+                let depth = object.depth(this.camera);
+                sorting.push([object, depth]);
+            });
+
+            sorting.sort((a, b) => { return b[1] - a[1]; });
+            sorting.forEach((object) => { object[0].draw(this.camera); });
+
+        }, 1000 / 60);
     }
 
-    let arrowHead = [new Vector2(0, 5), new Vector2(20, 0), new Vector2(0, -5)];
-    objects.push(new Polygon2(new Vector3(axisSize, 0, 0), new Vector3(1, 0, 0), arrowHead));
-    objects.push(new Polygon2(new Vector3(0, axisSize, 0), new Vector3(0, 1, 0), arrowHead));
-    objects.push(new Polygon2(new Vector3(0, 0, axisSize), new Vector3(0, 0, 1), arrowHead));
+    /** @param {Expression} equation */
+    async setEquation(equation) {
 
-    objects.push(new Text3(new Vector3(axisSize, 0, 0), new Vector3(1, 0, 0), new Vector2(30, 0), `x`));
-    objects.push(new Text3(new Vector3(0, axisSize, 0), new Vector3(0, 1, 0), new Vector2(30, 0), `y`));
-    objects.push(new Text3(new Vector3(0, 0, axisSize), new Vector3(0, 0, 1), new Vector2(30, 0), `z`));
+        this.camera.reset();
+
+        /** @type {(Vector2|Vector3|Line|Plane|Polygon3|Text3|Polygon2)[]} */
+        this.objects = [];
+
+        let axisSize = 300;
+        let frameSize = 250;
+        let step = 25;
+
+        this.drawAxis(this.objects, axisSize, frameSize, step);
+        this.drawFrame(this.objects, frameSize, step);
+
+        let blockSize = 25;
+        let graph = await plotGraph(frameSize, blockSize, equation);
+        this.objects = this.objects.concat(graph);
+    }
+
+    /**
+     * @param {(Vector3 | Line | Vector2 | Plane | Polygon3 | Text3 | Polygon2)[]} objects
+     * @param {number} axisSize
+     * @param {number} frameSize
+     * @param {number} step
+     */
+    drawAxis(objects, axisSize, frameSize, step) {
+
+        for (let i = -axisSize; i < axisSize; i += step) {
+            objects.push(new Line(new Vector3(i, 0, 0), new Vector3(i + step, 0, 0)));
+            objects.push(new Line(new Vector3(0, i, 0), new Vector3(0, i + step, 0)));
+            objects.push(new Line(new Vector3(0, 0, i), new Vector3(0, 0, i + step)));
+        }
+
+        let arrowHead = [new Vector2(0, 5), new Vector2(20, 0), new Vector2(0, -5)];
+        objects.push(new Polygon2(new Vector3(axisSize, 0, 0), new Vector3(1, 0, 0), arrowHead));
+        objects.push(new Polygon2(new Vector3(0, axisSize, 0), new Vector3(0, 1, 0), arrowHead));
+        objects.push(new Polygon2(new Vector3(0, 0, axisSize), new Vector3(0, 0, 1), arrowHead));
+
+        objects.push(new Text3(new Vector3(axisSize, 0, 0), new Vector3(1, 0, 0), new Vector2(30, 0), `x`));
+        objects.push(new Text3(new Vector3(0, axisSize, 0), new Vector3(0, 1, 0), new Vector2(30, 0), `y`));
+        objects.push(new Text3(new Vector3(0, 0, axisSize), new Vector3(0, 0, 1), new Vector2(30, 0), `z`));
 
 
-    objects.push(new Text3(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector2(0, -12), `0`));
+        objects.push(new Text3(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector2(0, -12), `0`));
 
-    for (let i = -frameSize; i <= frameSize; i += 125) {
-        if (i == 0) continue;
+        for (let i = -frameSize; i <= frameSize; i += 125) {
+            if (i == 0) continue;
 
-        objects.push(new Polygon2(new Vector3(i, 0, 0), new Vector3(1, 0, 0), [new Vector2(0, -5), new Vector2(0, 0)]));
-        objects.push(new Polygon2(new Vector3(0, i, 0), new Vector3(0, 1, 0), [new Vector2(0, -5), new Vector2(0, 0)]));
-        objects.push(new Polygon2(new Vector3(0, 0, i), new Vector3(0, 0, 1), [new Vector2(0, -5), new Vector2(0, 0)]));
+            objects.push(new Polygon2(new Vector3(i, 0, 0), new Vector3(1, 0, 0), [new Vector2(0, -5), new Vector2(0, 0)]));
+            objects.push(new Polygon2(new Vector3(0, i, 0), new Vector3(0, 1, 0), [new Vector2(0, -5), new Vector2(0, 0)]));
+            objects.push(new Polygon2(new Vector3(0, 0, i), new Vector3(0, 0, 1), [new Vector2(0, -5), new Vector2(0, 0)]));
 
-        objects.push(new Text3(new Vector3(i, 0, 0), new Vector3(1, 0, 0), new Vector2(0, -12), `${i / 125}`));
-        objects.push(new Text3(new Vector3(0, i, 0), new Vector3(0, 1, 0), new Vector2(0, -12), `${i / 125}`));
-        objects.push(new Text3(new Vector3(0, 0, i), new Vector3(0, 0, 1), new Vector2(0, -12), `${i / 125}`));
+            objects.push(new Text3(new Vector3(i, 0, 0), new Vector3(1, 0, 0), new Vector2(0, -12), `${i / 125}`));
+            objects.push(new Text3(new Vector3(0, i, 0), new Vector3(0, 1, 0), new Vector2(0, -12), `${i / 125}`));
+            objects.push(new Text3(new Vector3(0, 0, i), new Vector3(0, 0, 1), new Vector2(0, -12), `${i / 125}`));
+        }
+    }
+
+    /**
+     * @param {(Vector3 | Line | Vector2 | Plane | Polygon3 | Text3 | Polygon2)[]} objects
+     * @param {number} frameSize
+     * @param {number} step
+     */
+    drawFrame(objects, frameSize, step) {
+
+        for (let i = -frameSize; i < frameSize; i += step) {
+            objects.push(new Line(new Vector3(i, -frameSize, -frameSize), new Vector3(i + step, -frameSize, -frameSize)));
+            objects.push(new Line(new Vector3(i, frameSize, -frameSize), new Vector3(i + step, frameSize, -frameSize)));
+            objects.push(new Line(new Vector3(i, -frameSize, frameSize), new Vector3(i + step, -frameSize, frameSize)));
+            objects.push(new Line(new Vector3(i, frameSize, frameSize), new Vector3(i + step, frameSize, frameSize)));
+
+            objects.push(new Line(new Vector3(-frameSize, i, -frameSize), new Vector3(-frameSize, i + step, -frameSize)));
+            objects.push(new Line(new Vector3(frameSize, i, -frameSize), new Vector3(frameSize, i + step, -frameSize)));
+            objects.push(new Line(new Vector3(-frameSize, i, frameSize), new Vector3(-frameSize, i + step, frameSize)));
+            objects.push(new Line(new Vector3(frameSize, i, frameSize), new Vector3(frameSize, i + step, frameSize)));
+
+            objects.push(new Line(new Vector3(-frameSize, -frameSize, i), new Vector3(-frameSize, -frameSize, i + step)));
+            objects.push(new Line(new Vector3(frameSize, -frameSize, i), new Vector3(frameSize, -frameSize, i + step)));
+            objects.push(new Line(new Vector3(-frameSize, frameSize, i), new Vector3(-frameSize, frameSize, i + step)));
+            objects.push(new Line(new Vector3(frameSize, frameSize, i), new Vector3(frameSize, frameSize, i + step)));
+        }
     }
 }
 
-/**
- * @param {(Vector3 | Line | Vector2 | Plane | Polygon3 | Text3 | Polygon2)[]} objects
- * @param {number} frameSize
- * @param {number} step
- */
-function drawFrame(objects, frameSize, step) {
-
-    for (let i = -frameSize; i < frameSize; i += step) {
-        objects.push(new Line(new Vector3(i, -frameSize, -frameSize), new Vector3(i + step, -frameSize, -frameSize)));
-        objects.push(new Line(new Vector3(i, frameSize, -frameSize), new Vector3(i + step, frameSize, -frameSize)));
-        objects.push(new Line(new Vector3(i, -frameSize, frameSize), new Vector3(i + step, -frameSize, frameSize)));
-        objects.push(new Line(new Vector3(i, frameSize, frameSize), new Vector3(i + step, frameSize, frameSize)));
-
-        objects.push(new Line(new Vector3(-frameSize, i, -frameSize), new Vector3(-frameSize, i + step, -frameSize)));
-        objects.push(new Line(new Vector3(frameSize, i, -frameSize), new Vector3(frameSize, i + step, -frameSize)));
-        objects.push(new Line(new Vector3(-frameSize, i, frameSize), new Vector3(-frameSize, i + step, frameSize)));
-        objects.push(new Line(new Vector3(frameSize, i, frameSize), new Vector3(frameSize, i + step, frameSize)));
-
-        objects.push(new Line(new Vector3(-frameSize, -frameSize, i), new Vector3(-frameSize, -frameSize, i + step)));
-        objects.push(new Line(new Vector3(frameSize, -frameSize, i), new Vector3(frameSize, -frameSize, i + step)));
-        objects.push(new Line(new Vector3(-frameSize, frameSize, i), new Vector3(-frameSize, frameSize, i + step)));
-        objects.push(new Line(new Vector3(frameSize, frameSize, i), new Vector3(frameSize, frameSize, i + step)));
-    }
-}
 
 class Camera {
     constructor() {
