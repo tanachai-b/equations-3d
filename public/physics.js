@@ -316,7 +316,6 @@ class Line {
     }
 }
 
-
 class Plane {
     /**
      * @param {Vector3} u
@@ -361,7 +360,6 @@ class Plane {
         ctx.stroke();
     }
 }
-
 
 class Polygon3 {
 

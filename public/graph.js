@@ -212,7 +212,6 @@ function calcLineRecur(equation, v1, v2, memory, detail) {
     return hit;
 }
 
-
 /**
  * @param {Expression} equation
  * @param {number} x
