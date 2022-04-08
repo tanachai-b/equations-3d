@@ -6,7 +6,7 @@ class Camera {
         this.position = new Vector3(0, 0, 0);
 
         this.rotation = Line.default();
-        this.rotation = this.rotation.timesYZ(Vector2.polar(1, -90 * Math.PI / 180));
+        // this.rotation = this.rotation.timesYZ(Vector2.polar(1, -90 * Math.PI / 180));
         this.rotation = this.rotation.timesXZ(Vector2.polar(1, 10 * Math.PI / 180));
         this.rotation = this.rotation.timesYZ(Vector2.polar(1, 10 * Math.PI / 180));
 
@@ -51,7 +51,7 @@ class Camera {
 
     reset() {
         let dr2 = Line.default()
-        dr2 = dr2.timesYZ(Vector2.polar(1, -90 * Math.PI / 180));
+        // dr2 = dr2.timesYZ(Vector2.polar(1, -90 * Math.PI / 180));
         dr2 = dr2.timesXZ(Vector2.polar(1, 10 * Math.PI / 180));
         dr2 = dr2.timesYZ(Vector2.polar(1, 10 * Math.PI / 180));
         this.destRotation = dr2;
