@@ -8,24 +8,36 @@ class PlotArea {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
-        let ctx = canvas.getContext('2d');
 
         canvas.focus();
         canvas.addEventListener('keypress', (event) => {
             switch (event.key) { case ' ': this.camera.reset(); break; }
         });
 
+        let ctx = canvas.getContext('2d');
+
+
+        // buffer canvas
+        var canvas2 = document.createElement('canvas');
+        var ctx2 = canvas2.getContext('2d');
+
+
         this.camera = new Camera();
 
         /** @type {(Vector2|Vector3|Line|Plane|Polygon3|Text3|Polygon2)[]} */
         this.objects = [];
 
-        setInterval(() => {
+        let draw = () => {
+
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
 
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            canvas2.width = canvas.offsetWidth;
+            canvas2.height = canvas.offsetHeight;
+
+            ctx2.fillStyle = '#FFFFFF';
+            ctx2.fillRect(0, 0, canvas.width, canvas.height);
+
 
             this.camera.update();
 
@@ -37,9 +49,16 @@ class PlotArea {
             });
 
             sorting.sort((a, b) => { return b[1] - a[1]; });
-            sorting.forEach((object) => { object[0].draw(ctx, this.camera); });
+            sorting.forEach((object) => { object[0].draw(ctx2, this.camera); });
 
-        }, 1000 / 60);
+
+            ctx.drawImage(canvas2, 0, 0);
+
+
+            window.requestAnimationFrame(draw);
+        }
+
+        draw();
     }
 
     /** @param {Expression} equation */

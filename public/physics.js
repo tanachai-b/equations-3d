@@ -57,7 +57,8 @@ class Vector2 {
         let x1 = this.x * 10 ** (camera.zoom / 10) + canvas.width / 2;
         let y1 = -this.y * 10 ** (camera.zoom / 10) + canvas.height / 2;
 
-        return new Vector2(x1, y1);
+        // return new Vector2(x1, y1);
+        return new Vector2(x1 + 0.5 | 0, y1 + 0.5 | 0);
     }
 
     depth() { return 0; }
@@ -209,7 +210,8 @@ class Vector3 {
         let x1 = v1.x / z1 * 1000 + canvas.width / 2;
         let y1 = -v1.y / z1 * 1000 + canvas.height / 2;
 
-        return new Vector2(x1, y1);
+        // return new Vector2(x1, y1);
+        return new Vector2(x1 + 0.5 | 0, y1 + 0.5 | 0);
     }
 
     /** @param {Camera} camera */
