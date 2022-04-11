@@ -48,11 +48,11 @@ class Vector2 {
      */
     static polar(magnitude, angle) { return new Vector2(magnitude * Math.cos(angle), magnitude * Math.sin(angle)); }
 
-    /** @param {Camera} camera */
-    project(camera) {
-        /** @type {HTMLCanvasElement} */
-        // @ts-ignore
-        let canvas = document.getElementById('canvas');
+    /**
+     * @param {HTMLCanvasElement} canvas
+     * @param {Camera} camera
+     */
+    project(canvas, camera) {
 
         let x1 = this.x * 10 ** (camera.zoom / 10) + canvas.width / 2;
         let y1 = -this.y * 10 ** (camera.zoom / 10) + canvas.height / 2;
@@ -200,11 +200,11 @@ class Vector3 {
         return v1.timesXY(Vector2.polar(1, yaw));
     }
 
-    /** @param {Camera} camera */
-    project(camera) {
-        /** @type {HTMLCanvasElement} */
-        // @ts-ignore
-        let canvas = document.getElementById('canvas');
+    /**
+     * @param {HTMLCanvasElement} canvas
+     * @param {Camera} camera
+     */
+    project(canvas, camera) {
 
         let v1 = this.timesLine(camera.rotation);
         let z1 = Math.max(-v1.z + 1000 / 10 ** (camera.zoom / 10), 0);
@@ -234,7 +234,7 @@ class Vector3 {
         ctx.fillStyle = '#888888';
         ctx.lineWidth = 1;
 
-        let vp = this.project(camera);
+        let vp = this.project(canvas, camera);
 
         let v1 = this.timesLine(camera.rotation);
         let z1 = Math.max(-v1.z + 1000 / 10 ** (camera.zoom / 10), 0);
@@ -309,8 +309,8 @@ class Line {
         ctx.fillStyle = '#00000022';
         ctx.lineWidth = 1;
 
-        let v1 = this.v.project(camera);
-        let w1 = this.w.project(camera);
+        let v1 = this.v.project(canvas, camera);
+        let w1 = this.w.project(canvas, camera);
 
         ctx.beginPath();
         ctx.moveTo(v1.x, v1.y);
@@ -351,9 +351,9 @@ class Plane {
         ctx.fillStyle = '#CCDDFFCC';
         ctx.lineWidth = 1;
 
-        let u1 = this.u.project(camera);
-        let v1 = this.v.project(camera);
-        let w1 = this.w.project(camera);
+        let u1 = this.u.project(canvas, camera);
+        let v1 = this.v.project(canvas, camera);
+        let w1 = this.w.project(canvas, camera);
 
         ctx.beginPath();
         ctx.moveTo(u1.x, u1.y);
@@ -464,7 +464,7 @@ class Polygon3 {
 
 
         let projected = []
-        this.points.forEach((point) => { projected.push(point.project(camera)); });
+        this.points.forEach((point) => { projected.push(point.project(canvas, camera)); });
 
         ctx.beginPath();
         ctx.moveTo(projected[0].x, projected[0].y);
@@ -531,7 +531,7 @@ class Text3 {
         ctx.font = `${fontSize}px sans-serif`;
         ctx.textAlign = 'center';
 
-        let position1 = this.position.project(camera);
+        let position1 = this.position.project(canvas, camera);
         let rotation1 = this.rotation.timesLine(camera.rotation).xy().unit();
 
         let o1 = this.offset.timesScalar(10 ** (camera.zoom / 10));
@@ -573,7 +573,7 @@ class Polygon2 {
         ctx.lineWidth = 1;
 
 
-        let position1 = this.position.project(camera);
+        let position1 = this.position.project(canvas, camera);
         let rotation1 = this.rotation.timesLine(camera.rotation).xy().unit();
 
         let p1 = [];

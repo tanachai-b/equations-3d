@@ -2,7 +2,8 @@
 'use strict';
 
 class Camera {
-    constructor() {
+    /** @param {HTMLCanvasElement} canvas */
+    constructor(canvas) {
         this.position = new Vector3(0, 0, 0);
 
         this.rotation = Line.default();
@@ -18,13 +19,11 @@ class Camera {
         this.destZoom = this.zoom;
 
 
-        this.addMouseListener();
+        this.addMouseListener(canvas);
     }
 
-    addMouseListener() {
-        /** @type {HTMLCanvasElement} */
-        // @ts-ignore
-        let canvas = document.getElementById('canvas');
+    /** @param {HTMLCanvasElement} canvas */
+    addMouseListener(canvas) {
 
         let mButtons = 0;
 

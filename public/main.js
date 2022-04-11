@@ -3,6 +3,10 @@
 
 window.onload = function () {
 
+    /** @type {HTMLCanvasElement} */
+    // @ts-ignore
+    let canvas = document.getElementById('canvas');
+
     /** @ts-ignore @type {HTMLSelectElement} */
     let sampleDropdown = document.getElementById('sample');
     /** @ts-ignore @type {HTMLInputElement} */
@@ -15,7 +19,7 @@ window.onload = function () {
     if (equationInput.value == '') equationInput.value = '( sqrt ( x ^ 2 + y ^ 2 ) - 1.25 ) ^ 2 + z ^ 2 - 0.5 = 0';
 
     let equation = Expression.fromStrings(equationInput.value.replace(/\=/g, '>')).substConstants();
-    let plotArea = new PlotArea();
+    let plotArea = new PlotArea(canvas);
     plotArea.setEquation(equation);
 
 

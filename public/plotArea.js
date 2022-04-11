@@ -3,11 +3,8 @@
 
 class PlotArea {
 
-    constructor() {
-
-        /** @type {HTMLCanvasElement} */
-        // @ts-ignore
-        let canvas = document.getElementById('canvas');
+    /** @param {HTMLCanvasElement} canvas */
+    constructor(canvas) {
 
         canvas.focus();
         canvas.addEventListener('keypress', (event) => {
@@ -22,7 +19,7 @@ class PlotArea {
         var ctx2 = canvas2.getContext('2d');
 
 
-        this.camera = new Camera();
+        this.camera = new Camera(canvas);
 
         /** @type {(Vector2|Vector3|Line|Plane|Polygon3|Text3|Polygon2)[]} */
         this.objects = [];
