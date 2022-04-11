@@ -15,8 +15,8 @@ class PlotArea {
 
 
         // buffer canvas
-        var canvas2 = document.createElement('canvas');
-        var ctx2 = canvas2.getContext('2d');
+        var buffer = document.createElement('canvas');
+        var bCtx = buffer.getContext('2d');
 
 
         this.camera = new Camera(canvas);
@@ -24,16 +24,16 @@ class PlotArea {
         /** @type {(Vector2|Vector3|Line|Plane|Polygon3|Text3|Polygon2)[]} */
         this.objects = [];
 
-        let draw = () => {
+        setInterval(() => {
 
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
 
-            canvas2.width = canvas.offsetWidth;
-            canvas2.height = canvas.offsetHeight;
+            buffer.width = canvas.offsetWidth;
+            buffer.height = canvas.offsetHeight;
 
-            ctx2.fillStyle = '#FFFFFF';
-            ctx2.fillRect(0, 0, canvas.width, canvas.height);
+            bCtx.fillStyle = '#FFFFFF';
+            bCtx.fillRect(0, 0, canvas.width, canvas.height);
 
 
             this.camera.update();
@@ -46,12 +46,12 @@ class PlotArea {
             });
 
             sorting.sort((a, b) => { return b[1] - a[1]; });
-            sorting.forEach((object) => { object[0].draw(canvas2, this.camera); });
+            sorting.forEach((object) => { object[0].draw(buffer, this.camera); });
 
+        }, 1000 / 60);
 
-            ctx.drawImage(canvas2, 0, 0);
-
-
+        let draw = () => {
+            ctx.drawImage(buffer, 0, 0);
             window.requestAnimationFrame(draw);
         }
 
