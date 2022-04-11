@@ -8,6 +8,7 @@ class PlotArea {
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
 
         canvas.focus();
         canvas.addEventListener('keypress', (event) => {
@@ -19,7 +20,6 @@ class PlotArea {
         /** @type {(Vector2|Vector3|Line|Plane|Polygon3|Text3|Polygon2)[]} */
         this.objects = [];
 
-        let ctx = canvas.getContext('2d');
         setInterval(() => {
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
@@ -37,7 +37,7 @@ class PlotArea {
             });
 
             sorting.sort((a, b) => { return b[1] - a[1]; });
-            sorting.forEach((object) => { object[0].draw(this.camera); });
+            sorting.forEach((object) => { object[0].draw(ctx, this.camera); });
 
         }, 1000 / 60);
     }
