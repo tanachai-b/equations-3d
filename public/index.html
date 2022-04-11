@@ -6,12 +6,6 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>Equations 3D</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <script type="text/javascript" src='main.js'></script>
-    <script type="text/javascript" src='expression.js'></script>
-    <script type="text/javascript" src='plotArea.js'></script>
-    <script type="text/javascript" src='camera.js'></script>
-    <script type="text/javascript" src='graph.js'></script>
-    <script type="text/javascript" src='physics.js'></script>
     <style>
         html,
         body {
@@ -47,6 +41,10 @@
             box-sizing: border-box;
             padding: 10px;
             border-left: 1px solid lightgrey;
+        }
+
+        #answer {
+            width: 100%;
         }
     </style>
 </head>
@@ -96,9 +94,42 @@
                 <input type="text" id="equation" name="equation" style="width: 100%;"><br>
                 <div id="equation-message" style="color: crimson;"></div><br>
                 <input type="button" id="submit" value="Submit">
+                <p><span id="answer">x=</span></p>
+                <div>plain</div>
+                <div id="plain"></div>
+                <div>&nbsp;</div>
+                <div>latex</div>
+                <div id="latex"></div>
             </div>
         </div>
     </div>
 </body>
+
+<script type="text/javascript" src='main.js'></script>
+<script type="text/javascript" src='expression.js'></script>
+<script type="text/javascript" src='plotArea.js'></script>
+<script type="text/javascript" src='camera.js'></script>
+<script type="text/javascript" src='graph.js'></script>
+<script type="text/javascript" src='physics.js'></script>
+
+<link rel="stylesheet" href="mathquill-0.10.1/mathquill.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="mathquill-0.10.1/mathquill.js"></script>
+
+<script>
+    var MQ = MathQuill.getInterface(2);
+    var answerSpan = document.getElementById('answer');
+    var answerMathField = MQ.MathField(answerSpan, {
+        handlers: {
+            edit: function () {
+                var plain = document.getElementById('plain');
+                plain.innerHTML = answerMathField.text();
+                var latex = document.getElementById('latex');
+                latex.innerHTML = answerMathField.latex();
+                // answerMathField.
+            }
+        }
+    });
+</script>
 
 </html>
