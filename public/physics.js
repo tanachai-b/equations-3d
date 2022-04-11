@@ -63,8 +63,10 @@ class Vector2 {
 
     depth() { return 0; }
 
-    /** @param {CanvasRenderingContext2D} ctx */
-    draw(ctx) {
+    /** @param {HTMLCanvasElement} canvas */
+    draw(canvas) {
+        let ctx = canvas.getContext('2d');
+
         ctx.strokeStyle = '#888888';
         ctx.fillStyle = '#888888';
         ctx.lineWidth = 1;
@@ -222,10 +224,12 @@ class Vector3 {
     }
 
     /**
-     * @param {CanvasRenderingContext2D} ctx
+     * @param {HTMLCanvasElement} canvas
      * @param {Camera} camera
      */
-    draw(ctx, camera) {
+    draw(canvas, camera) {
+        let ctx = canvas.getContext('2d');
+
         ctx.strokeStyle = '#888888';
         ctx.fillStyle = '#888888';
         ctx.lineWidth = 1;
@@ -295,10 +299,12 @@ class Line {
     depth(camera) { return (this.v.depth(camera) + this.w.depth(camera)) / 2; }
 
     /**
-     * @param {CanvasRenderingContext2D} ctx
+     * @param {HTMLCanvasElement} canvas
      * @param {Camera} camera
      */
-    draw(ctx, camera) {
+    draw(canvas, camera) {
+        let ctx = canvas.getContext('2d');
+
         ctx.strokeStyle = '#00000022';
         ctx.fillStyle = '#00000022';
         ctx.lineWidth = 1;
@@ -335,10 +341,12 @@ class Plane {
     }
 
     /**
-     * @param {CanvasRenderingContext2D} ctx
+     * @param {HTMLCanvasElement} canvas
      * @param {Camera} camera
      */
-    draw(ctx, camera) {
+    draw(canvas, camera) {
+        let ctx = canvas.getContext('2d');
+
         ctx.strokeStyle = '#88AAEE';
         ctx.fillStyle = '#CCDDFFCC';
         ctx.lineWidth = 1;
@@ -395,10 +403,12 @@ class Polygon3 {
     }
 
     /**
-     * @param {CanvasRenderingContext2D} ctx
+     * @param {HTMLCanvasElement} canvas
      * @param {Camera} camera
      */
-    draw(ctx, camera) {
+    draw(canvas, camera) {
+        let ctx = canvas.getContext('2d');
+
         ctx.strokeStyle = '#FFFFFF22';
         ctx.fillStyle = '#CCDDFFCC';
         ctx.lineWidth = 1;
@@ -507,10 +517,12 @@ class Text3 {
     depth(camera) { return this.position.depth(camera); }
 
     /**
-     * @param {CanvasRenderingContext2D} ctx
+     * @param {HTMLCanvasElement} canvas
      * @param {Camera} camera
      */
-    draw(ctx, camera) {
+    draw(canvas, camera) {
+        let ctx = canvas.getContext('2d');
+
         ctx.strokeStyle = '#00000044';
         ctx.fillStyle = '#00000044';
         ctx.lineWidth = 1;
@@ -550,10 +562,12 @@ class Polygon2 {
     depth(camera) { return this.position.depth(camera); }
 
     /**
-     * @param {CanvasRenderingContext2D} ctx
+     * @param {HTMLCanvasElement} canvas
      * @param {Camera} camera
      */
-    draw(ctx, camera) {
+    draw(canvas, camera) {
+        let ctx = canvas.getContext('2d');
+
         ctx.strokeStyle = '#00000022';
         ctx.fillStyle = '#00000022';
         ctx.lineWidth = 1;

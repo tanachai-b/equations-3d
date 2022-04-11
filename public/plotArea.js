@@ -49,7 +49,7 @@ class PlotArea {
             });
 
             sorting.sort((a, b) => { return b[1] - a[1]; });
-            sorting.forEach((object) => { object[0].draw(ctx2, this.camera); });
+            sorting.forEach((object) => { object[0].draw(canvas2, this.camera); });
 
 
             ctx.drawImage(canvas2, 0, 0);
