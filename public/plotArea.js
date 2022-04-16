@@ -59,7 +59,7 @@ class PlotArea {
     }
 
     /** @param {Expression} equation */
-    async setEquation(equation) {
+    setEquation(equation) {
 
         this.camera.reset();
 
@@ -74,7 +74,7 @@ class PlotArea {
         this.drawFrame(this.objects, frameSize, step);
 
         let blockSize = 25;
-        let graph = await plotGraph(frameSize, blockSize, equation);
+        let graph = plotGraph(frameSize, blockSize, equation);
         this.objects = this.objects.concat(graph);
     }
 

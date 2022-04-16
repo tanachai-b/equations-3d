@@ -6,7 +6,7 @@
  * @param {number} blockSize
  * @param {Expression} equation
  */
-async function plotGraph(frameSize, blockSize, equation) {
+function plotGraph(frameSize, blockSize, equation) {
 
     let memory = new Map();
 
